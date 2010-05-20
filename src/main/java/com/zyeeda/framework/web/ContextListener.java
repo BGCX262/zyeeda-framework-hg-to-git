@@ -39,17 +39,18 @@ import com.zyeeda.framework.utils.JndiUtils;
 public class ContextListener implements ServletContextListener {
 
     private final static Logger logger = LoggerFactory.getLogger(ContextListener.class);
-    private final static String SERVER_JNDI_KEY = "server_jndi_key";
+    private final static String SERVER_JNDI_NAME = "server_jndi_name";
 
     private Server server;
 
     public void contextInitialized(ServletContextEvent event) {
         ServletContext context = event.getServletContext();
-        String serverJndiName = context.getInitParameter(SERVER_JNDI_KEY);
+        String serverJndiName = context.getInitParameter(SERVER_JNDI_NAME);
         if (serverJndiName == null) {
-        	LoggerHelper.error(logger, "{} is not specified", SERVER_JNDI_KEY);
+        	LoggerHelper.error(logger, "{} is not specified", SERVER_JNDI_NAME);
         	System.exit(1);
         }
+        Server.setJndiName(serverJndiName);
         
         // NOTE
         // Weblogic doesn't support
@@ -60,7 +61,7 @@ public class ContextListener implements ServletContextListener {
             contextRoot = context.getRealPath("/");
             LoggerHelper.debug(logger, "servlet context root = {}", contextRoot);
             
-            server = (Server) JndiUtils.getObjectFromJndi(serverJndiName);
+            server = (Server) JndiUtils.getObjectFromJndi(Server.getJndiName());
             Properties props = new Properties();
             props.setProperty(Server.SERVER_ROOT, contextRoot);
             server.init(props);

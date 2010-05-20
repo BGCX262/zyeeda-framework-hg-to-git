@@ -42,6 +42,8 @@ public class Server extends AbstractService {
 	public static final String SERVER_ROOT = "serverRoot";
 	public static final String PROPERTIES_FILE_NAME = "server.properties";
 	
+	public static String _jndiName = "";
+	
 	private static final Logger logger = LoggerFactory.getLogger(Server.class);
 
 	private File serverRoot;
@@ -116,6 +118,14 @@ public class Server extends AbstractService {
 
 	public File mapPath(String relativePath) {
 		return new File(serverRoot, relativePath);
+	}
+	
+	public static void setJndiName(String jndiName) {
+		_jndiName = jndiName;
+	}
+	
+	public static String getJndiName() {
+		return _jndiName;
 	}
 
 	/*public void start0() throws Exception {

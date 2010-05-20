@@ -15,6 +15,8 @@
  */
 package com.zyeeda.framework.services;
 
+import java.util.Properties;
+
 /**
  * Abstract service.
  * 
@@ -33,6 +35,10 @@ public abstract class AbstractService implements Service {
     
     public void changeState(ServiceState state) {
     	this.state = state;
+    }
+    
+    @Override
+    public void init(Properties properties) throws Exception {
     }
     
 }
