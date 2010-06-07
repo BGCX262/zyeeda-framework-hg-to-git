@@ -42,7 +42,7 @@ public class ServiceInvocationHandler<T extends AbstractService> implements Invo
 	@SuppressWarnings("unchecked")
 	public T bind(T originalService) {
 		if (originalService == null) {
-			throw new IllegalArgumentException("²ÎÊıÎª¿Õ");
+			throw new IllegalArgumentException("å‚æ•°ä¸ºç©º");
 		}
 		
 		this.originalService = originalService;

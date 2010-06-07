@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
+import com.zyeeda.framework.managers.EntityManager;
 
 /**
  * Persistence service using Hibernate.
@@ -38,11 +39,17 @@ public class PersistenceService extends AbstractService {
     private static final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
     private Configuration config;
     private SessionFactory sessionFactory;
+    private EntityManager entityMgr;
+    
+    public PersistenceService(Server server) {
+    	super(server);
+    }
 
 	@Override
 	public void start() throws Exception {
     	this.config = new Configuration().configure();
         this.sessionFactory = config.buildSessionFactory();
+        this.entityMgr = new EntityManager(this.getServer());
 	}
 
 	@Override
@@ -92,5 +99,9 @@ public class PersistenceService extends AbstractService {
         }
 
         LoggerHelper.debug(logger, "会话已关闭");
+    }
+    
+    public EntityManager getEntityManager() {
+    	return this.entityMgr;
     }
 }

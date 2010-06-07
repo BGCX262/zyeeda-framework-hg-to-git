@@ -47,7 +47,7 @@ public class OpenSessionInViewFilter implements Filter {
 		PersistenceService svc = null;
 		
 		try {
-			Server server = (Server) JndiUtils.getObjectFromJndi(Server.getJndiName());
+			Server server = (Server) JndiUtils.getObjectFromJndi(Server.JNDI_NAME);
 			svc = server.getService(PersistenceService.class);
 			svc.openSession();
 			chain.doFilter(request, response);

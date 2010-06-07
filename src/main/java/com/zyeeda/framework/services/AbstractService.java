@@ -15,7 +15,7 @@
  */
 package com.zyeeda.framework.services;
 
-import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
 
 /**
  * Abstract service.
@@ -26,7 +26,12 @@ import java.util.Properties;
  */
 public abstract class AbstractService implements Service {
 	
+	private Server server;
     private ServiceState state = ServiceState.NEW;
+    
+    public AbstractService(Server server) {
+    	this.server = server;
+    }
 
     @Override
     public ServiceState getState() {
@@ -38,7 +43,19 @@ public abstract class AbstractService implements Service {
     }
     
     @Override
-    public void init(Properties properties) throws Exception {
+    public void init(Configuration config) throws Exception {
+    }
+    
+	@Override
+	public void start() throws Exception {
+	}
+
+	@Override
+	public void stop() throws Exception {
+	}
+    
+    public Server getServer() {
+    	return this.server;
     }
     
 }

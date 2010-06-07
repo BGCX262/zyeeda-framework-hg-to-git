@@ -15,7 +15,7 @@
  */
 package com.zyeeda.framework.services;
 
-import java.util.Properties;
+import org.apache.commons.configuration.Configuration;
 
 /**
  * Service interface.
@@ -26,7 +26,7 @@ import java.util.Properties;
  */
 public interface Service {
 
-    void init(Properties properties) throws Exception;
+    void init(Configuration config) throws Exception;
     
     void start() throws Exception;
 

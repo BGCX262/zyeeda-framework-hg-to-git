@@ -16,14 +16,16 @@
 package com.zyeeda.framework.services;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.zyeeda.framework.helpers.LoggerHelper;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -42,12 +44,46 @@ public class TemplateService extends AbstractService {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
     
+    public static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
+    public static final String DATE_FORMAT = "dateFormat";
+    public static final String TIME_FORMAT = "timeFormat";
+    public static final String DATETIME_FORMAT = "datetimeFormat";
+    
+    private static final String DEFAULT_TEMPLATE_REPOSITORY_ROOT = "/WEB-INF/tpl";
+    private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    private static final String DEFAULT_TIME_FORMAT = "hh:mm:ss";
+    private static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    
     private File tplRoot;
+    private String dateFormat;
+    private String timeFormat;
+    private String datetimeFormat;
+    
     private Configuration config;
+    
+    public TemplateService(Server server) {
+    	super(server);
+    }
 
     @Override
-    public void init(Properties properties) {
-    	this.tplRoot = new File(properties.getProperty(ServerProperties.TEMPLATE_REPOSITORY_ROOT_KEY));
+    public void init(org.apache.commons.configuration.Configuration config) throws Exception {
+    	String tplRootString = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
+    	LoggerHelper.debug(logger, "template repository root = {}", tplRootString);
+    	
+    	this.tplRoot = new File(tplRootString);
+    	if (!this.tplRoot.exists()) {
+    		throw new FileNotFoundException(this.tplRoot.toString());
+    	}
+    	
+    	this.dateFormat = config.getString(DATE_FORMAT, DEFAULT_DATE_FORMAT);
+    	this.timeFormat = config.getString(TIME_FORMAT, DEFAULT_TIME_FORMAT);
+    	this.datetimeFormat = config.getString(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
+    	
+    	if (logger.isDebugEnabled()) {
+    		logger.debug("date format = {}", this.dateFormat);
+    		logger.debug("time format = {}", this.timeFormat);
+    		logger.debug("datetime format = {}", this.dateFormat);
+    	}
     }
 
     @Override
@@ -56,9 +92,9 @@ public class TemplateService extends AbstractService {
         this.config.setDirectoryForTemplateLoading(this.tplRoot);
         this.config.setDefaultEncoding("UTF-8");
         this.config.setOutputEncoding("UTF-8");
-        this.config.setDateFormat("yyyy-MM-dd");
-        this.config.setTimeFormat("HH:mm:ss");
-        this.config.setDateTimeFormat("yyyy-MM-dd HH:mm:ss");
+        this.config.setDateFormat(this.dateFormat);
+        this.config.setTimeFormat(this.timeFormat);
+        this.config.setDateTimeFormat(this.datetimeFormat);
         this.config.setObjectWrapper(new DefaultObjectWrapper());
         this.config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }

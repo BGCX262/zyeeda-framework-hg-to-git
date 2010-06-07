@@ -16,8 +16,6 @@
 package com.zyeeda.framework.services;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -25,10 +23,14 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.XMLConfiguration;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.zyeeda.framework.helpers.LoggerHelper;
 
 /**
  * Simple application server.
@@ -37,45 +39,39 @@ import org.slf4j.LoggerFactory;
  * @version		%I%, %G%
  * @since		1.0
  */
-public class Server extends AbstractService {
+public class Server implements Service {
 
-	public static final String SERVER_ROOT = "serverRoot";
-	public static final String PROPERTIES_FILE_NAME = "server.properties";
-	
-	public static String _jndiName = "";
-	
 	private static final Logger logger = LoggerFactory.getLogger(Server.class);
-
+	
+	private static final String CONFIGURATION_FILE_NAME = "server.config.xml";
+	public static final String SERVER_ROOT = "serverRoot";
+	
+	public static String JNDI_NAME = "";
+	
 	private File serverRoot;
-	private ServerProperties serverProperties;
+	private XMLConfiguration serverConfig;
+	private ServiceState state = ServiceState.NEW;
 
 	private List<Service> serviceList = new LinkedList<Service>();
 	private Map<Class<? extends Service>, Service> serviceMap = new HashMap<Class<? extends Service>, Service>();
 	
 	@Override
-	public void init(Properties properties) throws Exception {
-		this.serverRoot = new File(properties.getProperty(SERVER_ROOT));
-		if (!this.serverRoot.exists()) {
-			throw new FileNotFoundException(this.serverRoot.toString());
-		}
+	public void init(Configuration config) throws Exception {
+		String serverRootString = config.getString(SERVER_ROOT);
+		LoggerHelper.debug(logger, "server root = {}", serverRootString);
 		
-		this.serverProperties = new ServerProperties();
-		this.loadProperties();
-	}
-
-	private void loadProperties() throws IOException {
-		InputStream is = this.getClass().getResourceAsStream(PROPERTIES_FILE_NAME);
+		this.serverRoot = new File(serverRootString);
+		this.serverConfig = new XMLConfiguration();
+		
+		InputStream is = this.getClass().getResourceAsStream(CONFIGURATION_FILE_NAME);
 		if (is != null) {
-			InputStreamReader isr = null;
+			InputStreamReader reader = null;
 			try {
-				isr = new InputStreamReader(is, "UTF-8");
-				this.serverProperties.load(isr);
-				if (logger.isDebugEnabled()) {
-					this.serverProperties.dump(logger);
-				}
+				reader = new InputStreamReader(is, "UTF-8");
+				this.serverConfig.load(reader);
 			} finally {
-				if (isr != null) {
-					isr.close();
+				if (reader != null) {
+					reader.close();
 				}
 				if (is != null) {
 					is.close();
@@ -83,11 +79,11 @@ public class Server extends AbstractService {
 			}
 		}
 	}
-	
+
 	@Override
 	public void start() throws Exception {
 		for (Service service : this.serviceList) {
-			service.init(this.serverProperties);
+			service.init(this.serverConfig.configurationAt(service.getClass().getSimpleName()));
 			service.start();
 		}
 	}
@@ -112,94 +108,21 @@ public class Server extends AbstractService {
 		return (T) this.serviceMap.get(clazz);
 	}
 	
-	public ServerProperties getProperties() {
-		return this.serverProperties;
+	public Configuration getConfiguration() {
+		return this.serverConfig;
 	}
 
 	public File mapPath(String relativePath) {
 		return new File(serverRoot, relativePath);
 	}
 	
-	public static void setJndiName(String jndiName) {
-		_jndiName = jndiName;
-	}
-	
-	public static String getJndiName() {
-		return _jndiName;
-	}
-
-	/*public void start0() throws Exception {
-		this.loadProperties();
-
-		JbpmService jbpmSvc = new JbpmService();
-		jbpmSvc.init();
-		jbpmSvc.start();
-		this.serviceMap.put(jbpmSvc.getClass(), jbpmSvc);
-
-		TemplateService templateSvc = new TemplateService();
-		templateSvc.init(mapPath(this.serverProperties
-				.getProperty(ServerProperties.WEB_SITE_TEMPLATE_ROOT_KEY)));
-		templateSvc.start();
-		this.serviceMap.put(templateSvc.getClass(), templateSvc);
-
-		this.initManagers();
-		this.initProcesses();
-	}
-
-	public void stop0() throws Exception {
-		this.destroyProcesses();
-		this.destroyManagers();
-		
-		TemplateService templateSvc = this.getService(TemplateService.class);
-		templateSvc.stop();
-		this.serviceMap.remove(templateSvc.getClass());
-
-		JbpmService jbpmSvc = this.getService(JbpmService.class);
-		jbpmSvc.stop();
-		this.serviceMap.remove(jbpmSvc.getClass());
-	}
-	
-	private void initManagers() throws SecurityException, 
-			IllegalArgumentException, InstantiationException, 
-			IllegalAccessException, ClassNotFoundException, 
-			NoSuchMethodException, InvocationTargetException {
-		for (String className : this.managerClassNames) {
-			Manager obj = (Manager) this.getInstance(className);
-			this.managerMap.put(obj.getClass(), obj);
-		}
-	}
-
-	private void initProcesses() throws SecurityException,
-			IllegalArgumentException, InstantiationException,
-			IllegalAccessException, ClassNotFoundException,
-			NoSuchMethodException, InvocationTargetException {
-		for (String className : this.processClassNames) {
-			Process obj = (Process) this.getInstance(className);
-			this.processMap.put(obj.getClass(), obj);
-		}
-	}
-	
-	private void destroyManagers() {
-		this.managerMap.clear();
-	}
-	
-	private void destroyProcesses() {
-		this.processMap.clear();
-	}
-
-	private Object getInstance(String className) throws InstantiationException,
-			IllegalAccessException, ClassNotFoundException, SecurityException,
-			NoSuchMethodException, IllegalArgumentException,
-			InvocationTargetException {
-		LoggerHelper.debug(logger, "class name = {}", className);
-		Class<?> clazz = getClass().getClassLoader().loadClass(className);
-		Constructor<?> ctor = clazz.getConstructor(this.getClass());
-		return ctor.newInstance(this);
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T getProcess(Class<T> clazz) {
-		return (T) this.processMap.get(clazz);
-	}*/
+    @Override
+    public ServiceState getState() {
+        return this.state;
+    }
+    
+    public void changeState(ServiceState state) {
+    	this.state = state;
+    }
 
 }

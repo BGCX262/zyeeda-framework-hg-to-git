@@ -27,6 +27,7 @@ import org.slf4j.Logger;
  * @version		%I%, %G%
  * @since		1.0
  */
+@Deprecated
 public class ServerProperties extends Properties {
 
 	private static final long serialVersionUID = -428103055421634070L;

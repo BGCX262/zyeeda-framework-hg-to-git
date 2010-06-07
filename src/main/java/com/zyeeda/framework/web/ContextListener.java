@@ -15,12 +15,11 @@
  */
 package com.zyeeda.framework.web;
 
-import java.util.Properties;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ public class ContextListener implements ServletContextListener {
         	LoggerHelper.error(logger, "{} is not specified", SERVER_JNDI_NAME);
         	System.exit(1);
         }
-        Server.setJndiName(serverJndiName);
+        Server.JNDI_NAME = serverJndiName;
         
         // NOTE
         // Weblogic doesn't support
@@ -61,10 +60,11 @@ public class ContextListener implements ServletContextListener {
             contextRoot = context.getRealPath("/");
             LoggerHelper.debug(logger, "servlet context root = {}", contextRoot);
             
-            server = (Server) JndiUtils.getObjectFromJndi(Server.getJndiName());
-            Properties props = new Properties();
-            props.setProperty(Server.SERVER_ROOT, contextRoot);
-            server.init(props);
+            server = (Server) JndiUtils.getObjectFromJndi(Server.JNDI_NAME);
+            
+            PropertiesConfiguration config = new PropertiesConfiguration();
+            config.addProperty(Server.SERVER_ROOT, contextRoot);
+            server.init(config);
             
             server.start();
         } catch (Throwable e) {
