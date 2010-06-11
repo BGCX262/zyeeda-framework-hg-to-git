@@ -33,14 +33,14 @@ import com.zyeeda.framework.helpers.LoggerHelper;
  * @version		%I%, %G%
  * @since		1.0
  */
-public class ServiceInvocationHandler<T extends AbstractService> implements InvocationHandler {
+public class ServiceInvocationHandler<T extends Service> implements InvocationHandler {
 
 	private final static Logger logger = LoggerFactory.getLogger(ServiceInvocationHandler.class);
 
 	private T originalService;
 	
 	@SuppressWarnings("unchecked")
-	public T bind(T originalService) {
+	public Service bind(T originalService) {
 		if (originalService == null) {
 			throw new IllegalArgumentException("参数为空");
 		}
@@ -48,10 +48,12 @@ public class ServiceInvocationHandler<T extends AbstractService> implements Invo
 		this.originalService = originalService;
 		LoggerHelper.debug(logger, "original service = {}", this.originalService);
 		
-		return (T)Proxy.newProxyInstance(
-			this.originalService.getClass().getClassLoader(),
-			this.originalService.getClass().getInterfaces(),
-			this);
+		Service proxy = (T) Proxy.newProxyInstance(
+				this.originalService.getClass().getClassLoader(),
+				new Class<?>[] {Service.class},
+				this);
+		
+		return proxy;
 	}
 	
 	@Override
@@ -105,7 +107,7 @@ public class ServiceInvocationHandler<T extends AbstractService> implements Invo
 	}
 	
 	private String getServiceName() {
-		return this.originalService.getClass().getSimpleName();
+		return this.originalService.getName();
 	}
 
 }

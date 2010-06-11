@@ -80,6 +80,18 @@
             <classifier>jdk15</classifier>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>naming-factory</artifactId>
+            <version>5.5.23</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>tomcat</groupId>
+            <artifactId>naming-resources</artifactId>
+            <version>5.5.23</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -100,6 +112,21 @@
                     <encoding>UTF-8</encoding>
                     <debug>true</debug>
                     <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <suiteXmlFiles>
+                        <suiteXmlFile>src/test/conf/testng/default-test-suite.xml</suiteXmlFile>
+                    </suiteXmlFiles>
+                    <systemPropertyVariables>
+                        <java.naming.factory.initial>org.apache.naming.java.javaURLContextFactory</java.naming.factory.initial>
+                        <java.naming.factory.url.pkgs>org.apache.naming</java.naming.factory.url.pkgs>
+                        <serverRoot>${basedir}/prod/webapp</serverRoot>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
         </plugins>

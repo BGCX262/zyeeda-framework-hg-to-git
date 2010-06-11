@@ -23,6 +23,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.GlobalConstants;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.services.Server;
 import com.zyeeda.framework.utils.JndiUtils;
@@ -38,18 +39,16 @@ import com.zyeeda.framework.utils.JndiUtils;
 public class ContextListener implements ServletContextListener {
 
     private final static Logger logger = LoggerFactory.getLogger(ContextListener.class);
-    private final static String SERVER_JNDI_NAME = "server_jndi_name";
 
     private Server server;
 
     public void contextInitialized(ServletContextEvent event) {
         ServletContext context = event.getServletContext();
-        String serverJndiName = context.getInitParameter(SERVER_JNDI_NAME);
+        String serverJndiName = context.getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
         if (serverJndiName == null) {
-        	LoggerHelper.error(logger, "{} is not specified", SERVER_JNDI_NAME);
+        	LoggerHelper.error(logger, "{} is not specified", GlobalConstants.SERVER_JNDI_NAME);
         	System.exit(1);
         }
-        Server.JNDI_NAME = serverJndiName;
         
         // NOTE
         // Weblogic doesn't support
@@ -60,7 +59,7 @@ public class ContextListener implements ServletContextListener {
             contextRoot = context.getRealPath("/");
             LoggerHelper.debug(logger, "servlet context root = {}", contextRoot);
             
-            server = (Server) JndiUtils.getObjectFromJndi(Server.JNDI_NAME);
+            server = (Server) JndiUtils.getObjectFromJndi(serverJndiName);
             
             PropertiesConfiguration config = new PropertiesConfiguration();
             config.addProperty(Server.SERVER_ROOT, contextRoot);

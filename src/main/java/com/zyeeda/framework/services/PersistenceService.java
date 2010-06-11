@@ -34,6 +34,8 @@ import com.zyeeda.framework.managers.EntityManager;
 public class PersistenceService extends AbstractService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(PersistenceService.class);
+	
+	public static final String SERVICE_NAME = "persistence-service";
 
     private static final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal<Session>();
     private static final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
@@ -42,7 +44,7 @@ public class PersistenceService extends AbstractService {
     private EntityManager entityMgr;
     
     public PersistenceService(Server server) {
-    	super(server);
+    	super(SERVICE_NAME, server);
     }
 
 	@Override
@@ -104,4 +106,5 @@ public class PersistenceService extends AbstractService {
     public EntityManager getEntityManager() {
     	return this.entityMgr;
     }
+    
 }

@@ -26,11 +26,18 @@ import org.apache.commons.configuration.Configuration;
  */
 public abstract class AbstractService implements Service {
 	
+	private String name;
 	private Server server;
     private ServiceState state = ServiceState.NEW;
     
-    public AbstractService(Server server) {
+    public AbstractService(String name, Server server) {
+    	this.name = name;
     	this.server = server;
+    }
+    
+    @Override
+    public String getName() {
+    	return this.name;
     }
 
     @Override
@@ -38,6 +45,7 @@ public abstract class AbstractService implements Service {
         return this.state;
     }
     
+    @Override
     public void changeState(ServiceState state) {
     	this.state = state;
     }

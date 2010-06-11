@@ -44,6 +44,8 @@ public class TemplateService extends AbstractService {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
     
+    public static final String SERVICE_NAME = "template-service";
+    
     public static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
     public static final String DATE_FORMAT = "dateFormat";
     public static final String TIME_FORMAT = "timeFormat";
@@ -62,7 +64,7 @@ public class TemplateService extends AbstractService {
     private Configuration config;
     
     public TemplateService(Server server) {
-    	super(server);
+    	super(SERVICE_NAME, server);
     }
 
     @Override
@@ -70,7 +72,7 @@ public class TemplateService extends AbstractService {
     	String tplRootString = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
     	LoggerHelper.debug(logger, "template repository root = {}", tplRootString);
     	
-    	this.tplRoot = new File(tplRootString);
+    	this.tplRoot = this.getServer().mapPath(tplRootString);
     	if (!this.tplRoot.exists()) {
     		throw new FileNotFoundException(this.tplRoot.toString());
     	}
@@ -99,6 +101,7 @@ public class TemplateService extends AbstractService {
         this.config.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
     }
     
+    @Override
     public void stop() throws Exception {
     	this.config = null;
     	this.tplRoot = null;
@@ -117,5 +120,5 @@ public class TemplateService extends AbstractService {
 		Map<String, Object> args = new HashMap<String, Object>();
 		this.paint(tplPath, out, args);
     }
-
+    
 }

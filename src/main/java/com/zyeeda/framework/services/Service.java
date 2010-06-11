@@ -25,6 +25,8 @@ import org.apache.commons.configuration.Configuration;
  * @since		1.0
  */
 public interface Service {
+	
+	String getName();
 
     void init(Configuration config) throws Exception;
     
@@ -33,5 +35,7 @@ public interface Service {
     void stop() throws Exception;
     
     ServiceState getState();
+    
+    void changeState(ServiceState state);
     
 }
