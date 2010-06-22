@@ -58,7 +58,7 @@ public class OpenSessionInViewFilter implements Filter {
 			String jndiServerKey = this.config.getServletContext().getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
 			
 			Server server = (Server) JndiUtils.getObjectFromJndi(jndiServerKey);
-			svc = server.getService(PersistenceService.SERVICE_NAME);
+			svc = server.getService(PersistenceService.class);
 			svc.openSession();
 			chain.doFilter(request, response);
 		} catch (NamingException e) {

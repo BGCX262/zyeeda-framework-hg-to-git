@@ -23,7 +23,7 @@
     
     <groupId>com.zyeeda</groupId>
     <artifactId>zyeeda-framework</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.5-SNAPSHOT</version>
     <name>Zyeeda :: Framework</name>
     <url>http://www.zyeeda.com/oss/framework</url>
 

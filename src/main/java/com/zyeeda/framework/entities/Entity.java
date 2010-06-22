@@ -1,7 +1,14 @@
 package com.zyeeda.framework.entities;
 
-public interface Entity {
+public class Entity {
 
-	String getId();
+	private String id;
+	
+	public String getId() {
+		return this.id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
 	
 }

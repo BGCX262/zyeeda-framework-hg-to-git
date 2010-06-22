@@ -26,6 +26,7 @@ import org.apache.commons.configuration.Configuration;
  */
 public abstract class AbstractService implements Service {
 	
+	private Configuration config;
 	private String name;
 	private Server server;
     private ServiceState state = ServiceState.NEW;
@@ -52,6 +53,7 @@ public abstract class AbstractService implements Service {
     
     @Override
     public void init(Configuration config) throws Exception {
+    	this.config = config;
     }
     
 	@Override
@@ -61,6 +63,11 @@ public abstract class AbstractService implements Service {
 	@Override
 	public void stop() throws Exception {
 	}
+    
+    @Override
+    public Configuration getConfiguration() {
+    	return this.config;
+    }
     
     public Server getServer() {
     	return this.server;

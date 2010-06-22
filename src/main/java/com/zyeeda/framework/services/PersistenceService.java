@@ -35,8 +35,6 @@ public class PersistenceService extends AbstractService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(PersistenceService.class);
 	
-	public static final String SERVICE_NAME = "persistence-service";
-
     private static final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal<Session>();
     private static final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
     private Configuration config;
@@ -44,7 +42,7 @@ public class PersistenceService extends AbstractService {
     private EntityManager entityMgr;
     
     public PersistenceService(Server server) {
-    	super(SERVICE_NAME, server);
+    	super(PersistenceService.class.getSimpleName(), server);
     }
 
 	@Override

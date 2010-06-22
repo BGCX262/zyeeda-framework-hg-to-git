@@ -44,8 +44,6 @@ public class TemplateService extends AbstractService {
 
     private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
     
-    public static final String SERVICE_NAME = "template-service";
-    
     public static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
     public static final String DATE_FORMAT = "dateFormat";
     public static final String TIME_FORMAT = "timeFormat";
@@ -64,11 +62,13 @@ public class TemplateService extends AbstractService {
     private Configuration config;
     
     public TemplateService(Server server) {
-    	super(SERVICE_NAME, server);
+    	super(TemplateService.class.getSimpleName(), server);
     }
 
     @Override
     public void init(org.apache.commons.configuration.Configuration config) throws Exception {
+    	super.init(config);
+    	
     	String tplRootString = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
     	LoggerHelper.debug(logger, "template repository root = {}", tplRootString);
     	

@@ -45,6 +45,7 @@ public class Server implements Service {
 	
 	private static final String CONFIGURATION_FILE_NAME = "/server.config.xml";
 	public static final String SERVER_ROOT = "serverRoot";
+	public static final String SERIAL_NUMBER_LENGTH = "serialNumberLength";
 	
 	private File serverRoot;
 	private XMLConfiguration serverConfig;
@@ -122,18 +123,15 @@ public class Server implements Service {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public <T extends Service> T getService(String serviceName) {
-		return (T) this.serviceMap.get(serviceName);
+	public <T extends Service> T getService(Class<T> serviceClass) {
+		return (T) this.serviceMap.get(serviceClass.getSimpleName());
 	}
 	
+	@Override
 	public Configuration getConfiguration() {
 		return this.serverConfig;
 	}
 
-	public File mapPath(String relativePath) {
-		return new File(serverRoot, relativePath);
-	}
-	
     @Override
     public ServiceState getState() {
         return this.state;
@@ -148,5 +146,9 @@ public class Server implements Service {
     public String getName() {
     	return "server";
     }
+    
+	public File mapPath(String relativePath) {
+		return new File(serverRoot, relativePath);
+	}
 
 }
