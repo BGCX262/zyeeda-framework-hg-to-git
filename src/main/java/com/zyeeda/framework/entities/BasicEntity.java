@@ -4,9 +4,10 @@ import java.util.Date;
 
 public class BasicEntity extends Entity {
 
+	private static final long serialVersionUID = 2055338408696881639L;
+	
 	private String name;
     private String description;
-    private String owner;
     private String creator;
     private Date creationTime;
     private String lastModifier;
@@ -24,13 +25,6 @@ public class BasicEntity extends Entity {
     }
     public void setDescription(String description) {
         this.description = description;
-    }
-    
-    public String getOwner() {
-    	return this.owner;
-    }
-    public void setOwner(String owner) {
-    	this.owner = owner;
     }
     
     public String getCreator() {

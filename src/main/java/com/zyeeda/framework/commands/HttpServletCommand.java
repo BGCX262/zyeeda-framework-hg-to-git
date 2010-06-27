@@ -36,6 +36,7 @@ public class HttpServletCommand implements Command {
     
     private String scope;
     private String operation;
+    private Object returnValue;
 
     public HttpServletCommand(HttpServletRequest request, HttpServletResponse response) throws IllegalRequestException {
     	this.request = request;
@@ -95,6 +96,16 @@ public class HttpServletCommand implements Command {
 	
 	public HttpServletResponse getResponse() {
 		return this.response;
+	}
+	
+	@Override
+	public void setReturnValue(Object outputValue) {
+		this.returnValue = outputValue;
+	}
+	
+	@Override
+	public Object getReturnValue() {
+		return this.returnValue;
 	}
 
 }

@@ -25,6 +25,7 @@ public class CustomCommand implements Command {
     private String operation;
     private String id;
     private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Object returnValue;
     
     public CustomCommand() {
     }
@@ -107,5 +108,15 @@ public class CustomCommand implements Command {
             return values;
         }
     }
+    
+    @Override
+	public void setReturnValue(Object outputValue) {
+		this.returnValue = outputValue;
+	}
+	
+    @Override
+	public Object getReturnValue() {
+		return this.returnValue;
+	}
 
 }

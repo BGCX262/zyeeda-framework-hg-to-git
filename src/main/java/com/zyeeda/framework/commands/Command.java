@@ -33,4 +33,8 @@ public interface Command {
 
     public Map<String, Object> getParameterMap();
     
+    public void setReturnValue(Object returnValue);
+    
+    public Object getReturnValue();
+    
 }
