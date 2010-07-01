@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <configuration>
-    <TemplateServiceImpl>
+    <TemplateService>
         <templateRepositoryRoot>/WEB-INF/tpl</templateRepositoryRoot>
         <dateFormat>yyyy-MM-dd</dateFormat>
         <timeFormat>hh:mm:ss</timeFormat>
         <datetimeFormat>yyyy-MM-dd hh:mm:ss</datetimeFormat>
-    </TemplateServiceImpl>
+    </TemplateService>
 </configuration>
