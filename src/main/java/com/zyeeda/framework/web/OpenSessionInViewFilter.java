@@ -26,8 +26,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 import com.zyeeda.framework.GlobalConstants;
-import com.zyeeda.framework.services.PersistenceService;
 import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.impl.PersistenceServiceImpl;
 import com.zyeeda.framework.utils.JndiUtils;
 
 /**
@@ -52,13 +52,13 @@ public class OpenSessionInViewFilter implements Filter {
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		PersistenceService svc = null;
+		PersistenceServiceImpl svc = null;
 		
 		try {
 			String jndiServerKey = this.config.getServletContext().getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
 			
 			Server server = (Server) JndiUtils.getObjectFromJndi(jndiServerKey);
-			svc = server.getService(PersistenceService.class);
+			svc = server.getService(PersistenceServiceImpl.class);
 			svc.openSession();
 			chain.doFilter(request, response);
 		} catch (NamingException e) {

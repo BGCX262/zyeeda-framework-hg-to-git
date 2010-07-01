@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.services;
+package com.zyeeda.framework.services.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
+import com.zyeeda.framework.services.AbstractService;
+import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.TemplateService;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -40,9 +43,9 @@ import freemarker.template.TemplateExceptionHandler;
  * @version		%I%, %G%
  * @since		1.0
  */
-public class TemplateService extends AbstractService {
+public class TemplateServiceImpl extends AbstractService implements TemplateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TemplateService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TemplateServiceImpl.class);
     
     public static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
     public static final String DATE_FORMAT = "dateFormat";
@@ -61,8 +64,8 @@ public class TemplateService extends AbstractService {
     
     private Configuration config;
     
-    public TemplateService(Server server) {
-    	super(TemplateService.class.getSimpleName(), server);
+    public TemplateServiceImpl(Server server) {
+    	super(TemplateServiceImpl.class.getSimpleName(), server);
     }
 
     @Override

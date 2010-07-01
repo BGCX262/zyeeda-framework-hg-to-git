@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.services;
+package com.zyeeda.framework.services.impl;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -23,6 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.managers.EntityManager;
+import com.zyeeda.framework.services.AbstractService;
+import com.zyeeda.framework.services.PersistenceService;
+import com.zyeeda.framework.services.Server;
 
 /**
  * Persistence service using Hibernate.
@@ -31,9 +34,9 @@ import com.zyeeda.framework.managers.EntityManager;
  * @version 	%I%, %G%
  * @since		1.0
  */
-public class PersistenceService extends AbstractService {
+public class PersistenceServiceImpl extends AbstractService implements PersistenceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PersistenceService.class);
+	private static final Logger logger = LoggerFactory.getLogger(PersistenceServiceImpl.class);
 	
     private static final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal<Session>();
     private static final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
@@ -41,8 +44,8 @@ public class PersistenceService extends AbstractService {
     private SessionFactory sessionFactory;
     private EntityManager entityMgr;
     
-    public PersistenceService(Server server) {
-    	super(PersistenceService.class.getSimpleName(), server);
+    public PersistenceServiceImpl(Server server) {
+    	super(PersistenceServiceImpl.class.getSimpleName(), server);
     }
 
 	@Override

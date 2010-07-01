@@ -23,8 +23,6 @@ import javax.naming.Name;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
-import com.zyeeda.framework.services.Server;
-
 /**
  * JNDI server factory.
  *
@@ -34,12 +32,12 @@ import com.zyeeda.framework.services.Server;
  */
 public class ServerFactory implements ObjectFactory {
 
-    private Server server;
+    private Object obj;
 
     @Override
     public synchronized Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
-        if (this.server != null) {
-        	return this.server;
+        if (this.obj != null) {
+        	return this.obj;
         }
         
     	if (obj instanceof Reference) {
@@ -48,9 +46,9 @@ public class ServerFactory implements ObjectFactory {
             
             Class<?> clazz = this.getClass().getClassLoader().loadClass(className);
             Constructor<?> ctor = clazz.getConstructor();
-            this.server = (Server) ctor.newInstance();
+            this.obj = ctor.newInstance();
             
-            return this.server;
+            return this.obj;
         }
 
         return null;

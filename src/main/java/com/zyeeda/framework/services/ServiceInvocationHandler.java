@@ -40,7 +40,7 @@ public class ServiceInvocationHandler<T extends Service> implements InvocationHa
 	private T originalService;
 	
 	@SuppressWarnings("unchecked")
-	public Service bind(T originalService) {
+	public T bind(T originalService) {
 		if (originalService == null) {
 			throw new IllegalArgumentException("参数为空");
 		}
@@ -48,9 +48,9 @@ public class ServiceInvocationHandler<T extends Service> implements InvocationHa
 		this.originalService = originalService;
 		LoggerHelper.debug(logger, "original service = {}", this.originalService);
 		
-		Service proxy = (T) Proxy.newProxyInstance(
+		T proxy = (T) Proxy.newProxyInstance(
 				this.originalService.getClass().getClassLoader(),
-				new Class<?>[] {Service.class},
+				originalService.getClass().getInterfaces(),
 				this);
 		
 		return proxy;
