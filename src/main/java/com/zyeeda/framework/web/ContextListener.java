@@ -42,6 +42,7 @@ public class ContextListener implements ServletContextListener {
 
     private Server server;
 
+    @Override
     public void contextInitialized(ServletContextEvent event) {
         ServletContext context = event.getServletContext();
         String serverJndiName = context.getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
@@ -72,6 +73,7 @@ public class ContextListener implements ServletContextListener {
         }
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent event) {
         try {
             if (server != null) {

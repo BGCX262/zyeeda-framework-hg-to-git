@@ -65,7 +65,7 @@ public class TemplateServiceImpl extends AbstractService implements TemplateServ
     private Configuration config;
     
     public TemplateServiceImpl(Server server) {
-    	super(TemplateServiceImpl.class.getSimpleName(), server);
+    	super(TemplateService.class.getSimpleName(), server);
     }
 
     @Override

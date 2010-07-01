@@ -32,12 +32,12 @@ import javax.naming.spi.ObjectFactory;
  */
 public class ServerFactory implements ObjectFactory {
 
-    private Object obj;
+    private Object server;
 
     @Override
     public synchronized Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?, ?> environment) throws Exception {
-        if (this.obj != null) {
-        	return this.obj;
+        if (this.server != null) {
+        	return this.server;
         }
         
     	if (obj instanceof Reference) {
@@ -46,9 +46,9 @@ public class ServerFactory implements ObjectFactory {
             
             Class<?> clazz = this.getClass().getClassLoader().loadClass(className);
             Constructor<?> ctor = clazz.getConstructor();
-            this.obj = ctor.newInstance();
+            this.server = ctor.newInstance();
             
-            return this.obj;
+            return this.server;
         }
 
         return null;

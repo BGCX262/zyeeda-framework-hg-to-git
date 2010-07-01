@@ -45,7 +45,7 @@ public class PersistenceServiceImpl extends AbstractService implements Persisten
     private EntityManager entityMgr;
     
     public PersistenceServiceImpl(Server server) {
-    	super(PersistenceServiceImpl.class.getSimpleName(), server);
+    	super(PersistenceService.class.getSimpleName(), server);
     }
 
 	@Override
