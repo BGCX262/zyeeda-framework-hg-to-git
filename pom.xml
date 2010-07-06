@@ -72,6 +72,11 @@
             <artifactId>hibernate-core</artifactId>
             <version>3.5.2-Final</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-proxool</artifactId>
+            <version>3.5.2-Final</version>
+        </dependency>
 
         <dependency>
             <groupId>org.testng</groupId>

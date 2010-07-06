@@ -7,4 +7,6 @@
         <timeFormat>hh:mm:ss</timeFormat>
         <datetimeFormat>yyyy-MM-dd hh:mm:ss</datetimeFormat>
     </TemplateService>
+    <PersistenceService>
+    </PersistenceService>
 </configuration>
