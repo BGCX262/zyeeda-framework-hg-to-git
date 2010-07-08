@@ -27,7 +27,7 @@ import javax.servlet.ServletResponse;
 
 import com.zyeeda.framework.GlobalConstants;
 import com.zyeeda.framework.services.Server;
-import com.zyeeda.framework.services.impl.PersistenceServiceImpl;
+import com.zyeeda.framework.services.PersistenceService;
 import com.zyeeda.framework.utils.JndiUtils;
 
 /**
@@ -38,36 +38,36 @@ import com.zyeeda.framework.utils.JndiUtils;
  * @since		1.0
  */
 public class OpenSessionInViewFilter implements Filter {
-	
-	private FilterConfig config;
-	
-	@Override
-	public void init(FilterConfig config) throws ServletException {
-		this.config = config;
-	}
-	
-	@Override
-	public void destroy() {
-	}
 
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		PersistenceServiceImpl svc = null;
-		
-		try {
-			String jndiServerKey = this.config.getServletContext().getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
-			
-			Server server = (Server) JndiUtils.getObjectFromJndi(jndiServerKey);
-			svc = server.getService(PersistenceServiceImpl.class);
-			svc.openSession();
-			chain.doFilter(request, response);
-		} catch (NamingException e) {
-			throw new ServletException(e);
-		} finally {
-			if (svc != null) {
-				svc.closeSession();
-			}
-		}
-	}
+    private FilterConfig config;
+
+    @Override
+    public void init(FilterConfig config) throws ServletException {
+        this.config = config;
+    }
+
+    @Override
+    public void destroy() {
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        PersistenceService svc = null;
+
+        try {
+            String jndiServerKey = this.config.getServletContext().getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
+
+            Server server = (Server) JndiUtils.getObjectFromJndi(jndiServerKey);
+            svc = server.getService(PersistenceService.class);
+            svc.openSession();
+            chain.doFilter(request, response);
+        } catch (NamingException e) {
+            throw new ServletException(e);
+        } finally {
+            if (svc != null) {
+                svc.closeSession();
+            }
+        }
+    }
 
 }
