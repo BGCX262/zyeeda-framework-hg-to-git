@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.services.impl;
+package com.zyeeda.framework.services.internal;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -22,10 +22,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.managers.EntityManager;
 import com.zyeeda.framework.services.AbstractService;
 import com.zyeeda.framework.services.PersistenceService;
-import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.ApplicationServer;
 
 /**
  * Persistence service using Hibernate.
@@ -34,25 +33,23 @@ import com.zyeeda.framework.services.Server;
  * @version 	%I%, %G%
  * @since		1.0
  */
-public class PersistenceServiceImpl extends AbstractService implements PersistenceService {
+public class HibernatePersistenceServiceProvider extends AbstractService implements PersistenceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(PersistenceServiceImpl.class);
+	private static final Logger logger = LoggerFactory.getLogger(HibernatePersistenceServiceProvider.class);
 	
     private static final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal<Session>();
     private static final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
     private Configuration config;
     private SessionFactory sessionFactory;
-    private EntityManager entityMgr;
     
-    public PersistenceServiceImpl(Server server) {
-    	super(PersistenceService.class.getSimpleName(), server);
+    public HibernatePersistenceServiceProvider(ApplicationServer server) {
+    	super(HibernatePersistenceServiceProvider.class.getSimpleName(), server);
     }
 
 	@Override
 	public void start() throws Exception {
     	this.config = new Configuration().configure();
         this.sessionFactory = config.buildSessionFactory();
-        this.entityMgr = new EntityManager(this.getServer());
 	}
 
 	@Override
@@ -62,6 +59,7 @@ public class PersistenceServiceImpl extends AbstractService implements Persisten
         this.config = null;
 	}
 	
+	@Override
     public Session openSession() {
     	Integer count = countThreadLocal.get();
     	if (count == null) {
@@ -78,6 +76,7 @@ public class PersistenceServiceImpl extends AbstractService implements Persisten
         return session;
     }
 
+	@Override
     public void closeSession() {
     	Integer count = countThreadLocal.get();
     	if (count == null || count == 0) {
@@ -102,10 +101,6 @@ public class PersistenceServiceImpl extends AbstractService implements Persisten
         }
 
         LoggerHelper.debug(logger, "会话已关闭");
-    }
-    
-    public EntityManager getEntityManager() {
-    	return this.entityMgr;
     }
     
 }

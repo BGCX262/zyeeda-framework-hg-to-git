@@ -23,10 +23,8 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.GlobalConstants;
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.services.Server;
-import com.zyeeda.framework.utils.JndiUtils;
+import com.zyeeda.framework.services.ApplicationServer;
 
 /**
  * Context listener.
@@ -40,9 +38,31 @@ public class ContextListener implements ServletContextListener {
 
     private final static Logger logger = LoggerFactory.getLogger(ContextListener.class);
 
-    private Server server;
-
+    private ApplicationServer server;
+    
     @Override
+    public void contextInitialized(ServletContextEvent event) {
+    	try {
+        	ServletContext context = event.getServletContext();
+            String contextRoot = context.getRealPath("/");
+            LoggerHelper.debug(logger, "servlet context root = {}", contextRoot);
+            
+            ApplicationServer server = new ApplicationServer();
+            
+            PropertiesConfiguration config = new PropertiesConfiguration();
+            config.addProperty(ApplicationServer.SERVER_ROOT, contextRoot);
+            server.init(config);
+            
+            server.start();
+            
+            context.setAttribute(ApplicationServer.class.getName(), server);
+    	} catch (Throwable t) {
+        	LoggerHelper.error(logger, t.getMessage(), t);
+            System.exit(1);
+    	}
+    }
+
+    /*@Override
     public void contextInitialized(ServletContextEvent event) {
         ServletContext context = event.getServletContext();
         String serverJndiName = context.getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
@@ -71,7 +91,7 @@ public class ContextListener implements ServletContextListener {
         	LoggerHelper.error(logger, e.getMessage(), e);
             System.exit(1);
         }
-    }
+    }*/
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {

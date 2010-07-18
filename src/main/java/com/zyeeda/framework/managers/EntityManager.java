@@ -1,11 +1,11 @@
 package com.zyeeda.framework.managers;
 
 import com.zyeeda.framework.entities.Entity;
-import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.ApplicationServer;
 
 public class EntityManager extends AbstractManager {
 
-	public EntityManager(Server server) {
+	public EntityManager(ApplicationServer server) {
 		super(server);
 	}
 	

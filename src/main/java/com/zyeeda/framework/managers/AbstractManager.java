@@ -1,16 +1,16 @@
 package com.zyeeda.framework.managers;
 
-import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.ApplicationServer;
 
 public class AbstractManager {
 
-	private Server server;
+	private ApplicationServer server;
 	
-	public AbstractManager(Server server) {
+	public AbstractManager(ApplicationServer server) {
 		this.server = server;
 	}
 	
-	protected Server getServer() {
+	protected ApplicationServer getServer() {
 		return this.server;
 	}
 }

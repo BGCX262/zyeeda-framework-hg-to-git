@@ -17,7 +17,6 @@ package com.zyeeda.framework.web;
 
 import java.io.IOException;
 
-import javax.naming.NamingException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -25,10 +24,8 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import com.zyeeda.framework.GlobalConstants;
-import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.ApplicationServer;
 import com.zyeeda.framework.services.PersistenceService;
-import com.zyeeda.framework.utils.JndiUtils;
 
 /**
  * Open session in view servlet filter.
@@ -55,14 +52,10 @@ public class OpenSessionInViewFilter implements Filter {
         PersistenceService svc = null;
 
         try {
-            String jndiServerKey = this.config.getServletContext().getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
-
-            Server server = (Server) JndiUtils.getObjectFromJndi(jndiServerKey);
+            ApplicationServer server = (ApplicationServer) this.config.getServletContext().getAttribute(ApplicationServer.class.getName());
             svc = server.getService(PersistenceService.class);
             svc.openSession();
             chain.doFilter(request, response);
-        } catch (NamingException e) {
-            throw new ServletException(e);
         } finally {
             if (svc != null) {
                 svc.closeSession();

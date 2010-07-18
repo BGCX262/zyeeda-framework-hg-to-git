@@ -3,7 +3,7 @@ package com.zyeeda.framework.unittest.services;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.zyeeda.framework.services.Server;
+import com.zyeeda.framework.services.ApplicationServer;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 
 import static org.testng.Assert.*;
@@ -11,7 +11,7 @@ import static org.testng.Assert.*;
 @Test
 public class ServerTest extends TestSuiteBase {
 	
-	private Server server;
+	private ApplicationServer server;
 	
 	@BeforeTest
 	public void setUp() throws Exception {

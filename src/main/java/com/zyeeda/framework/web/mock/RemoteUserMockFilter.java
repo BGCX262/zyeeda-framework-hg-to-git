@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.mock;
+package com.zyeeda.framework.web.mock;
 
 import java.io.IOException;
 

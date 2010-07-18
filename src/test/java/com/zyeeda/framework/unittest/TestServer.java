@@ -2,19 +2,16 @@ package com.zyeeda.framework.unittest;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.zyeeda.framework.services.Server;
-import com.zyeeda.framework.services.ServiceInvocationHandler;
-import com.zyeeda.framework.services.TemplateService;
-import com.zyeeda.framework.services.impl.TemplateServiceImpl;
+import com.zyeeda.framework.services.ApplicationServer;
+import com.zyeeda.framework.services.internal.FreemarkerTemplateServiceProvider;
 
-public class TestServer extends Server {
+public class TestServer extends ApplicationServer {
 
 	@Override
 	public void init(Configuration config) throws Exception {
 		super.init(config);
 		
-		TemplateService tplSvc = new TemplateServiceImpl(this);
-		this.addService(new ServiceInvocationHandler<TemplateService>().bind(tplSvc));
+		this.addService(new FreemarkerTemplateServiceProvider(this));
 		//this.addService(new PersistenceService(this));
 	}
 }

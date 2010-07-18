@@ -27,7 +27,7 @@ import org.apache.commons.configuration.Configuration;
 public interface Service {
 	
 	String getName();
-
+	
     void init(Configuration config) throws Exception;
     
     void start() throws Exception;

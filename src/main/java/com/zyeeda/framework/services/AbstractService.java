@@ -28,10 +28,10 @@ public abstract class AbstractService implements Service {
 	
 	private Configuration config;
 	private String name;
-	private Server server;
+	private ApplicationServer server;
     private ServiceState state = ServiceState.NEW;
     
-    public AbstractService(String name, Server server) {
+    public AbstractService(String name, ApplicationServer server) {
     	this.name = name;
     	this.server = server;
     }
@@ -69,7 +69,7 @@ public abstract class AbstractService implements Service {
     	return this.config;
     }
     
-    public Server getServer() {
+    public ApplicationServer getServer() {
     	return this.server;
     }
     
