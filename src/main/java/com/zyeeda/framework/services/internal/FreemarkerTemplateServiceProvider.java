@@ -64,8 +64,12 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     
     private Configuration config;
     
+    public FreemarkerTemplateServiceProvider(ApplicationServer server, String name) {
+    	super(server, name);
+    }
+    
     public FreemarkerTemplateServiceProvider(ApplicationServer server) {
-    	super(FreemarkerTemplateServiceProvider.class.getSimpleName(), server);
+    	super(server, FreemarkerTemplateServiceProvider.class.getSimpleName());
     }
 
     @Override

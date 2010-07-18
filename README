@@ -1,0 +1,4 @@
+$ mvn clean package assembly:assembly -Dmaven.test.skip=true
+
+$ mvn clean package assembly:directory -Dmaven.test.skip=true
+

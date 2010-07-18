@@ -42,8 +42,12 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
     private Configuration config;
     private SessionFactory sessionFactory;
     
+    public HibernatePersistenceServiceProvider(ApplicationServer server, String name) {
+    	super(server, name);
+    }
+    
     public HibernatePersistenceServiceProvider(ApplicationServer server) {
-    	super(HibernatePersistenceServiceProvider.class.getSimpleName(), server);
+    	super(server, HibernatePersistenceServiceProvider.class.getSimpleName());
     }
 
 	@Override

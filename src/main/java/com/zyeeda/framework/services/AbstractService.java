@@ -31,7 +31,7 @@ public abstract class AbstractService implements Service {
 	private ApplicationServer server;
     private ServiceState state = ServiceState.NEW;
     
-    public AbstractService(String name, ApplicationServer server) {
+    public AbstractService(ApplicationServer server, String name) {
     	this.name = name;
     	this.server = server;
     }
