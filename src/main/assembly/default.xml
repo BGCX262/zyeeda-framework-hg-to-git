@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <id>default</id>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <formats>
+        <format>zip</format>
+        <format>war</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>prod/webapp</directory>
+            <outputDirectory>.</outputDirectory>
+        </fileSet>
+    </fileSets>
+    <dependencySets>
+        <dependencySet>
+            <unpack>false</unpack>
+            <useTransitiveDependencies>true</useTransitiveDependencies>
+            <outputDirectory>WEB-INF/lib</outputDirectory>
+        </dependencySet>
+    </dependencySets>
+</assembly>

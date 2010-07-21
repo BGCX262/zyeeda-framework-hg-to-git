@@ -3,7 +3,7 @@ package com.zyeeda.framework.unittest.services;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
-import com.zyeeda.framework.services.ApplicationServer;
+import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 
 import static org.testng.Assert.*;

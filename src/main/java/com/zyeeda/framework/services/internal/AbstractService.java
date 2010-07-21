@@ -13,9 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.services;
+package com.zyeeda.framework.services.internal;
 
 import org.apache.commons.configuration.Configuration;
+
+import com.zyeeda.framework.server.ApplicationServer;
+import com.zyeeda.framework.services.Service;
+import com.zyeeda.framework.services.ServiceState;
+
 
 /**
  * Abstract service.

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.services;
+package com.zyeeda.framework.server;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -23,6 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
+import com.zyeeda.framework.services.Service;
+import com.zyeeda.framework.services.ServiceState;
 
 /**
  * Service invocation handler.

@@ -2,7 +2,7 @@ package com.zyeeda.framework.unittest;
 
 import org.apache.commons.configuration.Configuration;
 
-import com.zyeeda.framework.services.ApplicationServer;
+import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.internal.FreemarkerTemplateServiceProvider;
 
 public class TestServer extends ApplicationServer {

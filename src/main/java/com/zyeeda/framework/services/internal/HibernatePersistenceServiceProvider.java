@@ -22,9 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.services.AbstractService;
+import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.PersistenceService;
-import com.zyeeda.framework.services.ApplicationServer;
 
 /**
  * Persistence service using Hibernate.

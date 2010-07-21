@@ -24,7 +24,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import com.zyeeda.framework.services.ApplicationServer;
+import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.PersistenceService;
 
 /**

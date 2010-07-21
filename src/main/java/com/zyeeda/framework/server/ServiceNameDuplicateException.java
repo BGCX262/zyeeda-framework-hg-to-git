@@ -1,4 +1,4 @@
-package com.zyeeda.framework.services;
+package com.zyeeda.framework.server;
 
 public class ServiceNameDuplicateException extends Exception {
 

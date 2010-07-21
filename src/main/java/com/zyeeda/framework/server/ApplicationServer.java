@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.services;
+package com.zyeeda.framework.server;
 
 import java.io.File;
 import java.io.InputStream;
@@ -32,6 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
+import com.zyeeda.framework.services.Service;
+import com.zyeeda.framework.services.ServiceState;
 
 /**
  * Simple application server.

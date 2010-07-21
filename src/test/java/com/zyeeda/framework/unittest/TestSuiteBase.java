@@ -4,7 +4,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import com.zyeeda.framework.services.ApplicationServer;
+import com.zyeeda.framework.server.ApplicationServer;
 
 public class TestSuiteBase {
 	
