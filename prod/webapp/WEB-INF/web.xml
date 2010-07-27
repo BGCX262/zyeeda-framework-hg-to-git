@@ -34,7 +34,12 @@
     </filter-mapping>
 
     <filter>
-        <filter-name>Apache Shiro Filter</filter-name>
-        <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>
+        <filter-name>Security Filter</filter-name>
+        <filter-class>com.zyeeda.framework.web.SecurityFilter</filter-class>
+        <!--<filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>-->
     </filter>
+    <filter-mapping>
+        <filter-name>Security Filter</filter-name>
+        <url-pattern>*.jsp</url-pattern>
+    </filter-mapping>
 </web-app>

@@ -49,16 +49,16 @@ public class ApplicationServer implements Service {
 	public static final String SERVER_ROOT = "serverRoot";
 	
 	private static final String CONFIGURATION_FILE_NAME = "/server.config.xml";
-	private static final String SERVICES_NODE = "services";
-	private static final String SERVICE_NAME_NODE = "service.name";
-	private static final String SERVICE_CLASS_NODE = "service.class";
+	private static final String SERVICES_NODE = "services.service";
+	private static final String SERVICE_NAME_NODE = "name";
+	private static final String SERVICE_CLASS_NODE = "class";
 	
 	private File serverRoot;
 	private XMLConfiguration serverConfig;
 	private ServiceState state = ServiceState.NEW;
 
 	private List<Service> serviceList = new LinkedList<Service>();
-	private Map<String, Service> serviceMap = new HashMap<String, Service>();
+	private Map<Class<? extends Service>, Service> serviceMap = new HashMap<Class<? extends Service>, Service>();
 	
 	@Override
 	public void init(Configuration config) throws Exception {
@@ -100,6 +100,7 @@ public class ApplicationServer implements Service {
 	@Override
 	public void start() throws Exception {
 		List services = this.serverConfig.configurationsAt(SERVICES_NODE);
+		LoggerHelper.debug(logger, "service count = {}", services.size());
 		for (Iterator it = services.iterator(); it.hasNext(); ) {
 			Configuration sub = (Configuration) it.next();
 			String serviceName = sub.getString(SERVICE_NAME_NODE);
@@ -145,12 +146,12 @@ public class ApplicationServer implements Service {
 		if (tempSvc != null) {
 			throw new ServiceNameDuplicateException(service.getName());
 		}
-		this.serviceMap.put(service.getName(), service);
+		this.serviceMap.put(service.getClass(), service);
 	}
 	
 	@SuppressWarnings("unchecked")
 	public <T extends Service> T getService(Class<T> serviceClass) {
-		return (T) this.serviceMap.get(serviceClass.getSimpleName());
+		return (T) this.serviceMap.get(serviceClass);
 	}
 	
 	@Override

@@ -16,9 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.security.internal.ShiroSecurityManager;
+import com.zyeeda.framework.security.ShiroSecurityManager;
 import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.SecurityService;
+import com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider;
 
 public class SecurityFilter extends IniShiroFilter {
 	
@@ -36,7 +37,7 @@ public class SecurityFilter extends IniShiroFilter {
 			LoggerHelper.warn(logger, "{} section will be ignored!", IniRealm.ROLES_SECTION_NAME);
 		}
 		
-		SecurityService<?> securitySvc = this.getServer().getService(SecurityService.class);
+		SecurityService<?> securitySvc = this.getServer().getService(ShiroSecurityServiceProvider.class);
 		SecurityManager securityManager = (SecurityManager) securitySvc.getSecurityManager();
 		if (!(securityManager instanceof ShiroSecurityManager)) {
 			String msg = "The security manager initialized by security service is not an instance of ShiroSecurityManager, " + 

@@ -7,6 +7,10 @@
 			<name>template-service</name>
 			<class>com.zyeeda.framework.services.internal.FreemarkerTemplateServiceProvider</class>
 		</service>
+		<service>
+			<name>security-service</name>
+			<class>com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider</class>
+		</service>
 	</services>
 	
     <template-service>
@@ -15,5 +19,6 @@
         <timeFormat>hh:mm:ss</timeFormat>
         <datetimeFormat>yyyy-MM-dd hh:mm:ss</datetimeFormat>
     </template-service>
+    <security-service />
 
 </configuration>

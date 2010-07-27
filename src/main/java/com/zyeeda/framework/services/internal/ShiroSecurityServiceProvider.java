@@ -4,7 +4,7 @@ import org.apache.commons.configuration.Configuration;
 
 import org.apache.shiro.mgt.SecurityManager;
 
-import com.zyeeda.framework.security.internal.ShiroSecurityManager;
+import com.zyeeda.framework.security.ShiroSecurityManager;
 import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.SecurityService;
 
@@ -24,7 +24,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 
 	@Override
 	public SecurityManager getSecurityManager() {
-		ShiroSecurityManager securityManager = new ShiroSecurityManager(this.getServer());
+		SecurityManager securityManager = new ShiroSecurityManager(this.getServer());
 		return securityManager;
 	}
 
