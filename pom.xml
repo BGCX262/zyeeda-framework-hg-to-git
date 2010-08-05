@@ -136,6 +136,7 @@
                         <java.naming.factory.initial>org.apache.naming.java.javaURLContextFactory</java.naming.factory.initial>
                         <java.naming.factory.url.pkgs>org.apache.naming</java.naming.factory.url.pkgs>
                         <serverRoot>${basedir}/prod/webapp</serverRoot>
+                        <javax.net.ssl.trustStore>jssecacerts</javax.net.ssl.trustStore>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

@@ -46,10 +46,10 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
 
     private static final Logger logger = LoggerFactory.getLogger(FreemarkerTemplateServiceProvider.class);
     
-    public static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
-    public static final String DATE_FORMAT = "dateFormat";
-    public static final String TIME_FORMAT = "timeFormat";
-    public static final String DATETIME_FORMAT = "datetimeFormat";
+    private static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
+    private static final String DATE_FORMAT = "dateFormat";
+    private static final String TIME_FORMAT = "timeFormat";
+    private static final String DATETIME_FORMAT = "datetimeFormat";
     
     private static final String DEFAULT_TEMPLATE_REPOSITORY_ROOT = "/WEB-INF/tpl";
     private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
@@ -88,6 +88,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     	this.datetimeFormat = config.getString(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
     	
     	if (logger.isDebugEnabled()) {
+    		logger.debug("template root = {}", this.tplRoot);
     		logger.debug("date format = {}", this.dateFormat);
     		logger.debug("time format = {}", this.timeFormat);
     		logger.debug("datetime format = {}", this.dateFormat);

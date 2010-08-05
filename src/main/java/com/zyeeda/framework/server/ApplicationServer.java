@@ -76,12 +76,12 @@ public class ApplicationServer implements Service {
 				reader = new InputStreamReader(is, "UTF-8");
 				this.serverConfig.load(reader);
 				
-				if (logger.isDebugEnabled()) {
-					logger.debug("server config = {}", this.serverConfig);
+				if (logger.isTraceEnabled()) {
+					logger.trace("server config = {}", this.serverConfig);
 					if (this.serverConfig != null) {
 						for (Iterator<?> it = this.serverConfig.getKeys(); it.hasNext(); ) {
 							String key = (String) it.next();
-							logger.debug("{} = {}", key, this.serverConfig.getProperty(key));
+							logger.trace("{} = {}", key, this.serverConfig.getProperty(key));
 						}
 					}
 				}

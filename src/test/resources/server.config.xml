@@ -11,6 +11,10 @@
 			<name>security-service</name>
 			<class>com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider</class>
 		</service>
+		<service>
+			<name>ldap-service</name>
+			<class>com.zyeeda.framework.services.internal.ShiroLdapServiceProvider</class>
+		</service>
 	</services>
 	
     <template-service>
@@ -20,5 +24,14 @@
         <datetimeFormat>yyyy-MM-dd hh:mm:ss</datetimeFormat>
     </template-service>
     <security-service />
+    <ldap-service>
+    	<authentication>simple</authentication>
+    	<searchBase>ou=Users\,dc=example\,dc=com</searchBase>
+    	<url>ldap://localhost:10389</url>
+    	<referral>follow</referral>
+    	<usePooling>true</usePooling>
+    	<systemUsername>uid=aeinstein\,ou=Users\,dc=example\,dc=com</systemUsername>
+    	<systemPassword>secret</systemPassword>
+    </ldap-service>
 
 </configuration>

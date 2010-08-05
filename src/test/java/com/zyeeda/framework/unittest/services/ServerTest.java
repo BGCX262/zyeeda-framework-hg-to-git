@@ -1,10 +1,17 @@
 package com.zyeeda.framework.unittest.services;
 
+import javax.naming.NamingException;
+import javax.naming.ldap.LdapContext;
+
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import com.zyeeda.framework.server.ApplicationServer;
+import com.zyeeda.framework.services.LdapService;
 import com.zyeeda.framework.services.SecurityService;
+import com.zyeeda.framework.services.TemplateService;
+import com.zyeeda.framework.services.internal.FreemarkerTemplateServiceProvider;
+import com.zyeeda.framework.services.internal.ShiroLdapServiceProvider;
 import com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 
@@ -25,8 +32,35 @@ public class ServerTest extends TestSuiteBase {
 		assertNotNull(server);
 	}
 	
+	@Test
+	public void testGetTemplateService() {
+		TemplateService tplSvc = this.server.getService(FreemarkerTemplateServiceProvider.class);
+		assertNotNull(tplSvc);
+	}
+	
+	@Test
 	public void testGetSecurityService() {
 		SecurityService<?> securitySvc = this.server.getService(ShiroSecurityServiceProvider.class);
 		assertNotNull(securitySvc);
+	}
+	
+	@Test
+	public void testGetLdapService() {
+		LdapService ldapSvc = this.server.getService(ShiroLdapServiceProvider.class);
+		assertNotNull(ldapSvc);
+	}
+	
+	@Test
+	public void testGetLdapContext() throws NamingException {
+		LdapService ldapSvc = this.server.getService(ShiroLdapServiceProvider.class);
+		LdapContext ctx = ldapSvc.getLdapContext("uid=mborn,ou=Users,dc=example,dc=com", "secret");
+		assertNotNull(ctx);
+	}
+	
+	@Test
+	public void testGetSystemLdapContext() throws NamingException {
+		LdapService ldapSvc = this.server.getService(ShiroLdapServiceProvider.class);
+		LdapContext ctx = ldapSvc.getLdapContext();
+		assertNotNull(ctx);
 	}
 }
