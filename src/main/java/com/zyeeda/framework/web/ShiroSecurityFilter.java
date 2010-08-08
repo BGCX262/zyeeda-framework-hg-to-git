@@ -21,9 +21,9 @@ import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.SecurityService;
 import com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider;
 
-public class SecurityFilter extends IniShiroFilter {
+public class ShiroSecurityFilter extends IniShiroFilter {
 	
-	private static final Logger logger = LoggerFactory.getLogger(SecurityFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(ShiroSecurityFilter.class);
 
 	@Override
 	protected Map<String, ?> applySecurityManager(Ini ini) {

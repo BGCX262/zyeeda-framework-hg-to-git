@@ -13,7 +13,7 @@
 		</service>
 		<service>
 			<name>ldap-service</name>
-			<class>com.zyeeda.framework.services.internal.ShiroLdapServiceProvider</class>
+			<class>com.zyeeda.framework.services.internal.SunJndiLdapServiceProvider</class>
 		</service>
 	</services>
 	
@@ -25,13 +25,13 @@
     </template-service>
     <security-service />
     <ldap-service>
-    	<authentication>simple</authentication>
-    	<searchBase>ou=Users\,dc=example\,dc=com</searchBase>
-    	<url>ldap://localhost:10389</url>
+    	<providerUrl>ldap://localhost:10389/ou=Users\,dc=example\,dc=com</providerUrl>
+    	<securityAuthentication>simple</securityAuthentication>
+    	<systemSecurityPrincipal>uid=aeinstein\,ou=Users\,dc=example\,dc=com</systemSecurityPrincipal>
+    	<systemSecurityCredentials>secret</systemSecurityCredentials>
+    	<securityPrincipalTemplate>uid=${username}\,ou=Users\,dc=example\,dc=com</securityPrincipalTemplate>
     	<referral>follow</referral>
     	<usePooling>true</usePooling>
-    	<systemUsername>uid=aeinstein\,ou=Users\,dc=example\,dc=com</systemUsername>
-    	<systemPassword>secret</systemPassword>
     </ldap-service>
 
 </configuration>

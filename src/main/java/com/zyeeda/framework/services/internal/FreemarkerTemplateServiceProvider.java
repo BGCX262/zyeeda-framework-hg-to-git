@@ -18,6 +18,9 @@ package com.zyeeda.framework.services.internal;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.server.ApplicationServer;
+import com.zyeeda.framework.services.TemplateServiceException;
 import com.zyeeda.framework.services.TemplateService;
 
 import freemarker.template.Configuration;
@@ -114,18 +118,47 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     	this.tplRoot = null;
     }
 
-    public void paint(String tplPath, Writer out, Map<?, ?> args) throws IOException, TemplateException {
+    @Override
+    public void paint(String tplPath, Writer out, Map<?, ?> args) throws IOException {
 		if (logger.isDebugEnabled()) {
 			logger.debug("painting template = {}", tplPath);
 			logger.debug("template varables = {}", args);
 		}
 		Template template = this.config.getTemplate(tplPath);
-		template.process(args, out);
+		try {
+			template.process(args, out);
+		} catch (TemplateException e) {
+			throw new TemplateServiceException(e);
+		}
     }
 
-    public void paint(String tplPath, Writer out) throws IOException,TemplateException {
+    @Override
+    public void paint(String tplPath, Writer out) throws IOException {
 		Map<String, Object> args = new HashMap<String, Object>();
 		this.paint(tplPath, out, args);
+    }
+    
+    @Override
+    public String render(String template, Map<?, ?> args) throws IOException {
+    	Reader reader = null;
+    	Writer writer = null;
+    	try {
+	    	reader = new StringReader(template);
+	    	Template tpl = new Template(null, reader, this.config);
+	    	writer = new StringWriter();
+	    	tpl.process(args, writer);
+	    	writer.flush();
+	    	return writer.toString();
+    	} catch (TemplateException e) {
+    		throw new TemplateServiceException(e);
+		} finally {
+    		if (reader != null) {
+    			reader.close();
+    		}
+    		if (writer != null) {
+    			writer.close();
+    		}
+    	}
     }
     
 }

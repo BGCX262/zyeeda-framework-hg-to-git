@@ -1,11 +1,8 @@
 package com.zyeeda.framework.services;
 
-import org.hibernate.Session;
+public interface PersistenceService<SESSION> extends Service {
 
-
-public interface PersistenceService extends Service {
-
-	public Session openSession();
+	public SESSION openSession();
 	
 	public void closeSession();
 	

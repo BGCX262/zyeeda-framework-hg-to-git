@@ -35,7 +35,7 @@
 
     <filter>
         <filter-name>Security Filter</filter-name>
-        <filter-class>com.zyeeda.framework.web.SecurityFilter</filter-class>
+        <filter-class>com.zyeeda.framework.web.ShiroSecurityFilter</filter-class>
         <!--<filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>-->
     </filter>
     <filter-mapping>

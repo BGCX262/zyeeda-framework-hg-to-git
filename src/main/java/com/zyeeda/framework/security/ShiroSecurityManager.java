@@ -9,7 +9,7 @@ public class ShiroSecurityManager extends DefaultWebSecurityManager {
 	private ApplicationServer server;
 	
 	public ShiroSecurityManager(ApplicationServer server) {
-		super(new CombinedRealm(server));
+		super(new ShiroCombinedRealm(server));
 		this.server = server;
 	}
 	

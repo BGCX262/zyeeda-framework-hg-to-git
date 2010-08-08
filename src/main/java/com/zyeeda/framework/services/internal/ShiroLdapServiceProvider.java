@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.services.LdapService;
 
+@Deprecated
 public class ShiroLdapServiceProvider extends AbstractService implements LdapService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ShiroLdapServiceProvider.class);

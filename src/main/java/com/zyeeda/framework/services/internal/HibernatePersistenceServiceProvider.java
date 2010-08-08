@@ -32,7 +32,7 @@ import com.zyeeda.framework.services.PersistenceService;
  * @version 	%I%, %G%
  * @since		1.0
  */
-public class HibernatePersistenceServiceProvider extends AbstractService implements PersistenceService {
+public class HibernatePersistenceServiceProvider extends AbstractService implements PersistenceService<Session> {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HibernatePersistenceServiceProvider.class);
 	
