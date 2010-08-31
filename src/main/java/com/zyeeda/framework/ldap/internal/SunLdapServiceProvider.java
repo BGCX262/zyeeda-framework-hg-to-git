@@ -38,8 +38,8 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 	private static final String DEFAULT_SECURITY_AUTHENTICATION = "simple";
 	
 	// Injected
-	private TemplateService tplSvc;
-	private Logger logger;
+	private final TemplateService tplSvc;
+	private final Logger logger;
 	
 	private String providerUrl;
 	private String securityAuthentication;

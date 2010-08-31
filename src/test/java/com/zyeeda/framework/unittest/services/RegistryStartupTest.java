@@ -7,7 +7,7 @@ import static org.testng.Assert.*;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 
 @Test
-public class RegistryStartupTestSuite extends TestSuiteBase {
+public class RegistryStartupTest extends TestSuiteBase {
 
 	@Test
 	public void testGetRegistry() {

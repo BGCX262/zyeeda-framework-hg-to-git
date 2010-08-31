@@ -21,6 +21,7 @@ import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.ShiroSecurityManager;
 
+@Deprecated
 public class ShiroSecurityFilter extends IniShiroFilter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(ShiroSecurityFilter.class);

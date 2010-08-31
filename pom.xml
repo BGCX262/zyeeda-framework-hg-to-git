@@ -97,6 +97,11 @@
 			<artifactId>chenillekit-core</artifactId>
 			<version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.13</version>
+        </dependency>
 
         <dependency>
             <groupId>org.testng</groupId>
@@ -115,12 +120,6 @@
             <groupId>tomcat</groupId>
             <artifactId>naming-resources</artifactId>
             <version>5.5.23</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -161,7 +160,7 @@
 						<index>true</index>
 						<manifestEntries>
 							<Tapestry-Module-Classes>
-								com.zyeeda.framework.FreemarkerTemplateServiceProviderModule
+								com.zyeeda.framework.FrameworkModule
 							</Tapestry-Module-Classes>
 							<Implementation-Version>
 								${project.version}

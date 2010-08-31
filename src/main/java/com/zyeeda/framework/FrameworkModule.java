@@ -8,6 +8,7 @@ import org.apache.tapestry5.ioc.annotations.Symbol;
 import org.chenillekit.core.services.ConfigurationService;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
@@ -18,6 +19,12 @@ import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider;
 
 public class FrameworkModule {
+	
+	private final Logger logger;
+	
+	public FrameworkModule(Logger logger) {
+		this.logger = logger;
+	}
 
 	@Marker(Primary.class)
 	public TemplateService buildFreemarkerTemplateServiceProvider(
@@ -67,8 +74,9 @@ public class FrameworkModule {
 					persistenceSvc.start();
 					ldapSvc.start();
 					securitySvc.start();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
+				} catch (Throwable t) {
+					LoggerHelper.error(logger, t.getMessage(), t);
+					throw new RuntimeException(t);
 				}
 			}
 			

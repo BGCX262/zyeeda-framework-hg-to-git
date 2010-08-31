@@ -1,7 +1,7 @@
 package com.zyeeda.framework.security.internal;
 
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -22,6 +22,7 @@ import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.persistence.PersistenceService;
@@ -29,9 +30,9 @@ import com.zyeeda.framework.persistence.PersistenceService;
 public class ShiroCombinedRealm extends AuthorizingRealm {
 	
 	// Injected
-	private LdapService ldapSvc;
-	private PersistenceService persistenceSvc;
-	private Logger logger;
+	private final LdapService ldapSvc;
+	private final PersistenceService persistenceSvc;
+	private final Logger logger;
 	
 	public ShiroCombinedRealm(LdapService ldapSvc,
 			PersistenceService persistenceSvc,
@@ -41,33 +42,7 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 		this.persistenceSvc = persistenceSvc;
 		this.logger = logger;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		EntityManager em = null;
-		try {
-			em = this.persistenceSvc.openSession();
-			em.getTransaction().begin();
-			String username = (String) this.getAvailablePrincipal(principals);
-			Query query = em.createNamedQuery("getRolesBySubject");
-			query.setParameter("subject", username);
-			List<String> roles = query.getResultList();
-			em.getTransaction().commit();
-			
-			return new SimpleAuthorizationInfo(new HashSet<String>(roles));
-		} catch (Throwable t) {
-			if (em != null) {
-				em.getTransaction().rollback();
-			}
-			throw new AuthorizationException(t);
-		} finally {
-			if (em != null) {
-				em.close();
-			}
-		}
-	}
-
+	
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		LoggerHelper.debug(logger, "authentication token type = {}", token.getClass().getName());
@@ -94,6 +69,43 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 		}
 		
 		return new SimpleAuthenticationInfo(upToken.getUsername(), upToken.getPassword(), this.getName());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+		EntityManager em = null;
+		try {
+			em = this.persistenceSvc.openSession();
+			em.getTransaction().begin();
+			
+			String username = (String) this.getAvailablePrincipal(principals);
+			Query query = em.createNamedQuery("getRolesBySubject");
+			query.setParameter("subject", username);
+			List<Role> roles = query.getResultList();
+			
+			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+			for (Iterator<Role> it = roles.iterator(); it.hasNext(); ) {
+				Role role = it.next();
+				if (this.logger.isDebugEnabled()) {
+					logger.debug("role name = {}", role.getName());
+					logger.debug("role perms = {}", role.getPermissions());
+				}
+				info.addRole(role.getName());
+				info.addStringPermissions(role.getPermissionSet());
+			}
+			
+			em.getTransaction().commit();
+			
+			return info;
+		} catch (Throwable t) {
+			if (em != null) {
+				em.getTransaction().rollback();
+			}
+			throw new AuthorizationException(t);
+		} finally {
+			this.persistenceSvc.closeSession();
+		}
 	}
 
 }

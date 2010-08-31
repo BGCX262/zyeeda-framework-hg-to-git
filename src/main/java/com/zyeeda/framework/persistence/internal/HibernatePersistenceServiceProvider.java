@@ -15,7 +15,7 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
 	private static final String DEFAULT_PERSISTENCE_UNIT_NAME = "default";
 	
 	// Injected
-	private Logger logger;
+	private final Logger logger;
 	
 	private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
 	private EntityManagerFactory emf;
@@ -25,7 +25,7 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
 	}
 	
 	@Override
-	public void start() {
+	public void start() throws Exception {
 		this.emf = Persistence.createEntityManagerFactory(DEFAULT_PERSISTENCE_UNIT_NAME);
 	}
 	

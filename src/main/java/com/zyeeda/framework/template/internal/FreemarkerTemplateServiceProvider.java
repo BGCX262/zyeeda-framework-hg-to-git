@@ -64,7 +64,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
 
     // Injected
     private File appRoot;
-    private Logger logger;
+    private final Logger logger;
     
     private File tplRoot;
     private String dateFormat;

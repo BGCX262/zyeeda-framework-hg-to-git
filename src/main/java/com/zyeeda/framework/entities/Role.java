@@ -11,6 +11,10 @@ import javax.persistence.FetchType;
 import javax.persistence.Column;
 import javax.persistence.Basic;
 import javax.persistence.JoinColumn;
+import javax.persistence.Transient;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.util.CollectionUtils;
 
 @Entity
 @Table(name = "SYS_ROLE")
@@ -25,6 +29,7 @@ import javax.persistence.JoinColumn;
 public class Role extends LiteDomainEntity {
 
 	private static final long serialVersionUID = 1665902703034523260L;
+	private static final char PERMISSION_SEPARATOR = ';';
 	
 	private Set<String> subjects;
 	private String permissions;
@@ -48,6 +53,13 @@ public class Role extends LiteDomainEntity {
 	}
 	public void setPermissions(String permissions) {
 		this.permissions = permissions;
+	}
+	
+	@Transient
+	public Set<String> getPermissionSet() {
+		String permissions = this.getPermissions();
+		String[] permissionArray = StringUtils.split(permissions, PERMISSION_SEPARATOR);
+		return CollectionUtils.asSet(permissionArray);
 	}
 	
 	@Basic

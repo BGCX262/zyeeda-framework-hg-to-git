@@ -12,10 +12,10 @@ import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 
 @Test
-public class TemplateServiceTestSuite extends TestSuiteBase {
+public class TemplateServiceTest extends TestSuiteBase {
 
 	@Test
-	public void testFreemarkerTemplateServiceProvider() {
+	public void testGetTemplateService() {
 		TemplateService tplSvc = this.getService();
 		assertNotNull(tplSvc);
 	}

@@ -12,9 +12,9 @@ import com.zyeeda.framework.service.AbstractService;
 public class ShiroSecurityServiceProvider extends AbstractService implements SecurityService<SecurityManager> {
 
 	// Injected
-	private LdapService ldapSvc;
-	private PersistenceService persistenceSvc;
-	private Logger logger;
+	private final LdapService ldapSvc;
+	private final PersistenceService persistenceSvc;
+	private final Logger logger;
 	
 	private RoleManager roleMgr;
 	
