@@ -32,8 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.services.Service;
-import com.zyeeda.framework.services.ServiceState;
+import com.zyeeda.framework.service.Service;
+import com.zyeeda.framework.service.ServiceInvocationHandler;
+import com.zyeeda.framework.service.ServiceState;
 
 /**
  * Simple application server.
@@ -96,7 +97,7 @@ public class ApplicationServer implements Service {
 		}
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	@Override
 	public void start() throws Exception {
 		List services = this.serverConfig.configurationsAt(SERVICES_NODE);
@@ -173,6 +174,11 @@ public class ApplicationServer implements Service {
     public String getName() {
     	return "server";
     }
+    
+	@Override
+	public ApplicationServer getServer() {
+		return this;
+	}
     
 	public File mapPath(String relativePath) {
 		return new File(serverRoot, relativePath);

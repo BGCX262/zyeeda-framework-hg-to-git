@@ -19,12 +19,16 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.tapestry5.ioc.IOCUtilities;
+import org.apache.tapestry5.ioc.Registry;
+import org.apache.tapestry5.ioc.RegistryBuilder;
+import org.apache.tapestry5.ioc.def.ContributionDef;
+
+import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.server.ApplicationServer;
 
 /**
  * Context listener.
@@ -38,69 +42,47 @@ public class ContextListener implements ServletContextListener {
 
     private final static Logger logger = LoggerFactory.getLogger(ContextListener.class);
 
-    private ApplicationServer server;
+    private final RegistryBuilder builder = new RegistryBuilder();
     
     @Override
     public void contextInitialized(ServletContextEvent event) {
+    	LoggerHelper.info(logger, "context initialized");
+    	
     	try {
         	ServletContext context = event.getServletContext();
-            String contextRoot = context.getRealPath("/");
-            LoggerHelper.debug(logger, "servlet context root = {}", contextRoot);
             
-            ApplicationServer server = new ApplicationServer();
+            IOCUtilities.addDefaultModules(builder);
+            ContributionDef contributionDef = new SyntheticSymbolSourceContributionDef(context);
+            builder.add(new SyntheticModuleDef(contributionDef));
+            builder.add(this.provideExtraModules());
+            Registry registry = builder.build();
             
-            PropertiesConfiguration config = new PropertiesConfiguration();
-            config.addProperty(ApplicationServer.SERVER_ROOT, contextRoot);
-            server.init(config);
+            context.setAttribute(FrameworkConstants.SERVICE_REGISTRY, registry);
             
-            server.start();
-            
-            context.setAttribute(ApplicationServer.class.getName(), server);
+            registry.performRegistryStartup();
     	} catch (Throwable t) {
-        	LoggerHelper.error(logger, t.getMessage(), t);
-            System.exit(1);
+    		LoggerHelper.error(logger, t.getMessage(), t);
+    		System.exit(1);
     	}
     }
-
-    /*@Override
-    public void contextInitialized(ServletContextEvent event) {
-        ServletContext context = event.getServletContext();
-        String serverJndiName = context.getInitParameter(GlobalConstants.SERVER_JNDI_NAME);
-        if (serverJndiName == null) {
-        	LoggerHelper.error(logger, "{} is not specified", GlobalConstants.SERVER_JNDI_NAME);
-        	System.exit(1);
-        }
-        
-        // NOTE
-        // Weblogic doesn't support
-        // String contextRoot = context.getRealPath("/");
-        
-        String contextRoot = null;
-        try {
-            contextRoot = context.getRealPath("/");
-            LoggerHelper.debug(logger, "servlet context root = {}", contextRoot);
-            
-            server = (Server) JndiUtils.getObjectFromJndi(serverJndiName);
-            
-            PropertiesConfiguration config = new PropertiesConfiguration();
-            config.addProperty(Server.SERVER_ROOT, contextRoot);
-            server.init(config);
-            
-            server.start();
-        } catch (Throwable e) {
-        	LoggerHelper.error(logger, e.getMessage(), e);
-            System.exit(1);
-        }
-    }*/
-
+    
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-        try {
-            if (server != null) {
-                server.stop();
-            }
-        } catch (Throwable e) {
-        	LoggerHelper.error(logger, e.getMessage(), e);
-        }
+    	LoggerHelper.info(logger, "context destroyed");
+    	
+    	try {
+	    	ServletContext context = event.getServletContext();
+	    	Registry registry = (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+	    	registry.shutdown();
+	    	context.removeAttribute(FrameworkConstants.SERVICE_REGISTRY);
+    	} catch (Throwable t) {
+    		LoggerHelper.error(logger, t.getMessage(), t);
+    		System.exit(1);
+    	}
     }
+    
+    protected Class<?>[] provideExtraModules() {
+    	return new Class<?>[0];
+    }
+
 }

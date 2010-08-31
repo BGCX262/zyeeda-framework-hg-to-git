@@ -1,37 +1,59 @@
 package com.zyeeda.framework.unittest;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import static org.easymock.EasyMock.createStrictMock;
+import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.replay;
+
+import javax.servlet.ServletContext;
+import javax.servlet.ServletContextEvent;
+
+import org.apache.tapestry5.ioc.Registry;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
-import com.zyeeda.framework.server.ApplicationServer;
+import com.zyeeda.framework.FrameworkConstants;
+import com.zyeeda.framework.template.FreemarkerTemplateServiceProviderModule;
+import com.zyeeda.framework.unittest.services.ServletContextMock;
+import com.zyeeda.framework.web.ContextListener;
 
 public class TestSuiteBase {
 	
-	private ApplicationServer server;
+	private static ServletContext context;
 	
 	@BeforeSuite
-	public ApplicationServer setupServer() throws Exception {
-		ApplicationServer server = new ApplicationServer();
-		PropertiesConfiguration config = new PropertiesConfiguration();
-        config.addProperty(ApplicationServer.SERVER_ROOT, System.getProperty("serverRoot"));
-        server.init(config);
-		server.start();
+	public static void setupContext() {
+		context = new ServletContextMock();
 		
-		this.server = server;
+		ContextListener ctxListener = new ContextListener() {
+			
+			@Override
+			protected Class<?>[] provideExtraModules() {
+				return new Class<?>[] {
+						FreemarkerTemplateServiceProviderModule.class
+				};
+			}
+			
+		};
 		
-		return server;
+		ServletContextEvent event = createStrictMock(ServletContextEvent.class);
+		expect(event.getServletContext()).andReturn(context).anyTimes();
+		replay(event);
+		
+		ctxListener.contextInitialized(event);
 	}
 	
 	@AfterSuite
-	public void tearDownServer() throws Exception {
-		if (this.server != null) {
-			this.server.stop();
-		}
+	public static void tearDownContext() {
+		ContextListener ctxListener = new ContextListener();
+		ServletContextEvent event = createStrictMock(ServletContextEvent.class);
+		expect(event.getServletContext()).andReturn(context).anyTimes();
+		replay(event);
+		
+		ctxListener.contextDestroyed(event);
 	}
 	
-	protected ApplicationServer getServer() {
-		return this.server;
+	protected static Registry getRegistry() {
+		return (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
 	}
 	
 }

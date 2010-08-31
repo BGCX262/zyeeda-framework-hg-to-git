@@ -25,7 +25,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.services.TemplateService;
+import com.zyeeda.framework.template.TemplateService;
 
 import freemarker.template.TemplateException;
 

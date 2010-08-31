@@ -5,15 +5,19 @@
 	<services>
 		<service>
 			<name>template-service</name>
-			<class>com.zyeeda.framework.services.internal.FreemarkerTemplateServiceProvider</class>
+			<class>com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider</class>
 		</service>
 		<service>
 			<name>security-service</name>
-			<class>com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider</class>
+			<class>com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider</class>
 		</service>
 		<service>
 			<name>ldap-service</name>
-			<class>com.zyeeda.framework.services.internal.SunJndiLdapServiceProvider</class>
+			<class>com.zyeeda.framework.ldap.internal.SunJndiLdapServiceProvider</class>
+		</service>
+		<service>
+			<name>persistence-service</name>
+			<class>com.zyeeda.framework.persistence.internal.JpaPersistenceServiceProvider</class>
 		</service>
 	</services>
 	
@@ -33,5 +37,6 @@
     	<referral>follow</referral>
     	<usePooling>true</usePooling>
     </ldap-service>
+    <persistence-service />
 
 </configuration>

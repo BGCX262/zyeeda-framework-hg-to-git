@@ -16,10 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.security.ShiroSecurityManager;
+import com.zyeeda.framework.security.SecurityService;
+import com.zyeeda.framework.security.internal.ShiroSecurityManager;
+import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
 import com.zyeeda.framework.server.ApplicationServer;
-import com.zyeeda.framework.services.SecurityService;
-import com.zyeeda.framework.services.internal.ShiroSecurityServiceProvider;
 
 public class ShiroSecurityFilter extends IniShiroFilter {
 	
