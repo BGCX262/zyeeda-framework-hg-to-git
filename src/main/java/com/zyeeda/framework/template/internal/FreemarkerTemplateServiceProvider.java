@@ -29,10 +29,8 @@ import org.apache.tapestry5.ioc.Resource;
 import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
 import org.chenillekit.core.services.ConfigurationService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
-import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.TemplateServiceException;
@@ -52,58 +50,48 @@ import freemarker.template.TemplateExceptionHandler;
  */
 public class FreemarkerTemplateServiceProvider extends AbstractService implements TemplateService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FreemarkerTemplateServiceProvider.class);
+    private static final String SERVICE_PROVIDER_NAME = "freemarker-template-service-provider";
     
-    public static final String SERVICE_PROVIDER_NAME = "freemarker-template-service-provider";
-    
-    public static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
-    public static final String DATE_FORMAT = "dateFormat";
-    public static final String TIME_FORMAT = "timeFormat";
-    public static final String DATETIME_FORMAT = "datetimeFormat";
+    private static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
+    private static final String DATE_FORMAT = "dateFormat";
+    private static final String TIME_FORMAT = "timeFormat";
+    private static final String DATETIME_FORMAT = "datetimeFormat";
     
     private static final String DEFAULT_TEMPLATE_REPOSITORY_ROOT = "/WEB-INF/tpl";
     private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     private static final String DEFAULT_TIME_FORMAT = "hh:mm:ss";
     private static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
+
+    // Injected
+    private File appRoot;
+    private Logger logger;
     
     private File tplRoot;
     private String dateFormat;
     private String timeFormat;
     private String datetimeFormat;
     
-    private File appRoot;
-    
     private Configuration config;
-    
-    public FreemarkerTemplateServiceProvider(ApplicationServer server, String name) {
-    	super(server, name);
-    }
-    
-    public FreemarkerTemplateServiceProvider(ApplicationServer server) {
-    	super(server, FreemarkerTemplateServiceProvider.class.getSimpleName());
-    }
     
     public FreemarkerTemplateServiceProvider(
     		String appRoot,
-    		ConfigurationService configSvc) throws Exception {
+    		ConfigurationService configSvc,
+    		Logger logger) throws Exception {
     	
-    	super(null, null);
     	this.appRoot = new File(appRoot);
+    	this.logger = logger;
+    	
     	Resource configFile = new ClasspathResource(SERVICE_PROVIDER_NAME + ".properties");
     	org.apache.commons.configuration.Configuration config = configSvc.getConfiguration(configFile);
-    	
     	this.init(config);
     }
 
-    @Override
-    public void init(org.apache.commons.configuration.Configuration config) throws Exception {
-    	super.init(config);
+    private void init(org.apache.commons.configuration.Configuration config) throws Exception {
     	
-    	String tplRootString = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
-    	LoggerHelper.debug(logger, "template repository root = {}", tplRootString);
+    	String tplRoot = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
+    	LoggerHelper.debug(this.logger, "template repository root = {}", tplRoot);
     	
-    	//this.tplRoot = this.getServer().mapPath(tplRootString);
-    	this.tplRoot = new File(this.appRoot, tplRootString);
+    	this.tplRoot = new File(this.appRoot, tplRoot);
     	if (!this.tplRoot.exists()) {
     		throw new FileNotFoundException(this.tplRoot.toString());
     	}
@@ -112,11 +100,11 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     	this.timeFormat = config.getString(TIME_FORMAT, DEFAULT_TIME_FORMAT);
     	this.datetimeFormat = config.getString(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
     	
-    	if (logger.isDebugEnabled()) {
-    		logger.debug("template root = {}", this.tplRoot);
-    		logger.debug("date format = {}", this.dateFormat);
-    		logger.debug("time format = {}", this.timeFormat);
-    		logger.debug("datetime format = {}", this.dateFormat);
+    	if (this.logger.isDebugEnabled()) {
+    		this.logger.debug("template root = {}", this.tplRoot);
+    		this.logger.debug("date format = {}", this.dateFormat);
+    		this.logger.debug("time format = {}", this.timeFormat);
+    		this.logger.debug("datetime format = {}", this.dateFormat);
     	}
     }
 
@@ -141,9 +129,9 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
 
     @Override
     public void paint(String tplPath, Writer out, Map<?, ?> args) throws IOException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("painting template = {}", tplPath);
-			logger.debug("template varables = {}", args);
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("painting template = {}", tplPath);
+			this.logger.debug("template varables = {}", args);
 		}
 		Template template = this.config.getTemplate(tplPath);
 		try {

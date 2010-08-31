@@ -12,21 +12,21 @@ import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.tapestry5.ioc.Resource;
+import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
+import org.chenillekit.core.services.ConfigurationService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.LdapServiceException;
-import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.TemplateServiceException;
-import com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider;
 
-public class SunJndiLdapServiceProvider extends AbstractService implements LdapService {
+public class SunLdapServiceProvider extends AbstractService implements LdapService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(SunJndiLdapServiceProvider.class);
+	private static final String SERVICE_PROVIDER_NAME = "sun-ldap-service-provider";
 	
 	private static final String PROVIDER_URL = "providerUrl";
 	private static final String SECURITY_AUTHENTICATION = "securityAuthentication";
@@ -37,17 +37,29 @@ public class SunJndiLdapServiceProvider extends AbstractService implements LdapS
 	private static final String DEFAULT_INITIAL_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
 	private static final String DEFAULT_SECURITY_AUTHENTICATION = "simple";
 	
+	// Injected
+	private TemplateService tplSvc;
+	private Logger logger;
+	
 	private String providerUrl;
 	private String securityAuthentication;
 	private String systemSecurityPrincipal;
 	private String systemSecurityCredentials;
 	private String securityPrincipalTemplate;
 	
-	public SunJndiLdapServiceProvider(ApplicationServer server, String name) {
-		super(server, name);
+	public SunLdapServiceProvider(
+			ConfigurationService configSvc, 
+			TemplateService tplSvc,
+			Logger logger) throws Exception {
+		
+		this.tplSvc = tplSvc;
+		this.logger = logger;
+		
+		Resource configFile = new ClasspathResource(SERVICE_PROVIDER_NAME + ".properties");
+    	Configuration config = configSvc.getConfiguration(configFile);
+    	this.init(config);
 	}
 	
-	@Override
 	public void init(Configuration config) throws Exception {
 		this.providerUrl = config.getString(PROVIDER_URL);
 		this.securityAuthentication = config.getString(SECURITY_AUTHENTICATION, DEFAULT_SECURITY_AUTHENTICATION);
@@ -55,12 +67,12 @@ public class SunJndiLdapServiceProvider extends AbstractService implements LdapS
 		this.systemSecurityCredentials = config.getString(SYSTEM_SECURITY_CREDENTIALS);
 		this.securityPrincipalTemplate = config.getString(SECURITY_PRINCIPAL_TEMPLATE);
 		
-		if (logger.isDebugEnabled()) {
-			logger.debug("provider url = {}", this.providerUrl);
-			logger.debug("security authentication = {}", this.securityAuthentication);
-			logger.debug("system security principal = {}", this.systemSecurityPrincipal);
-			logger.debug("system security credentials = ******");
-			logger.debug("security princiapl template = {}", this.securityPrincipalTemplate);
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("provider url = {}", this.providerUrl);
+			this.logger.debug("security authentication = {}", this.securityAuthentication);
+			this.logger.debug("system security principal = {}", this.systemSecurityPrincipal);
+			this.logger.debug("system security credentials = ******");
+			this.logger.debug("security princiapl template = {}", this.securityPrincipalTemplate);
 		}
 	}
 
@@ -74,16 +86,16 @@ public class SunJndiLdapServiceProvider extends AbstractService implements LdapS
 
 	@Override
 	public LdapContext getLdapContext(String username, String password)	throws NamingException, IOException, TemplateServiceException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("username = {}", username);
-			logger.debug("password = ******");
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("username = {}", username);
+			this.logger.debug("password = ******");
 		}
 		
 		Hashtable<String, String> env = this.setupEnvironment();
 		Map<String, String> args = new HashMap<String, String>(1);
 		args.put("username", username);
-		String principal = this.getTemplateService().render(this.securityPrincipalTemplate, args);
-		LoggerHelper.debug(logger, "rendered principal = {}", principal);
+		String principal = this.tplSvc.render(this.securityPrincipalTemplate, args);
+		LoggerHelper.debug(this.logger, "rendered principal = {}", principal);
 		
 		env.put(Context.SECURITY_PRINCIPAL, principal);
 		env.put(Context.SECURITY_CREDENTIALS, password);
@@ -101,10 +113,6 @@ public class SunJndiLdapServiceProvider extends AbstractService implements LdapS
 		
 		env.put(Context.SECURITY_AUTHENTICATION, this.securityAuthentication);
 		return env;
-	}
-	
-	private TemplateService getTemplateService() {
-		return this.getServer().getService(FreemarkerTemplateServiceProvider.class);
 	}
 
 }

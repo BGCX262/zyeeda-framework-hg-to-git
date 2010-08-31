@@ -15,11 +15,6 @@
  */
 package com.zyeeda.framework.service;
 
-import org.apache.commons.configuration.Configuration;
-
-import com.zyeeda.framework.server.ApplicationServer;
-
-
 /**
  * Abstract service.
  * 
@@ -29,20 +24,7 @@ import com.zyeeda.framework.server.ApplicationServer;
  */
 public abstract class AbstractService implements Service {
 	
-	private Configuration config;
-	private String name;
-	private ApplicationServer server;
     private ServiceState state = ServiceState.NEW;
-    
-    public AbstractService(ApplicationServer server, String name) {
-    	this.name = name;
-    	this.server = server;
-    }
-    
-    @Override
-    public String getName() {
-    	return this.name;
-    }
 
     @Override
     public ServiceState getState() {
@@ -54,11 +36,6 @@ public abstract class AbstractService implements Service {
     	this.state = state;
     }
     
-    @Override
-    public void init(Configuration config) throws Exception {
-    	this.config = config;
-    }
-    
 	@Override
 	public void start() throws Exception {
 	}
@@ -66,14 +43,5 @@ public abstract class AbstractService implements Service {
 	@Override
 	public void stop() throws Exception {
 	}
-    
-    @Override
-    public Configuration getConfiguration() {
-    	return this.config;
-    }
-    
-    public ApplicationServer getServer() {
-    	return this.server;
-    }
     
 }

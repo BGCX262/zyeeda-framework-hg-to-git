@@ -15,11 +15,6 @@
  */
 package com.zyeeda.framework.service;
 
-import org.apache.commons.configuration.Configuration;
-
-import com.zyeeda.framework.server.ApplicationServer;
-
-
 /**
  * Service interface.
  *
@@ -29,10 +24,6 @@ import com.zyeeda.framework.server.ApplicationServer;
  */
 public interface Service {
 	
-	String getName();
-	
-    void init(Configuration config) throws Exception;
-    
     void start() throws Exception;
 
     void stop() throws Exception;
@@ -40,9 +31,5 @@ public interface Service {
     ServiceState getState();
     
     void changeState(ServiceState state);
-    
-    Configuration getConfiguration();
-    
-    ApplicationServer getServer();
     
 }

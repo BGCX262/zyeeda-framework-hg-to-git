@@ -7,19 +7,18 @@ import javax.persistence.EntityTransaction;
 
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.JpaPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 
 public class RoleManager extends DomainEntityManager {
 	
-	private SecurityService<?> securityService;
+	private SecurityService<?> securitySvc;
 	
-	public RoleManager(SecurityService<?> securityService) {
-		this.securityService = securityService;
+	public RoleManager(SecurityService<?> securitySvc) {
+		this.securitySvc = securitySvc;
 	}
 
 	public List<Role> getRolesBySubject(String subject) throws Throwable {
-		PersistenceService<EntityManager> persistenceSvc = this.getPersistenceService();
+		PersistenceService persistenceSvc = this.securitySvc.getPersistenceService();
 		EntityManager em = persistenceSvc.openSession();
 		EntityTransaction tx = em.getTransaction();
 		try {
@@ -33,10 +32,6 @@ public class RoleManager extends DomainEntityManager {
 			tx.rollback();
 			throw t;
 		}
-	}
-	
-	private PersistenceService<EntityManager> getPersistenceService() {
-		return this.securityService.getServer().getService(JpaPersistenceServiceProvider.class);
 	}
 	
 }

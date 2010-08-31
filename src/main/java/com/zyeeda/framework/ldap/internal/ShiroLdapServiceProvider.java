@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.server.ApplicationServer;
 import com.zyeeda.framework.service.AbstractService;
 
 @Deprecated
@@ -41,11 +40,6 @@ public class ShiroLdapServiceProvider extends AbstractService implements LdapSer
 	
 	private DefaultLdapContextFactory factory;
 	
-	public ShiroLdapServiceProvider(ApplicationServer server, String name) {
-		super(server, name);
-	}
-	
-	@Override
 	public void init(Configuration config) throws Exception {
 		this.authentication = config.getString(AUTHENTICATION, DEFAULT_AUTHENTICATION);
 		this.principalSuffix = config.getString(PRINCIPAL_SUFFIX);

@@ -11,15 +11,15 @@ import org.apache.shiro.web.config.WebIniSecurityManagerFactory;
 import org.apache.shiro.web.mgt.WebSecurityManager;
 import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.tapestry5.ioc.Registry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.ShiroSecurityManager;
-import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
-import com.zyeeda.framework.server.ApplicationServer;
 
 public class ShiroSecurityFilter extends IniShiroFilter {
 	
@@ -37,7 +37,8 @@ public class ShiroSecurityFilter extends IniShiroFilter {
 			LoggerHelper.warn(logger, "{} section will be ignored!", IniRealm.ROLES_SECTION_NAME);
 		}
 		
-		SecurityService<?> securitySvc = this.getServer().getService(ShiroSecurityServiceProvider.class);
+		Registry reg = (Registry) this.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+		SecurityService<?> securitySvc = reg.getService(SecurityService.class);
 		SecurityManager securityManager = (SecurityManager) securitySvc.getSecurityManager();
 		if (!(securityManager instanceof ShiroSecurityManager)) {
 			String msg = "The security manager initialized by security service is not an instance of ShiroSecurityManager, " + 
@@ -55,10 +56,6 @@ public class ShiroSecurityFilter extends IniShiroFilter {
             factory = new WebIniSecurityManagerFactory(ini);
         }
         return factory.getBeans();
-	}
-	
-	private ApplicationServer getServer() {
-		return (ApplicationServer) this.getServletContext().getAttribute(ApplicationServer.class.getName());
 	}
 
 }

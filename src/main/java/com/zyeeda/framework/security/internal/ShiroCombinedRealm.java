@@ -21,32 +21,33 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.ldap.internal.SunJndiLdapServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.JpaPersistenceServiceProvider;
-import com.zyeeda.framework.server.ApplicationServer;
 
 public class ShiroCombinedRealm extends AuthorizingRealm {
 	
-	private static final Logger logger = LoggerFactory.getLogger(ShiroCombinedRealm.class);
+	// Injected
+	private LdapService ldapSvc;
+	private PersistenceService persistenceSvc;
+	private Logger logger;
 	
-	private ApplicationServer server;
-	
-	public ShiroCombinedRealm(ApplicationServer server) {
-		this.server = server;
+	public ShiroCombinedRealm(LdapService ldapSvc,
+			PersistenceService persistenceSvc,
+			Logger logger) {
+		
+		this.ldapSvc = ldapSvc;
+		this.persistenceSvc = persistenceSvc;
+		this.logger = logger;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		PersistenceService<EntityManager> persistenceSvc = this.getPersistenceService();
 		EntityManager em = null;
 		try {
-			em = persistenceSvc.openSession();
+			em = this.persistenceSvc.openSession();
 			em.getTransaction().begin();
 			String username = (String) this.getAvailablePrincipal(principals);
 			Query query = em.createNamedQuery("getRolesBySubject");
@@ -83,7 +84,7 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 		
 		LdapContext ctx = null;
 		try {
-			ctx = this.getLdapService().getLdapContext(upToken.getUsername(), new String(upToken.getPassword()));
+			ctx = this.ldapSvc.getLdapContext(upToken.getUsername(), new String(upToken.getPassword()));
 		} catch (NamingException e) {
 			throw new AuthenticationException(e);
 		} catch (IOException e) {
@@ -93,14 +94,6 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 		}
 		
 		return new SimpleAuthenticationInfo(upToken.getUsername(), upToken.getPassword(), this.getName());
-	}
-	
-	private LdapService getLdapService() {
-		return this.server.getService(SunJndiLdapServiceProvider.class);
-	}
-	
-	private PersistenceService<EntityManager> getPersistenceService() {
-		return this.server.getService(JpaPersistenceServiceProvider.class);
 	}
 
 }

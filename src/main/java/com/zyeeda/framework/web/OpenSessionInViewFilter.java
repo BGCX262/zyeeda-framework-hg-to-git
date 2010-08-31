@@ -24,11 +24,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import javax.persistence.EntityManager;
+import org.apache.tapestry5.ioc.Registry;
 
+import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.JpaPersistenceServiceProvider;
-import com.zyeeda.framework.server.ApplicationServer;
 
 /**
  * Open session in view servlet filter.
@@ -52,11 +51,11 @@ public class OpenSessionInViewFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        PersistenceService<EntityManager> svc = null;
+        PersistenceService svc = null;
 
         try {
-            ApplicationServer server = (ApplicationServer) this.config.getServletContext().getAttribute(ApplicationServer.class.getName());
-            svc = server.getService(JpaPersistenceServiceProvider.class);
+        	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+        	svc = reg.getService(PersistenceService.class);
             svc.openSession();
             chain.doFilter(request, response);
         } finally {

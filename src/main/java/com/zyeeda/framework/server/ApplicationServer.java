@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License. 
  */
-package com.zyeeda.framework.server;
+/*package com.zyeeda.framework.server;
 
 import java.io.File;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.service.Service;
 import com.zyeeda.framework.service.ServiceInvocationHandler;
-import com.zyeeda.framework.service.ServiceState;
+import com.zyeeda.framework.service.ServiceState;*/
 
 /**
  * Simple application server.
@@ -43,7 +43,7 @@ import com.zyeeda.framework.service.ServiceState;
  * @version		%I%, %G%
  * @since		1.0
  */
-public class ApplicationServer implements Service {
+/*public class ApplicationServer implements Service {
 
 	private static final Logger logger = LoggerFactory.getLogger(ApplicationServer.class);
 	
@@ -185,3 +185,4 @@ public class ApplicationServer implements Service {
 	}
 
 }
+*/

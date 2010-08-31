@@ -16,10 +16,10 @@ import org.apache.shiro.web.servlet.IniShiroFilter;
 import org.apache.shiro.config.Ini;
 import org.apache.shiro.config.IniFactorySupport;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.tapestry5.ioc.Registry;
 
+import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.security.SecurityService;
-import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
-import com.zyeeda.framework.server.ApplicationServer;
 
 public class SecurityFilter implements Filter {
 	
@@ -31,8 +31,9 @@ public class SecurityFilter implements Filter {
 		this.config = config;
 		this.innerFilter = new IniShiroFilter();
 		
-		SecurityService<SecurityManager> securityService = this.getSecurityService();
-		SecurityManager securityMgr = securityService.getSecurityManager();
+		Registry reg = (Registry) config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+		SecurityService<?> securityService = reg.getService(SecurityService.class);
+		SecurityManager securityMgr = (SecurityManager) securityService.getSecurityManager();
 		if (!(securityMgr instanceof WebSecurityManager)) {
 			throw new ServletException("Incompatible security manager.");
 		}
@@ -53,23 +54,15 @@ public class SecurityFilter implements Filter {
             this.innerFilter.setFilterChainResolver(resolver);
         }
 	}
-
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-		this.innerFilter.doFilter(request, response, filterChain);
-	}
 	
 	@Override
 	public void destroy() {
 		this.innerFilter.destroy();
 	}
-	
-	private ApplicationServer getServer() {
-		return (ApplicationServer) this.config.getServletContext().getAttribute(ApplicationServer.class.getName());
-	}
-	
-	private SecurityService<SecurityManager> getSecurityService() {
-		return this.getServer().getService(ShiroSecurityServiceProvider.class);
+
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+		this.innerFilter.doFilter(request, response, filterChain);
 	}
 
 }
