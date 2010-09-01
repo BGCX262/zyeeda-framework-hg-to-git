@@ -2,10 +2,8 @@ package com.zyeeda.framework.managers;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
+import org.hibernate.Session;
 
-import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
 
@@ -17,19 +15,18 @@ public class RoleManager extends DomainEntityManager {
 		this.securitySvc = securitySvc;
 	}
 
-	public List<Role> getRolesBySubject(String subject) throws Throwable {
+	public List<?> getRolesBySubject(String subject) throws Throwable {
 		PersistenceService persistenceSvc = this.securitySvc.getPersistenceService();
-		EntityManager em = persistenceSvc.openSession();
-		EntityTransaction tx = em.getTransaction();
+		Session session = persistenceSvc.openSession();
 		try {
-			tx.begin();
-			List<Role> roles = em.createNamedQuery("getRolesBySubject", Role.class)
-				.setParameter("subject", subject).getResultList();
-			tx.commit();
+			session.getTransaction().begin();
+			List<?> roles = session.getNamedQuery("getRolesBySubject")
+				.setParameter("subject", subject).list();
+			session.getTransaction().commit();
 			
 			return roles;
 		} catch (Throwable t) {
-			tx.rollback();
+			session.getTransaction().rollback();
 			throw t;
 		}
 	}

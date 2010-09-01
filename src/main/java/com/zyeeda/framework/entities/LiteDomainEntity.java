@@ -1,5 +1,7 @@
 package com.zyeeda.framework.entities;
 
+import javax.validation.constraints.NotNull;
+
 @javax.persistence.MappedSuperclass
 public class LiteDomainEntity extends DomainEntity {
 
@@ -10,6 +12,7 @@ public class LiteDomainEntity extends DomainEntity {
     
     @javax.persistence.Basic
     @javax.persistence.Column(name = "F_NAME")
+    @NotNull
     public String getName() {
         return this.name;
     }

@@ -17,6 +17,8 @@ import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider;
+import com.zyeeda.framework.validation.ValidationService;
+import com.zyeeda.framework.validation.internal.HibernateValidationServiceProvider;
 
 public class FrameworkModule {
 	
@@ -37,9 +39,17 @@ public class FrameworkModule {
 	}
 	
 	@Marker(Primary.class)
-	public PersistenceService buildHibernatePersistenceServiceProvider(
+	public ValidationService buildHibernateValidationServiceProvider(
+			@Primary PersistenceService persistenceSvc,
 			Logger logger) {
-		return new HibernatePersistenceServiceProvider(logger);
+		return new HibernateValidationServiceProvider(persistenceSvc, logger);
+	}
+	
+	@Marker(Primary.class)
+	public PersistenceService buildHibernatePersistenceServiceProvider(
+			@Primary ValidationService validationSvc,
+			Logger logger) {
+		return new HibernatePersistenceServiceProvider(validationSvc, logger);
 	}
 	
 	@Marker(Primary.class)
@@ -54,13 +64,16 @@ public class FrameworkModule {
 	public SecurityService<?> buildShiroSecurityServiceProvider(
 			@Primary LdapService ldapSvc,
 			@Primary PersistenceService persistenceSvc,
+			@Primary SecurityService<?> securitySvc,
 			Logger logger) {
-		return new ShiroSecurityServiceProvider(ldapSvc, persistenceSvc, logger);
+		return new ShiroSecurityServiceProvider(
+				ldapSvc, persistenceSvc, securitySvc, logger);
 	}
 	
 	public void contributeRegistryStartup(
 			OrderedConfiguration<Runnable> configuration,
 			@Primary final TemplateService tplSvc,
+			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService persistenceSvc,
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc) {
@@ -71,6 +84,7 @@ public class FrameworkModule {
 			public void run() {
 				try {
 					tplSvc.start();
+					validationSvc.start();
 					persistenceSvc.start();
 					ldapSvc.start();
 					securitySvc.start();

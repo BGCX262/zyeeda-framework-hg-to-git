@@ -14,16 +14,19 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	// Injected
 	private final LdapService ldapSvc;
 	private final PersistenceService persistenceSvc;
+	private final SecurityService<?> securitySvc;
 	private final Logger logger;
 	
 	private RoleManager roleMgr;
 	
 	public ShiroSecurityServiceProvider(LdapService ldapSvc,
 			PersistenceService persistenceSvc,
+			SecurityService<?> securitySvc,
 			Logger logger) {
 		
 		this.ldapSvc = ldapSvc;
 		this.persistenceSvc = persistenceSvc;
+		this.securitySvc = securitySvc;
 		this.logger = logger;
 		
 		this.roleMgr = new RoleManager(this);
@@ -32,7 +35,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	@Override
 	public SecurityManager getSecurityManager() {
 		return new ShiroSecurityManager(
-				this.ldapSvc, this.persistenceSvc, this.logger);
+				this.ldapSvc, this.persistenceSvc, this.securitySvc, this.logger);
 	}
 	
 	@Override

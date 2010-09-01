@@ -1,12 +1,12 @@
 package com.zyeeda.framework.persistence;
 
-import javax.persistence.EntityManager;
+import org.hibernate.Session;
 
 import com.zyeeda.framework.service.Service;
 
 public interface PersistenceService extends Service {
 
-	public EntityManager openSession();
+	public Session openSession();
 	
 	public void closeSession();
 	
