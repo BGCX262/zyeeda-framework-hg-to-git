@@ -3,6 +3,9 @@ package com.zyeeda.framework.validation.internal;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.apache.tapestry5.ioc.annotations.Marker;
+import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.slf4j.Logger;
@@ -11,6 +14,8 @@ import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.validation.ValidationService;
 
+@ServiceId("HibernateValidationServiceProvider")
+@Marker(Primary.class)
 public class HibernateValidationServiceProvider extends AbstractService	implements ValidationService {
 
 	// Injected

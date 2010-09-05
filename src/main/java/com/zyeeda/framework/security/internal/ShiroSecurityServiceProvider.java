@@ -1,6 +1,9 @@
 package com.zyeeda.framework.security.internal;
 
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.tapestry5.ioc.annotations.Marker;
+import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.ldap.LdapService;
@@ -9,6 +12,8 @@ import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.service.AbstractService;
 
+@ServiceId("ShiroSecurityServiceProvider")
+@Marker(Primary.class)
 public class ShiroSecurityServiceProvider extends AbstractService implements SecurityService<SecurityManager> {
 
 	// Injected

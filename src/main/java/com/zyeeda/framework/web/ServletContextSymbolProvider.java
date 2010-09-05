@@ -17,6 +17,7 @@ import com.zyeeda.framework.FrameworkConstants;
 /**
  * This class is copied from tapestry-core.
  */
+@Deprecated
 public class ServletContextSymbolProvider implements SymbolProvider {
 	
 	private final static Logger logger = LoggerFactory.getLogger(ContextListener.class);

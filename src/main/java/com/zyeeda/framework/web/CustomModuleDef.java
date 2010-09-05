@@ -9,14 +9,11 @@ import org.apache.tapestry5.ioc.def.DecoratorDef;
 import org.apache.tapestry5.ioc.def.ModuleDef;
 import org.apache.tapestry5.ioc.def.ServiceDef;
 
-/**
- * This class is copied from tapestry-core.
- */
-public class SyntheticModuleDef implements ModuleDef {
+public class CustomModuleDef implements ModuleDef {
 
 	private Set<ContributionDef> defs;
 	
-	public SyntheticModuleDef(ContributionDef... defs) {
+	public CustomModuleDef(ContributionDef... defs) {
 		this.defs = CollectionUtils.asSet(defs);
 	}
 
@@ -38,7 +35,7 @@ public class SyntheticModuleDef implements ModuleDef {
 
 	@Override
 	public String getLoggerName() {
-		return "SyntheticModule";
+		return "CustomModule";
 	}
 
 	@Override

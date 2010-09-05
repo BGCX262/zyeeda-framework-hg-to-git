@@ -1,11 +1,8 @@
 package com.zyeeda.framework;
 
 import org.apache.tapestry5.ioc.OrderedConfiguration;
-import org.apache.tapestry5.ioc.annotations.Inject;
-import org.apache.tapestry5.ioc.annotations.Marker;
+import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
-import org.apache.tapestry5.ioc.annotations.Symbol;
-import org.chenillekit.core.services.ConfigurationService;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
@@ -27,47 +24,13 @@ public class FrameworkModule {
 	public FrameworkModule(Logger logger) {
 		this.logger = logger;
 	}
-
-	@Marker(Primary.class)
-	public TemplateService buildFreemarkerTemplateServiceProvider(
-			@Inject @Symbol(FrameworkConstants.APPLICATION_ROOT) String appRoot,
-			ConfigurationService configSvc,
-			Logger logger) throws Exception {
-		
-		return new FreemarkerTemplateServiceProvider(
-				appRoot, configSvc, logger);
-	}
 	
-	@Marker(Primary.class)
-	public ValidationService buildHibernateValidationServiceProvider(
-			@Primary PersistenceService persistenceSvc,
-			Logger logger) {
-		return new HibernateValidationServiceProvider(persistenceSvc, logger);
-	}
-	
-	@Marker(Primary.class)
-	public PersistenceService buildHibernatePersistenceServiceProvider(
-			@Primary ValidationService validationSvc,
-			Logger logger) {
-		return new HibernatePersistenceServiceProvider(validationSvc, logger);
-	}
-	
-	@Marker(Primary.class)
-	public LdapService buildSunLdapServiceProvider(
-			ConfigurationService configSvc,
-			@Primary TemplateService tplSvc, 
-			Logger logger) throws Exception {
-		return new SunLdapServiceProvider(configSvc, tplSvc, logger);
-	}
-	
-	@Marker(Primary.class)
-	public SecurityService<?> buildShiroSecurityServiceProvider(
-			@Primary LdapService ldapSvc,
-			@Primary PersistenceService persistenceSvc,
-			@Primary SecurityService<?> securitySvc,
-			Logger logger) {
-		return new ShiroSecurityServiceProvider(
-				ldapSvc, persistenceSvc, securitySvc, logger);
+	public void bind(ServiceBinder binder) {
+		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
+		binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
+		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
+		binder.bind(LdapService.class, SunLdapServiceProvider.class);
+		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
 	}
 	
 	public void contributeRegistryStartup(

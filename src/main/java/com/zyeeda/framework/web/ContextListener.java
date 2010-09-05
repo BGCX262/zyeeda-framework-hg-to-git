@@ -52,8 +52,8 @@ public class ContextListener implements ServletContextListener {
         	ServletContext context = event.getServletContext();
             
             IOCUtilities.addDefaultModules(builder);
-            ContributionDef contributionDef = new SyntheticSymbolSourceContributionDef(context);
-            builder.add(new SyntheticModuleDef(contributionDef));
+            ContributionDef contributionDef = new ConfigurationServiceContributionDef(context);
+            builder.add(new CustomModuleDef(contributionDef));
             builder.add(this.provideExtraModules());
             Registry registry = builder.build();
             

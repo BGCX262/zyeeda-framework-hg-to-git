@@ -9,41 +9,37 @@ import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceResources;
 import org.apache.tapestry5.ioc.def.ContributionDef;
 
-/**
- * This class is copied from tapestry-core.
- */
-public class SyntheticSymbolSourceContributionDef implements ContributionDef {
+public class ConfigurationServiceContributionDef implements ContributionDef {
 
 	private ServletContext context;
 	
-	public SyntheticSymbolSourceContributionDef(ServletContext context) {
+	public ConfigurationServiceContributionDef(ServletContext context) {
 		this.context = context;
 	}
 	
-	@SuppressWarnings("rawtypes")
-	@Override
-	public void contribute(ModuleBuilderSource moduleSource,
-			ServiceResources resources, Configuration configuration) {
-	}
-
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
-			OrderedConfiguration configuration) {
+			Configuration configuration) {
 		
-		configuration.add("ServletContext", new ServletContextSymbolProvider(context), "before:ApplicationDefaults");
+		configuration.add(this.context);
 	}
 
 	@SuppressWarnings("rawtypes")
 	@Override
-	public void contribute(ModuleBuilderSource moduleSource,
-			ServiceResources resources,
+	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
+			OrderedConfiguration configuration) {
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			MappedConfiguration configuration) {
 	}
 
 	@Override
 	public String getServiceId() {
-		return "SymbolSource";
+		return "DefaultConfigurationServiceProvider";
 	}
 	
 }

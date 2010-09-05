@@ -13,10 +13,13 @@ import javax.naming.ldap.LdapContext;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.ioc.Resource;
+import org.apache.tapestry5.ioc.annotations.Marker;
+import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
-import org.chenillekit.core.services.ConfigurationService;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.LdapServiceException;
@@ -24,6 +27,8 @@ import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.TemplateServiceException;
 
+@ServiceId("SunLdapServiceProvider")
+@Marker(Primary.class)
 public class SunLdapServiceProvider extends AbstractService implements LdapService {
 	
 	private static final String SERVICE_PROVIDER_NAME = "sun-ldap-service-provider";
@@ -55,7 +60,7 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		this.tplSvc = tplSvc;
 		this.logger = logger;
 		
-		Resource configFile = new ClasspathResource(SERVICE_PROVIDER_NAME + ".properties");
+		Resource configFile = new ClasspathResource(String.format("%s.properties", SERVICE_PROVIDER_NAME));
     	Configuration config = configSvc.getConfiguration(configFile);
     	this.init(config);
 	}

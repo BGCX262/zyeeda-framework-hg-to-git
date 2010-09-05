@@ -26,16 +26,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.tapestry5.ioc.Resource;
+import org.apache.tapestry5.ioc.annotations.Marker;
+import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
-import org.chenillekit.core.services.ConfigurationService;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.TemplateServiceException;
 
-import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -48,6 +50,8 @@ import freemarker.template.TemplateExceptionHandler;
  * @version		%I%, %G%
  * @since		1.0
  */
+@ServiceId("FreemarkerTemplateServiceProvider")
+@Marker(Primary.class)
 public class FreemarkerTemplateServiceProvider extends AbstractService implements TemplateService {
 
     private static final String SERVICE_PROVIDER_NAME = "freemarker-template-service-provider";
@@ -63,7 +67,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     private static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
     // Injected
-    private File appRoot;
+    private ConfigurationService configSvc;
     private final Logger logger;
     
     private File tplRoot;
@@ -71,17 +75,14 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     private String timeFormat;
     private String datetimeFormat;
     
-    private Configuration config;
+    private freemarker.template.Configuration config;
     
-    public FreemarkerTemplateServiceProvider(
-    		String appRoot,
-    		ConfigurationService configSvc,
-    		Logger logger) throws Exception {
+    public FreemarkerTemplateServiceProvider(ConfigurationService configSvc, Logger logger) throws Exception {
     	
-    	this.appRoot = new File(appRoot);
+    	this.configSvc = configSvc;
     	this.logger = logger;
     	
-    	Resource configFile = new ClasspathResource(SERVICE_PROVIDER_NAME + ".properties");
+    	Resource configFile = new ClasspathResource(String.format("%s.properties", SERVICE_PROVIDER_NAME));
     	org.apache.commons.configuration.Configuration config = configSvc.getConfiguration(configFile);
     	this.init(config);
     }
@@ -91,7 +92,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     	String tplRoot = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
     	LoggerHelper.debug(this.logger, "template repository root = {}", tplRoot);
     	
-    	this.tplRoot = new File(this.appRoot, tplRoot);
+    	this.tplRoot = new File(this.configSvc.getApplicationRoot(), tplRoot);
     	if (!this.tplRoot.exists()) {
     		throw new FileNotFoundException(this.tplRoot.toString());
     	}
@@ -110,7 +111,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
 
     @Override
     public void start() throws Exception {
-        this.config = new Configuration();
+        this.config = new freemarker.template.Configuration();
         this.config.setDirectoryForTemplateLoading(this.tplRoot);
         this.config.setDefaultEncoding("UTF-8");
         this.config.setOutputEncoding("UTF-8");
@@ -125,6 +126,9 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     public void stop() throws Exception {
     	this.config = null;
     	this.tplRoot = null;
+    	this.dateFormat = null;
+    	this.timeFormat = null;
+    	this.datetimeFormat = null;
     }
 
     @Override

@@ -17,6 +17,9 @@ package com.zyeeda.framework.persistence.internal;
 
 import java.util.Properties;
 
+import org.apache.tapestry5.ioc.annotations.Marker;
+import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AnnotationConfiguration;
@@ -39,6 +42,8 @@ import com.zyeeda.framework.validation.ValidationService;
  * @version 	%I%, %G%
  * @since		1.0
  */
+@ServiceId("HibernatePersistenceServiceProvider")
+@Marker(Primary.class)
 public class HibernatePersistenceServiceProvider extends AbstractService implements PersistenceService {
 	
     private final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal<Session>();
