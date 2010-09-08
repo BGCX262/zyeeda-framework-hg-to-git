@@ -17,14 +17,14 @@ package com.zyeeda.framework.persistence.internal;
 
 import java.util.Properties;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.AnnotationConfiguration;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.beanvalidation.BeanValidationEventListener;
+import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PreInsertEventListener;
 import org.hibernate.event.PreUpdateEventListener;
@@ -46,14 +46,14 @@ import com.zyeeda.framework.validation.ValidationService;
 @Marker(Primary.class)
 public class HibernatePersistenceServiceProvider extends AbstractService implements PersistenceService {
 	
-    private final ThreadLocal<Session> sessionThreadLocal = new ThreadLocal<Session>();
+    private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
     //private final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
     
     // Injected
     private final ValidationService validationSvc;
     private final Logger logger;
     
-    private SessionFactory sessionFactory;
+    private EntityManagerFactory sessionFactory;
     
     public HibernatePersistenceServiceProvider(ValidationService validationSvc, Logger logger) {
     	this.validationSvc = validationSvc;
@@ -62,7 +62,7 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
 
 	@Override
 	public void start() throws Exception {
-    	Configuration config = new AnnotationConfiguration().configure();
+		Ejb3Configuration config = new Ejb3Configuration().configure("default", null);
     	config.getEventListeners().setPreInsertEventListeners(
     			new PreInsertEventListener[] {
     					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
@@ -73,7 +73,7 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
     			new PreDeleteEventListener[] {
     					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
         
-    	this.sessionFactory = config.buildSessionFactory();
+    	this.sessionFactory = config.buildEntityManagerFactory();
 	}
 
 	@Override
@@ -83,29 +83,32 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
 	}
 	
 	@Override
-	public Session openSession() {
-		Session session = this.sessionThreadLocal.get();
+	public EntityManager openSession() {
+		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
-            session = this.sessionFactory.openSession();
+            session = this.sessionFactory.createEntityManager();
             this.sessionThreadLocal.set(session);
         }
 
-        LoggerHelper.debug(logger, "Open session.");
         return session;
 	}
 
 	@Override
     public void closeSession() {
-        Session session = this.sessionThreadLocal.get();
+		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
-        	LoggerHelper.debug(logger, "No session opened.");
+        	LoggerHelper.warn(logger, "No session opened.");
         	return;
         }
         
         session.close();
         this.sessionThreadLocal.remove();
-        LoggerHelper.debug(logger, "Close session.");
     }
+	
+	@Override
+	public EntityManagerFactory getSessionFactory() {
+		return this.sessionFactory;
+	}
 	
 	/*@Override
     public Session openSession() {

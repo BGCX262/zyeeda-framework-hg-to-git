@@ -5,6 +5,8 @@ import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.config.ConfigurationService;
+import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
@@ -25,7 +27,8 @@ public class FrameworkModule {
 		this.logger = logger;
 	}
 	
-	public void bind(ServiceBinder binder) {
+	public static void bind(ServiceBinder binder) {
+		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
 		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
 		binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
@@ -35,6 +38,7 @@ public class FrameworkModule {
 	
 	public void contributeRegistryStartup(
 			OrderedConfiguration<Runnable> configuration,
+			@Primary final ConfigurationService configSvc,
 			@Primary final TemplateService tplSvc,
 			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService persistenceSvc,
@@ -46,6 +50,7 @@ public class FrameworkModule {
 			@Override
 			public void run() {
 				try {
+					configSvc.start();
 					tplSvc.start();
 					validationSvc.start();
 					persistenceSvc.start();

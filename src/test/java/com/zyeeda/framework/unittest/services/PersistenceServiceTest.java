@@ -1,6 +1,7 @@
 package com.zyeeda.framework.unittest.services;
 
-import org.hibernate.Session;
+import javax.persistence.EntityManager;
+
 import org.testng.annotations.Test;
 
 import com.zyeeda.framework.entities.Role;
@@ -14,11 +15,11 @@ public class PersistenceServiceTest extends TestSuiteBase {
 	public void testSaveRole() {
 		Role r = new Role();
 		PersistenceService svc = this.getService();
-		Session session = null;
+		EntityManager session = null;
 		try {
 			session = svc.openSession();
 			session.getTransaction().begin();
-			session.save(r);
+			session.persist(r);
 			session.getTransaction().commit();
 		} catch (Throwable t) {
 			session.getTransaction().rollback();

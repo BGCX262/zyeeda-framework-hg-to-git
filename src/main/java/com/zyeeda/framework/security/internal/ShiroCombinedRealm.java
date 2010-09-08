@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
+import javax.persistence.EntityManager;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -18,7 +19,6 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.entities.Role;
@@ -76,7 +76,7 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		Session session = null;
+		EntityManager session = null;
 		try {
 			session = this.persistenceSvc.openSession();
 			session.getTransaction().begin();
@@ -94,17 +94,14 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 				info.addRole(role.getName());
 				info.addStringPermissions(role.getPermissionSet());
 			}
-			
 			session.getTransaction().commit();
 			
 			return info;
 		} catch (Throwable t) {
-			if (session != null) {
+			if (session != null && session.getTransaction().isActive()) {
 				session.getTransaction().rollback();
 			}
 			throw new AuthorizationException(t);
-		} finally {
-			this.persistenceSvc.closeSession();
 		}
 	}
 

@@ -15,10 +15,11 @@ import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 
 import com.zyeeda.framework.config.ConfigurationService;
+import com.zyeeda.framework.service.AbstractService;
 
 @ServiceId("DefaultConfigurationServiceProvider")
 @Marker(Primary.class)
-public class DefaultConfigurationServiceProvider implements ConfigurationService {
+public class DefaultConfigurationServiceProvider extends AbstractService implements ConfigurationService {
 	
 	private ServletContext context;
 	

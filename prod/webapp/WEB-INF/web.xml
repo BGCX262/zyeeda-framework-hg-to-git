@@ -33,14 +33,14 @@
         <url-pattern>*.jsp</url-pattern>
     </filter-mapping>
     
-    <!-- <filter>
+    <filter>
     	<filter-name>Open Session in View Filter</filter-name>
     	<filter-class>com.zyeeda.framework.web.OpenSessionInViewFilter</filter-class>
     </filter>
         <filter-mapping>
         <filter-name>Open Session in View Filter</filter-name>
         <url-pattern>*.jsp</url-pattern>
-    </filter-mapping>-->
+    </filter-mapping>
 
     <filter>
         <filter-name>Security Filter</filter-name>
@@ -52,4 +52,49 @@
         <filter-name>Security Filter</filter-name>
         <url-pattern>*.jsp</url-pattern>
     </filter-mapping>
+
+	<servlet>
+		<servlet-name>CXF Servlet</servlet-name>
+		<display-name>CXF Servlet</display-name>
+		<servlet-class>
+			org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
+ 		</servlet-class>
+ 		<!-- 
+		<init-param>
+			<param-name>jaxrs.serviceClasses</param-name>
+			<param-value>
+				org.apache.cxf.systest.jaxrs.BookStore1
+				org.apache.cxf.systest.jaxrs.BookStore2		      
+  			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.providers</param-name>
+			<param-value>
+				org.apache.cxf.systest.jaxrs.BookStoreProvider1
+				org.apache.cxf.systest.jaxrs.BookStoreProvider2		      
+  			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.schemaLocations</param-name>
+			<param-value>
+				classpath:/WEB-INF/schemas/schema1.xsd
+				classpath:/WEB-INF/schemas/schema2.xsd		      
+  		</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.inInterceptors</param-name>
+			<param-value>
+				org.apache.cxf.systest.jaxrs.CustomInInterceptor
+ 		</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jaxrs.outInterceptors</param-name>
+			<param-value>
+				org.apache.cxf.systest.jaxrs.CustomOutInterceptor
+  			</param-value>
+		</init-param>
+		-->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+    
 </web-app>
