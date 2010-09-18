@@ -23,6 +23,7 @@ import javax.persistence.EntityManagerFactory;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.hibernate.cfg.beanvalidation.BeanValidationEventListener;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.event.PreDeleteEventListener;
@@ -51,13 +52,13 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
     
     // Injected
     private final ValidationService validationSvc;
-    private final Logger logger;
     
     private EntityManagerFactory sessionFactory;
     
-    public HibernatePersistenceServiceProvider(ValidationService validationSvc, Logger logger) {
+    public HibernatePersistenceServiceProvider(
+    		ValidationService validationSvc, Logger logger, RegistryShutdownHub shutdownHub) {
+    	super(logger, shutdownHub);
     	this.validationSvc = validationSvc;
-    	this.logger = logger;
     }
 
 	@Override
@@ -97,7 +98,7 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
     public void closeSession() {
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
-        	LoggerHelper.warn(logger, "No session opened.");
+        	LoggerHelper.warn(this.getLogger(), "No session opened.");
         	return;
         }
         

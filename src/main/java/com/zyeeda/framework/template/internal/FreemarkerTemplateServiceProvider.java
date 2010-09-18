@@ -30,6 +30,7 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.config.ConfigurationService;
@@ -68,7 +69,6 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
 
     // Injected
     private ConfigurationService configSvc;
-    private final Logger logger;
     
     private File tplRoot;
     private String dateFormat;
@@ -77,10 +77,12 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     
     private freemarker.template.Configuration config;
     
-    public FreemarkerTemplateServiceProvider(ConfigurationService configSvc, Logger logger) throws Exception {
+    public FreemarkerTemplateServiceProvider(
+    		ConfigurationService configSvc, 
+    		Logger logger, RegistryShutdownHub shutdownHub) throws Exception {
     	
+    	super(logger, shutdownHub);
     	this.configSvc = configSvc;
-    	this.logger = logger;
     	
     	Resource configFile = new ClasspathResource(String.format("%s.properties", SERVICE_PROVIDER_NAME));
     	org.apache.commons.configuration.Configuration config = configSvc.getConfiguration(configFile);
@@ -90,7 +92,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     private void init(org.apache.commons.configuration.Configuration config) throws Exception {
     	
     	String tplRoot = config.getString(TEMPLATE_REPOSITORY_ROOT, DEFAULT_TEMPLATE_REPOSITORY_ROOT);
-    	LoggerHelper.debug(this.logger, "template repository root = {}", tplRoot);
+    	LoggerHelper.debug(this.getLogger(), "template repository root = {}", tplRoot);
     	
     	this.tplRoot = new File(this.configSvc.getApplicationRoot(), tplRoot);
     	if (!this.tplRoot.exists()) {
@@ -101,11 +103,11 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     	this.timeFormat = config.getString(TIME_FORMAT, DEFAULT_TIME_FORMAT);
     	this.datetimeFormat = config.getString(DATETIME_FORMAT, DEFAULT_DATETIME_FORMAT);
     	
-    	if (this.logger.isDebugEnabled()) {
-    		this.logger.debug("template root = {}", this.tplRoot);
-    		this.logger.debug("date format = {}", this.dateFormat);
-    		this.logger.debug("time format = {}", this.timeFormat);
-    		this.logger.debug("datetime format = {}", this.dateFormat);
+    	if (this.getLogger().isDebugEnabled()) {
+    		this.getLogger().debug("template root = {}", this.tplRoot);
+    		this.getLogger().debug("date format = {}", this.dateFormat);
+    		this.getLogger().debug("time format = {}", this.timeFormat);
+    		this.getLogger().debug("datetime format = {}", this.dateFormat);
     	}
     }
 
@@ -133,9 +135,9 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
 
     @Override
     public void paint(String tplPath, Writer out, Map<?, ?> args) throws IOException {
-		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("painting template = {}", tplPath);
-			this.logger.debug("template varables = {}", args);
+		if (this.getLogger().isDebugEnabled()) {
+			this.getLogger().debug("painting template = {}", tplPath);
+			this.getLogger().debug("template varables = {}", args);
 		}
 		Template template = this.config.getTemplate(tplPath);
 		try {

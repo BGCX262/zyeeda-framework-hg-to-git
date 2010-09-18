@@ -6,6 +6,7 @@ import javax.validation.ValidatorFactory;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.slf4j.Logger;
@@ -20,13 +21,13 @@ public class HibernateValidationServiceProvider extends AbstractService	implemen
 
 	// Injected
 	private final PersistenceService persistenceSvc;
-	private final Logger logger;
 	
 	private ValidatorFactory validatorFactory;
 	
-	public HibernateValidationServiceProvider(PersistenceService persistenceSvc, Logger logger) {
+	public HibernateValidationServiceProvider(
+			PersistenceService persistenceSvc, Logger logger, RegistryShutdownHub shutdownHub) {
+		super(logger, shutdownHub);
 		this.persistenceSvc = persistenceSvc;
-		this.logger = logger;
 	}
 	
     @Override
@@ -34,7 +35,7 @@ public class HibernateValidationServiceProvider extends AbstractService	implemen
         HibernateValidatorConfiguration config = Validation.byProvider(HibernateValidator.class).configure();
         this.validatorFactory = config.constraintValidatorFactory(
         		new CustomConstraintValidatorFactory(
-        				this.persistenceSvc, this.logger)).buildValidatorFactory();
+        				this.persistenceSvc, this.getLogger())).buildValidatorFactory();
     }
 	
     @Override

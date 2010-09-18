@@ -1,4 +1,4 @@
-package com.zyeeda.framework;
+package com.zyeeda.framework.ioc;
 
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
@@ -64,4 +64,5 @@ public class FrameworkModule {
 			
 		});
 	}
+
 }

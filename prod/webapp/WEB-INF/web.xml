@@ -30,7 +30,7 @@
     </filter>
     <filter-mapping>
         <filter-name>Character Encoding Filter</filter-name>
-        <url-pattern>*.jsp</url-pattern>
+        <url-pattern>*</url-pattern>
     </filter-mapping>
     
     <filter>
@@ -39,7 +39,7 @@
     </filter>
         <filter-mapping>
         <filter-name>Open Session in View Filter</filter-name>
-        <url-pattern>*.jsp</url-pattern>
+        <url-pattern>*</url-pattern>
     </filter-mapping>
 
     <filter>
@@ -50,30 +50,28 @@
     </filter>
     <filter-mapping>
         <filter-name>Security Filter</filter-name>
-        <url-pattern>*.jsp</url-pattern>
+        <url-pattern>*</url-pattern>
     </filter-mapping>
 
 	<servlet>
-		<servlet-name>CXF Servlet</servlet-name>
+		<servlet-name>cxf_servlet</servlet-name>
 		<display-name>CXF Servlet</display-name>
 		<servlet-class>
 			org.apache.cxf.jaxrs.servlet.CXFNonSpringJaxrsServlet
  		</servlet-class>
- 		<!-- 
 		<init-param>
 			<param-name>jaxrs.serviceClasses</param-name>
 			<param-value>
-				org.apache.cxf.systest.jaxrs.BookStore1
-				org.apache.cxf.systest.jaxrs.BookStore2		      
+				com.zyeeda.framework.resources.RoleResource
   			</param-value>
 		</init-param>
 		<init-param>
 			<param-name>jaxrs.providers</param-name>
 			<param-value>
-				org.apache.cxf.systest.jaxrs.BookStoreProvider1
-				org.apache.cxf.systest.jaxrs.BookStoreProvider2		      
+				org.apache.cxf.jaxrs.provider.JAXBElementProvider
   			</param-value>
 		</init-param>
+		<!-- 
 		<init-param>
 			<param-name>jaxrs.schemaLocations</param-name>
 			<param-value>
@@ -96,5 +94,9 @@
 		-->
 		<load-on-startup>1</load-on-startup>
 	</servlet>
+	<servlet-mapping>
+		<servlet-name>cxf_servlet</servlet-name>
+		<url-pattern>/resources/*</url-pattern>
+	</servlet-mapping>
     
 </web-app>

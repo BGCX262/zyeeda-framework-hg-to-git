@@ -15,6 +15,12 @@
  */
 package com.zyeeda.framework.service;
 
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
+import org.apache.tapestry5.ioc.services.RegistryShutdownListener;
+import org.slf4j.Logger;
+
+import com.zyeeda.framework.helpers.LoggerHelper;
+
 /**
  * Abstract service.
  * 
@@ -22,10 +28,16 @@ package com.zyeeda.framework.service;
  * @version 	%I%, %G%
  * @since		1.0
  */
-public abstract class AbstractService implements Service {
+public abstract class AbstractService implements Service, RegistryShutdownListener {
 	
+	private final Logger logger;
     private ServiceState state = ServiceState.NEW;
 
+    protected AbstractService(Logger logger, RegistryShutdownHub shutdownHub) {
+    	this.logger = logger;
+    	shutdownHub.addRegistryShutdownListener(this);
+    }
+    
     @Override
     public ServiceState getState() {
         return this.state;
@@ -42,6 +54,21 @@ public abstract class AbstractService implements Service {
 
 	@Override
 	public void stop() throws Exception {
+	}
+	
+	@Override
+	public void registryDidShutdown() {
+		try {
+			LoggerHelper.info(logger, "{} stopping", this.getClass().getSimpleName());
+			this.stop();
+			LoggerHelper.info(logger, "{} stopped", this.getClass().getSimpleName());
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	protected Logger getLogger() {
+		return this.logger;
 	}
     
 }

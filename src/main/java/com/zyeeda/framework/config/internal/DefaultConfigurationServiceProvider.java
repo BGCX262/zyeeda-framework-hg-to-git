@@ -13,6 +13,8 @@ import org.apache.tapestry5.ioc.Resource;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
+import org.slf4j.Logger;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.service.AbstractService;
@@ -23,11 +25,14 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 	
 	private ServletContext context;
 	
-	public DefaultConfigurationServiceProvider(Collection<ServletContext> contexts) {
+	public DefaultConfigurationServiceProvider(
+			Collection<ServletContext> contexts, Logger logger, RegistryShutdownHub shutdownHub) {
+		
+		super(logger, shutdownHub);
+		
 		if (contexts.size() != 1) {
 			throw new IllegalStateException("There should be one and only one context.");
 		}
-		
 		this.context = contexts.iterator().next();
 	}
 

@@ -17,6 +17,7 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.config.ConfigurationService;
@@ -44,7 +45,6 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 	
 	// Injected
 	private final TemplateService tplSvc;
-	private final Logger logger;
 	
 	private String providerUrl;
 	private String securityAuthentication;
@@ -55,10 +55,11 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 	public SunLdapServiceProvider(
 			ConfigurationService configSvc, 
 			TemplateService tplSvc,
-			Logger logger) throws Exception {
+			Logger logger,
+			RegistryShutdownHub shutdownHub) throws Exception {
 		
+		super(logger, shutdownHub);
 		this.tplSvc = tplSvc;
-		this.logger = logger;
 		
 		Resource configFile = new ClasspathResource(String.format("%s.properties", SERVICE_PROVIDER_NAME));
     	Configuration config = configSvc.getConfiguration(configFile);
@@ -72,12 +73,12 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		this.systemSecurityCredentials = config.getString(SYSTEM_SECURITY_CREDENTIALS);
 		this.securityPrincipalTemplate = config.getString(SECURITY_PRINCIPAL_TEMPLATE);
 		
-		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("provider url = {}", this.providerUrl);
-			this.logger.debug("security authentication = {}", this.securityAuthentication);
-			this.logger.debug("system security principal = {}", this.systemSecurityPrincipal);
-			this.logger.debug("system security credentials = ******");
-			this.logger.debug("security princiapl template = {}", this.securityPrincipalTemplate);
+		if (this.getLogger().isDebugEnabled()) {
+			this.getLogger().debug("provider url = {}", this.providerUrl);
+			this.getLogger().debug("security authentication = {}", this.securityAuthentication);
+			this.getLogger().debug("system security principal = {}", this.systemSecurityPrincipal);
+			this.getLogger().debug("system security credentials = ******");
+			this.getLogger().debug("security princiapl template = {}", this.securityPrincipalTemplate);
 		}
 	}
 
@@ -91,16 +92,16 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 
 	@Override
 	public LdapContext getLdapContext(String username, String password)	throws NamingException, IOException, TemplateServiceException {
-		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("username = {}", username);
-			this.logger.debug("password = ******");
+		if (this.getLogger().isDebugEnabled()) {
+			this.getLogger().debug("username = {}", username);
+			this.getLogger().debug("password = ******");
 		}
 		
 		Hashtable<String, String> env = this.setupEnvironment();
 		Map<String, String> args = new HashMap<String, String>(1);
 		args.put("username", username);
 		String principal = this.tplSvc.render(this.securityPrincipalTemplate, args);
-		LoggerHelper.debug(this.logger, "rendered principal = {}", principal);
+		LoggerHelper.debug(this.getLogger(), "rendered principal = {}", principal);
 		
 		env.put(Context.SECURITY_PRINCIPAL, principal);
 		env.put(Context.SECURITY_CREDENTIALS, password);

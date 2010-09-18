@@ -6,6 +6,7 @@ import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.FetchType;
 import javax.persistence.Column;
@@ -25,6 +26,10 @@ import org.apache.shiro.util.CollectionUtils;
 			+ "LEFT JOIN SYS_SUBJECT s ON s.F_ROLE_ID = r.F_ID "
 			+ "WHERE s.F_SUBJECT = :subject",
 		resultClass = Role.class
+)
+@NamedQuery(
+		name = "getRoles",
+		query = "SELECT r FROM Role r"
 )
 public class Role extends LiteDomainEntity {
 

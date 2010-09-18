@@ -4,6 +4,7 @@ import org.apache.shiro.mgt.SecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.ldap.LdapService;
@@ -20,19 +21,19 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	private final LdapService ldapSvc;
 	private final PersistenceService persistenceSvc;
 	private final SecurityService<?> securitySvc;
-	private final Logger logger;
 	
 	private RoleManager roleMgr;
 	
 	public ShiroSecurityServiceProvider(LdapService ldapSvc,
 			PersistenceService persistenceSvc,
 			SecurityService<?> securitySvc,
-			Logger logger) {
+			Logger logger,
+			RegistryShutdownHub shutdownHub) {
 		
+		super(logger, shutdownHub);
 		this.ldapSvc = ldapSvc;
 		this.persistenceSvc = persistenceSvc;
 		this.securitySvc = securitySvc;
-		this.logger = logger;
 		
 		this.roleMgr = new RoleManager(this);
 	}
@@ -40,7 +41,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	@Override
 	public SecurityManager getSecurityManager() {
 		return new ShiroSecurityManager(
-				this.ldapSvc, this.persistenceSvc, this.securitySvc, this.logger);
+				this.ldapSvc, this.persistenceSvc, this.securitySvc, this.getLogger());
 	}
 	
 	@Override

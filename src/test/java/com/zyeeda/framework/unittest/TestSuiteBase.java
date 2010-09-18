@@ -12,7 +12,7 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 import com.zyeeda.framework.FrameworkConstants;
-import com.zyeeda.framework.FrameworkModule;
+import com.zyeeda.framework.ioc.FrameworkModule;
 import com.zyeeda.framework.unittest.services.ServletContextMock;
 import com.zyeeda.framework.web.ContextListener;
 
