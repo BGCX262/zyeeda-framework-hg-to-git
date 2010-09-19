@@ -2,3 +2,16 @@ $ mvn clean package assembly:assembly -Dmaven.test.skip=true
 
 $ mvn clean package assembly:directory -Dmaven.test.skip=true
 
+二、使用 Eclipse
+1. 安装 Eclipse WTP 插件，以支持 Web 开发
+2. 安装 m2eclipse 插件，以支持 Maven
+3. 导入 Maven 项目 zyeeda-framework/core
+4. 在 webapp 目录下运行如下命令
+
+	mvn eclipse:eclipse
+
+5. 导入普通 Eclipse 项目 zyeeda-framework/webapp
+6. 在 Eclipse 中配置 Server 运行环境到 Tomcat 6.x
+7. 在 zyeeda-framework-webapp 项目的 run as 菜单下选择使用配置的 Tomcat 运行即可
+
+该方法是以支持 Eclipse 的增量编译和热部署，省去多次重启的烦恼。

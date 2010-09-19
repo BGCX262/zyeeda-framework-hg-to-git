@@ -17,7 +17,7 @@ import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.vos.Roles;
 
-@Path("/role")
+@Path("/hello")
 public class RoleResource {
 
 	@GET
