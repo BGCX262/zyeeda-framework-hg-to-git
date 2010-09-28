@@ -239,6 +239,12 @@
                             <Implementation-Version>
                                 ${project.version}
                             </Implementation-Version>
+                            <Zyeeda-Framework-Entity-Classes>
+                            	com.zyeeda.framework.entities.Role
+                            </Zyeeda-Framework-Entity-Classes>
+                            <Drools-Task-Entity-Classes>
+                                org.drools.task.Attachment,org.drools.task.Content,org.drools.task.BooleanExpression,org.drools.task.Comment,org.drools.task.Deadline,org.drools.task.Comment,org.drools.task.Deadlines,org.drools.task.Delegation,org.drools.task.Escalation,org.drools.task.Group,org.drools.task.I18NText,org.drools.task.Notification,org.drools.task.EmailNotification,org.drools.task.EmailNotificationHeader,org.drools.task.PeopleAssignments,org.drools.task.Reassignment,org.drools.task.Status,org.drools.task.Task,org.drools.task.TaskData,org.drools.task.SubTasksStrategy,org.drools.task.OnParentAbortAllSubTasksEndStrategy,org.drools.task.OnAllSubTasksEndParentEndStrategy,org.drools.task.User
+                            </Drools-Task-Entity-Classes>
                         </manifestEntries>
                     </archive>
                 </configuration>

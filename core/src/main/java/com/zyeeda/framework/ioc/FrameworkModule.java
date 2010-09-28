@@ -8,9 +8,12 @@ import org.slf4j.Logger;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.helpers.LoggerHelper;
+import com.zyeeda.framework.knowledge.KnowledgeService;
+import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
@@ -31,9 +34,11 @@ public class FrameworkModule {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
 		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
 		binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
+		binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
 		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
+		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
 	}
 	
 	public void contributeRegistryStartup(
@@ -42,8 +47,10 @@ public class FrameworkModule {
 			@Primary final TemplateService tplSvc,
 			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService persistenceSvc,
+			@DroolsTask final PersistenceService droolsTaskPersistenceSvc,
 			@Primary final LdapService ldapSvc,
-			@Primary final SecurityService<?> securitySvc) {
+			@Primary final SecurityService<?> securitySvc,
+			@Primary final KnowledgeService knowledgeSvc) {
 		
 		configuration.add("ServiceStartup", new Runnable() {
 			
@@ -54,8 +61,10 @@ public class FrameworkModule {
 					tplSvc.start();
 					validationSvc.start();
 					persistenceSvc.start();
+					droolsTaskPersistenceSvc.start();
 					ldapSvc.start();
 					securitySvc.start();
+					knowledgeSvc.start();
 				} catch (Throwable t) {
 					LoggerHelper.error(logger, t.getMessage(), t);
 					throw new RuntimeException(t);

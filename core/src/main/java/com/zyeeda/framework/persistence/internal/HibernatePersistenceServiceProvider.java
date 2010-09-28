@@ -17,9 +17,6 @@ package com.zyeeda.framework.persistence.internal;
 
 import java.util.Properties;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
@@ -31,9 +28,7 @@ import org.hibernate.event.PreInsertEventListener;
 import org.hibernate.event.PreUpdateEventListener;
 import org.slf4j.Logger;
 
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.validation.ValidationService;
 
 /**
@@ -45,15 +40,12 @@ import com.zyeeda.framework.validation.ValidationService;
  */
 @ServiceId("HibernatePersistenceServiceProvider")
 @Marker(Primary.class)
-public class HibernatePersistenceServiceProvider extends AbstractService implements PersistenceService {
+public class HibernatePersistenceServiceProvider extends AbstractPersistenceServiceProvider implements PersistenceService {
 	
-    private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
-    //private final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
+	private final static String ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Zyeeda-Framework-Entity-Classes";
     
     // Injected
     private final ValidationService validationSvc;
-    
-    private EntityManagerFactory sessionFactory;
     
     public HibernatePersistenceServiceProvider(
     		ValidationService validationSvc, Logger logger, RegistryShutdownHub shutdownHub) {
@@ -74,85 +66,9 @@ public class HibernatePersistenceServiceProvider extends AbstractService impleme
     			new PreDeleteEventListener[] {
     					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
         
-    	this.sessionFactory = config.buildEntityManagerFactory();
-	}
-
-	@Override
-	public void stop() throws Exception {
-        this.sessionFactory.close();
-        this.sessionFactory = null;
-	}
-	
-	@Override
-	public EntityManager openSession() {
-		EntityManager session = this.sessionThreadLocal.get();
-        if (session == null) {
-            session = this.sessionFactory.createEntityManager();
-            this.sessionThreadLocal.set(session);
-        }
-
-        return session;
-	}
-
-	@Override
-    public void closeSession() {
-		EntityManager session = this.sessionThreadLocal.get();
-        if (session == null) {
-        	LoggerHelper.warn(this.getLogger(), "No session opened.");
-        	return;
-        }
-        
-        session.close();
-        this.sessionThreadLocal.remove();
-    }
-	
-	@Override
-	public EntityManagerFactory getSessionFactory() {
-		return this.sessionFactory;
-	}
-	
-	/*@Override
-    public Session openSession() {
-    	Integer count = countThreadLocal.get();
-    	if (count == null) {
-    		count = 0;
-    	}
-    	countThreadLocal.set(++count);
+    	this.addMappingClasses(config, ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME);
     	
-        Session session = sessionThreadLocal.get();
-        if (session == null) {
-            session = this.sessionFactory.openSession();
-            sessionThreadLocal.set(session);
-        }
+    	this.setSessionFactory(config.buildEntityManagerFactory());
+	}
 
-        return session;
-    }*/
-
-	/*@Override
-    public void closeSession() {
-    	Integer count = countThreadLocal.get();
-    	if (count == null || count == 0) {
-    		LoggerHelper.trace(logger, "会话未开启");
-    		return;
-    	}
-    	countThreadLocal.set(--count);
-    	if (count > 0) {
-    		LoggerHelper.trace(logger, "会话未关闭");
-    		return;
-    	}
-    	this.realCloseSession();
-    }*/
-
-    /*private void realCloseSession() {
-        Session session = sessionThreadLocal.get();
-        sessionThreadLocal.remove();
-        countThreadLocal.remove();
-
-        if (session != null) {
-            session.close();
-        }
-
-        LoggerHelper.debug(logger, "会话已关闭");
-    }*/
-    
 }

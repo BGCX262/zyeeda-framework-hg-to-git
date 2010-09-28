@@ -1,9 +1,14 @@
 package com.zyeeda.framework.knowledge;
 
+import org.drools.KnowledgeBase;
+import org.drools.task.service.TaskService;
+
 import com.zyeeda.framework.service.Service;
 
-public interface KnowledgeService<T> extends Service {
+public interface KnowledgeService extends Service {
 
-	public T getKnowledgeBase();
+	public KnowledgeBase getKnowledgeBase();
+	
+	public TaskService getTaskService();
 	
 }
