@@ -16,7 +16,7 @@ public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceSer
 
 	private final static String DROOLS_TASK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Drools-Task-Entity-Classes";
 	
-	protected DroolsTaskPersistenceServiceProvider(Logger logger,
+	public DroolsTaskPersistenceServiceProvider(Logger logger,
 			RegistryShutdownHub shutdownHub) {
 		
 		super(logger, shutdownHub);
@@ -24,7 +24,7 @@ public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceSer
 	
 	@Override
 	public void start() throws Exception {
-		Ejb3Configuration config = new Ejb3Configuration().configure("org.drools.task");
+		Ejb3Configuration config = new Ejb3Configuration().configure("org.drools.task", null);
 		this.addMappingClasses(config, DROOLS_TASK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME);
 		this.setSessionFactory(config.buildEntityManagerFactory());
 	}

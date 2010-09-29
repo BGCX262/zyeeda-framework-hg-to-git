@@ -39,12 +39,12 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		
 		this.droolsTaskPersistenceSvc = droolsTaskPersistenceSvc;
 		
-		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
+		/*KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
 		kbuilder.add(ResourceFactory.newClassPathResource("drools-changeset.xml"), ResourceType.CHANGE_SET);
 		if (kbuilder.hasErrors()) {
 			throw new RuntimeException(kbuilder.getErrors().toString());
 		}
-		this.kbase = kbuilder.newKnowledgeBase();
+		this.kbase = kbuilder.newKnowledgeBase();*/
 	}
 	
 	@Override

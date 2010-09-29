@@ -25,7 +25,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	private RoleManager roleMgr;
 	
 	public ShiroSecurityServiceProvider(LdapService ldapSvc,
-			PersistenceService persistenceSvc,
+			@Primary PersistenceService persistenceSvc,
 			SecurityService<?> securitySvc,
 			Logger logger,
 			RegistryShutdownHub shutdownHub) {

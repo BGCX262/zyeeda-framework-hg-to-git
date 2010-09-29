@@ -1,1 +1,19 @@
 Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: hzkf
+Build-Jdk: 1.6.0_21
+Drools-Task-Entity-Classes: org.drools.task.Attachment,org.drools.task
+ .Content,org.drools.task.BooleanExpression,org.drools.task.Comment,or
+ g.drools.task.Deadline,org.drools.task.Comment,org.drools.task.Deadli
+ nes,org.drools.task.Delegation,org.drools.task.Escalation,org.drools.
+ task.Group,org.drools.task.I18NText,org.drools.task.Notification,org.
+ drools.task.EmailNotification,org.drools.task.EmailNotificationHeader
+ ,org.drools.task.PeopleAssignments,org.drools.task.Reassignment,org.d
+ rools.task.Status,org.drools.task.Task,org.drools.task.TaskData,org.d
+ rools.task.SubTasksStrategy,org.drools.task.OnParentAbortAllSubTasksE
+ ndStrategy,org.drools.task.OnAllSubTasksEndParentEndStrategy,org.droo
+ ls.task.User
+Implementation-Version: 1.5-SNAPSHOT
+Tapestry-Module-Classes: com.zyeeda.framework.ioc.FrameworkModule
+Zyeeda-Framework-Entity-Classes: com.zyeeda.framework.entities.Role

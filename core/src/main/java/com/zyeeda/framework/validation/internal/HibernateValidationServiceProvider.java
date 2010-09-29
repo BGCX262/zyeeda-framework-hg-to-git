@@ -25,7 +25,7 @@ public class HibernateValidationServiceProvider extends AbstractService	implemen
 	private ValidatorFactory validatorFactory;
 	
 	public HibernateValidationServiceProvider(
-			PersistenceService persistenceSvc, Logger logger, RegistryShutdownHub shutdownHub) {
+			@Primary PersistenceService persistenceSvc, Logger logger, RegistryShutdownHub shutdownHub) {
 		super(logger, shutdownHub);
 		this.persistenceSvc = persistenceSvc;
 	}

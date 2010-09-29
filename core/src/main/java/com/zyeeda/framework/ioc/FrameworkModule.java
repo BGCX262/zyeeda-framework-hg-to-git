@@ -2,7 +2,10 @@ package com.zyeeda.framework.ioc;
 
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
+import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.config.ConfigurationService;
@@ -33,12 +36,27 @@ public class FrameworkModule {
 	public static void bind(ServiceBinder binder) {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
 		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
-		binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
-		binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
+		//binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
+		//binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
 		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
+	}
+	
+	@ServiceId("HibernatePersistenceServiceProvider")
+	@Marker(Primary.class)
+	public static PersistenceService buildHibernatePersistenceServiceProvider(
+			@Primary ValidationService validationSvc,
+			Logger logger,
+			RegistryShutdownHub shutdownHub) {
+		return new HibernatePersistenceServiceProvider(validationSvc, logger, shutdownHub);
+	}
+	
+	@ServiceId("DroolsTaskPersistenceServiceProvider")
+	@Marker(DroolsTask.class)
+	public PersistenceService buildDroolsTaskPersistenceServiceProvider(Logger logger, RegistryShutdownHub shutdownHub) {
+		return new DroolsTaskPersistenceServiceProvider(logger, shutdownHub);
 	}
 	
 	public void contributeRegistryStartup(
@@ -60,8 +78,8 @@ public class FrameworkModule {
 					configSvc.start();
 					tplSvc.start();
 					validationSvc.start();
-					persistenceSvc.start();
 					droolsTaskPersistenceSvc.start();
+					persistenceSvc.start();
 					ldapSvc.start();
 					securitySvc.start();
 					knowledgeSvc.start();
