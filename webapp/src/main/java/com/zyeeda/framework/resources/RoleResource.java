@@ -25,7 +25,8 @@ public class RoleResource {
 	@Transaction
 	public Roles getRoles(@Context ServletContext context) {
 		Registry reg = (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-		PersistenceService persistenceSvc = reg.getService(PersistenceService.class);
+		//PersistenceService persistenceSvc = reg.getService(PersistenceService.class);
+		PersistenceService persistenceSvc = reg.getService("HibernatePersistenceServiceProvider", PersistenceService.class);
 		EntityManager session = persistenceSvc.openSession();
 		List<Role> roleList = session.createNamedQuery("getRoles", Role.class).getResultList();
 		Roles roles = new Roles();

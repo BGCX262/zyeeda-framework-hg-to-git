@@ -24,13 +24,13 @@ public aspect TransactionManagementAspect {
 		LoggerSource loggerSource = reg.getService(LoggerSource.class);
 		Logger logger = loggerSource.getLogger(TransactionManagementAspect.class);
 		
-		PersistenceService persistenceSvc = reg.getService(PersistenceService.class);
+		PersistenceService persistenceSvc = reg.getService("HibernatePersistenceServiceProvider", PersistenceService.class);
 		EntityManager session = persistenceSvc.openSession();
 		try {
 			LoggerHelper.info(logger, "trying to begin transaction");
 			
 			if (session.getTransaction().isActive()) {
-				LoggerHelper.info(logger, "transaction is action");
+				LoggerHelper.info(logger, "transaction is active");
 				return proceed(ctx);
 			}
 			

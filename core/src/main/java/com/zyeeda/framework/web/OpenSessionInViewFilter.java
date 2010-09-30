@@ -55,7 +55,8 @@ public class OpenSessionInViewFilter implements Filter {
 
         try {
         	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-        	svc = reg.getService(PersistenceService.class);
+        	svc = reg.getService("HibernatePersistenceServiceProvider", PersistenceService.class);
+        	//svc = reg.getService(PersistenceService.class);
             svc.openSession();
             chain.doFilter(request, response);
         } finally {

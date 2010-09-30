@@ -10,6 +10,7 @@
 	</persistence-unit>
 	
 	<persistence-unit name="org.drools.task">
+		<mapping-file>META-INF/drools.task.orm.xml</mapping-file>
 		<properties>
 			<property name="hibernate.ejb.cfgfile" value="/drools.task.hibernate.cfg.xml" />
 		</properties>

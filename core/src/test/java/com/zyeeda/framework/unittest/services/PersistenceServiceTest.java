@@ -30,6 +30,6 @@ public class PersistenceServiceTest extends TestSuiteBase {
 	}
 	
 	private PersistenceService getService() {
-		return getRegistry().getService(PersistenceService.class);
+		return getRegistry().getService("HibernatePersistenceServiceProvider", PersistenceService.class);
 	}
 }
