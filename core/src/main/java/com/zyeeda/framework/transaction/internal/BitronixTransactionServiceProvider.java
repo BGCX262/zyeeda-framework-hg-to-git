@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.annotations.Marker;
@@ -50,6 +51,11 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 		Context ctx = new InitialContext(env);
 
 		return (UserTransaction) ctx.lookup(JNDI_USER_TRANSACTION_NAME);
+	}
+	
+	@Override
+	public TransactionManager getTransactionManager() {
+		return TransactionManagerServices.getTransactionManager();
 	}
 	
 }

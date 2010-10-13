@@ -32,15 +32,17 @@ import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.StatefulCommand;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
+import com.zyeeda.framework.transaction.TransactionService;
 
 @ServiceId("DroolsKnowledgeServiceProvider")
 @Marker(Primary.class)
 public class DroolsKnowledgeServiceProvider extends AbstractService implements KnowledgeService {
 	
-	private static final String SERVICE_PROVIDER_NAME = "drools-knowledge-service-provider";
+	//private static final String SERVICE_PROVIDER_NAME = "drools-knowledge-service-provider";
 	
 	private final PersistenceService defaultPersistenceSvc;
 	private final PersistenceService droolsTaskPersistenceSvc;
+	private final TransactionService txSvc;
 	
 	private KnowledgeBase kbase;
 	private TaskService taskService;
@@ -49,12 +51,14 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	public DroolsKnowledgeServiceProvider(
 			@DroolsTask PersistenceService droolsTaskPersistenceSvc,
 			@Primary PersistenceService defaultPersistenceSvc,
+			@Primary TransactionService txSvc,
 			Logger logger, RegistryShutdownHub shutdownHub) {
 		
 		super(logger, shutdownHub);
 		
 		this.defaultPersistenceSvc = defaultPersistenceSvc;
 		this.droolsTaskPersistenceSvc = droolsTaskPersistenceSvc;
+		this.txSvc = txSvc;
 	}
 	
 	@Override
@@ -109,7 +113,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
-			//env.set(EnvironmentName.TRANSACTION, this.defaultPersistenceSvc.openSession().getTransaction());
+			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
 			ksession = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
 			//ksession = this.kbase.newStatefulKnowledgeSession();

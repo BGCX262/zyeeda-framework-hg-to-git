@@ -7,6 +7,9 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 import javax.persistence.EntityManager;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.UserTransaction;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -26,22 +29,26 @@ import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
+import com.zyeeda.framework.transaction.TransactionService;
 
 public class ShiroCombinedRealm extends AuthorizingRealm {
 	
 	// Injected
 	private final LdapService ldapSvc;
 	private final PersistenceService persistenceSvc;
+	private final TransactionService txSvc;
 	private final SecurityService<?> securitySvc;
 	private final Logger logger;
 	
 	public ShiroCombinedRealm(LdapService ldapSvc,
 			PersistenceService persistenceSvc,
+			TransactionService txSvc,
 			SecurityService<?> securitySvc,
 			Logger logger) {
 		
 		this.ldapSvc = ldapSvc;
 		this.persistenceSvc = persistenceSvc;
+		this.txSvc = txSvc;
 		this.securitySvc = securitySvc;
 		this.logger = logger;
 	}
@@ -76,10 +83,12 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		EntityManager session = null;
+		UserTransaction utx = null;
 		try {
-			session = this.persistenceSvc.openSession();
-			session.getTransaction().begin();
+			utx = this.txSvc.getTransaction();
+			utx.begin();
+			//EntityManager session = this.persistenceSvc.openSession();
+			//session.getTransaction().begin();
 			
 			String username = (String) this.getAvailablePrincipal(principals);
 			List<?> roles = this.securitySvc.getRoleManager().getRolesBySubject(username);
@@ -94,12 +103,20 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 				info.addRole(role.getName());
 				info.addStringPermissions(role.getPermissionSet());
 			}
-			session.getTransaction().commit();
+			//session.getTransaction().commit();
+			utx.commit();
 			
 			return info;
 		} catch (Throwable t) {
-			if (session != null && session.getTransaction().isActive()) {
+			/*if (session != null && session.getTransaction().isActive()) {
 				session.getTransaction().rollback();
+			}*/
+			try {
+				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
+					utx.rollback();
+				}
+			} catch (Throwable e) {
+				LoggerHelper.error(logger, e.getMessage(), e);
 			}
 			throw new AuthorizationException(t);
 		}

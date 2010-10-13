@@ -12,6 +12,7 @@ import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.service.AbstractService;
+import com.zyeeda.framework.transaction.TransactionService;
 
 @ServiceId("ShiroSecurityServiceProvider")
 @Marker(Primary.class)
@@ -20,12 +21,14 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	// Injected
 	private final LdapService ldapSvc;
 	private final PersistenceService persistenceSvc;
+	private final TransactionService txSvc;
 	private final SecurityService<?> securitySvc;
 	
 	private RoleManager roleMgr;
 	
 	public ShiroSecurityServiceProvider(LdapService ldapSvc,
 			@Primary PersistenceService persistenceSvc,
+			@Primary TransactionService txSvc,
 			SecurityService<?> securitySvc,
 			Logger logger,
 			RegistryShutdownHub shutdownHub) {
@@ -33,6 +36,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		super(logger, shutdownHub);
 		this.ldapSvc = ldapSvc;
 		this.persistenceSvc = persistenceSvc;
+		this.txSvc = txSvc;
 		this.securitySvc = securitySvc;
 		
 		this.roleMgr = new RoleManager(this);
@@ -41,7 +45,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	@Override
 	public SecurityManager getSecurityManager() {
 		return new ShiroSecurityManager(
-				this.ldapSvc, this.persistenceSvc, this.securitySvc, this.getLogger());
+				this.ldapSvc, this.persistenceSvc, this.txSvc, this.securitySvc, this.getLogger());
 	}
 	
 	@Override
