@@ -67,12 +67,12 @@
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
                     <showWeaveInfo>true</showWeaveInfo>
-					<aspectLibraries>
-						<aspectLibrary>
-							<groupId>com.zyeeda</groupId>
-							<artifactId>zyeeda-framework-core</artifactId>
-						</aspectLibrary>
-					</aspectLibraries>
+                    <aspectLibraries>
+                        <aspectLibrary>
+                            <groupId>com.zyeeda</groupId>
+                            <artifactId>zyeeda-framework-core</artifactId>
+                        </aspectLibrary>
+                    </aspectLibraries>
                 </configuration>
                 <executions>
                     <execution>

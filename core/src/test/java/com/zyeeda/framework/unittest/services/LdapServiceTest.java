@@ -32,8 +32,8 @@ public class LdapServiceTest extends TestSuiteBase {
 	@Test
 	public void testGetLdapContext() throws NamingException, IOException {
 		LdapService ldapSvc = this.getService();
-		//LdapContext ctx = ldapSvc.getLdapContext("mborn", "secret");
-		LdapContext ctx = ldapSvc.getLdapContext("John Fryer", "pass");
+		LdapContext ctx = ldapSvc.getLdapContext("mborn", "secret");
+		//LdapContext ctx = ldapSvc.getLdapContext("John Fryer", "pass");
 		assertNotNull(ctx);
 	}
 	

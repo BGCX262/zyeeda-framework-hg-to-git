@@ -22,6 +22,8 @@ import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider;
+import com.zyeeda.framework.transaction.TransactionService;
+import com.zyeeda.framework.transaction.internal.BitronixTransactionServiceProvider;
 import com.zyeeda.framework.validation.ValidationService;
 import com.zyeeda.framework.validation.internal.HibernateValidationServiceProvider;
 
@@ -36,12 +38,11 @@ public class FrameworkModule {
 	public static void bind(ServiceBinder binder) {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
 		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
-		//binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
-		//binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
 		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
+		binder.bind(TransactionService.class, BitronixTransactionServiceProvider.class);
 	}
 	
 	@ServiceId("HibernatePersistenceServiceProvider")
@@ -63,6 +64,7 @@ public class FrameworkModule {
 			OrderedConfiguration<Runnable> configuration,
 			@Primary final ConfigurationService configSvc,
 			@Primary final TemplateService tplSvc,
+			@Primary final TransactionService txSvc,
 			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService persistenceSvc,
 			@DroolsTask final PersistenceService droolsTaskPersistenceSvc,
@@ -77,6 +79,7 @@ public class FrameworkModule {
 				try {
 					configSvc.start();
 					tplSvc.start();
+					txSvc.start();
 					validationSvc.start();
 					droolsTaskPersistenceSvc.start();
 					persistenceSvc.start();

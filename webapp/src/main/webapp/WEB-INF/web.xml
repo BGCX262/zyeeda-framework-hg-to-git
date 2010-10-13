@@ -62,7 +62,8 @@
 		<init-param>
 			<param-name>jaxrs.serviceClasses</param-name>
 			<param-value>
-				com.zyeeda.framework.resources.RoleResource
+				com.zyeeda.framework.resources.RoleResource 
+				com.zyeeda.framework.resources.SampleFlowResource
   			</param-value>
 		</init-param>
 		<init-param>

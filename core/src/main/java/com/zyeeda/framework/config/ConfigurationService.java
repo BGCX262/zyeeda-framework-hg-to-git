@@ -14,6 +14,8 @@ public interface ConfigurationService extends Service, RegistryShutdownListener 
 	
 	File getApplicationRoot();
 	
+	String mapPath(String path);
+	
 	String getContextParameter(String name);
 	
 }

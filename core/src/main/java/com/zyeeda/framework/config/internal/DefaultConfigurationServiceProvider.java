@@ -67,6 +67,12 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 		String contextRoot = this.context.getRealPath("/");
 		return new File(contextRoot);
 	}
+	
+	@Override
+	public String mapPath(String path) {
+		File f = new File(this.getApplicationRoot(), path);
+		return f.getAbsolutePath();
+	}
 
 	@Override
 	public String getContextParameter(String name) {
