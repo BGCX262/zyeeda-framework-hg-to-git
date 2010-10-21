@@ -22,7 +22,6 @@ public class ServletContextMock implements ServletContext {
 		return this.attributes.get(name);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getAttributeNames() {
 		return null;
@@ -43,7 +42,6 @@ public class ServletContextMock implements ServletContext {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getInitParameterNames() {
 		return new Enumeration() {
@@ -101,7 +99,6 @@ public class ServletContextMock implements ServletContext {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Set getResourcePaths(String arg0) {
 		return null;
@@ -122,13 +119,11 @@ public class ServletContextMock implements ServletContext {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getServletNames() {
 		return null;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public Enumeration getServlets() {
 		return null;

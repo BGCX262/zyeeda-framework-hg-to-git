@@ -51,12 +51,10 @@ import freemarker.template.TemplateExceptionHandler;
  * @version		%I%, %G%
  * @since		1.0
  */
-@ServiceId("FreemarkerTemplateServiceProvider")
+@ServiceId("freemarker-template-service-provider")
 @Marker(Primary.class)
 public class FreemarkerTemplateServiceProvider extends AbstractService implements TemplateService {
 
-    private static final String SERVICE_PROVIDER_NAME = "freemarker-template-service-provider";
-    
     private static final String TEMPLATE_REPOSITORY_ROOT = "templateRepositoryRoot";
     private static final String DATE_FORMAT = "dateFormat";
     private static final String TIME_FORMAT = "timeFormat";
@@ -84,7 +82,7 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     	super(logger, shutdownHub);
     	this.configSvc = configSvc;
     	
-    	Resource configFile = new ClasspathResource(String.format("%s.properties", SERVICE_PROVIDER_NAME));
+    	Resource configFile = new ClasspathResource(String.format("%s.properties", this.getServiceId()));
     	org.apache.commons.configuration.Configuration config = configSvc.getConfiguration(configFile);
     	this.init(config);
     }

@@ -28,11 +28,9 @@ import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.TemplateServiceException;
 
-@ServiceId("SunLdapServiceProvider")
+@ServiceId("sun-ldap-service-provider")
 @Marker(Primary.class)
 public class SunLdapServiceProvider extends AbstractService implements LdapService {
-	
-	private static final String SERVICE_PROVIDER_NAME = "sun-ldap-service-provider";
 	
 	private static final String PROVIDER_URL = "providerUrl";
 	private static final String SECURITY_AUTHENTICATION = "securityAuthentication";
@@ -61,7 +59,7 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		super(logger, shutdownHub);
 		this.tplSvc = tplSvc;
 		
-		Resource configFile = new ClasspathResource(String.format("%s.properties", SERVICE_PROVIDER_NAME));
+		Resource configFile = new ClasspathResource(String.format("%s.properties", this.getServiceId()));
     	Configuration config = configSvc.getConfiguration(configFile);
     	this.init(config);
 	}

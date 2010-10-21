@@ -38,7 +38,7 @@ import com.zyeeda.framework.validation.ValidationService;
  * @version 	%I%, %G%
  * @since		1.0
  */
-@ServiceId("HibernatePersistenceServiceProvider")
+@ServiceId("hibernate-persistence-service-provider")
 @Marker(Primary.class)
 public class HibernatePersistenceServiceProvider extends AbstractPersistenceServiceProvider implements PersistenceService {
 	

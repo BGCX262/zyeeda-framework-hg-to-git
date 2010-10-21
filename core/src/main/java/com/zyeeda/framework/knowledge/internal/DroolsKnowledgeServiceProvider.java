@@ -14,10 +14,12 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
+import org.drools.command.Command;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.persistence.jpa.JPAKnowledgeService;
+import org.drools.process.audit.WorkingMemoryDbLogger;
 import org.drools.process.workitem.wsht.WSHumanTaskHandler;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
@@ -29,16 +31,13 @@ import org.slf4j.Logger;
 
 import com.zyeeda.framework.ioc.DroolsTask;
 import com.zyeeda.framework.knowledge.KnowledgeService;
-import com.zyeeda.framework.knowledge.StatefulCommand;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 
-@ServiceId("DroolsKnowledgeServiceProvider")
+@ServiceId("drools-knowledge-service-provider")
 @Marker(Primary.class)
 public class DroolsKnowledgeServiceProvider extends AbstractService implements KnowledgeService {
-	
-	//private static final String SERVICE_PROVIDER_NAME = "drools-knowledge-service-provider";
 	
 	private final PersistenceService defaultPersistenceSvc;
 	private final PersistenceService droolsTaskPersistenceSvc;
@@ -106,23 +105,30 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	}
 	
 	@Override
-	public <T> T execute(StatefulCommand<T> command) throws Exception {
+	public <T> T execute(Command<T> command) throws Exception {
 		StatefulKnowledgeSession ksession = null;
-		KnowledgeRuntimeLogger logger = null;
-		
+		KnowledgeRuntimeLogger rtLogger = null;
+		WorkingMemoryDbLogger dbLogger = null;
+
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
+			//env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.openSession());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
 			ksession = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
-			//ksession = this.kbase.newStatefulKnowledgeSession();
 			ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
-			logger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
-			return command.execute(ksession);
+			
+			rtLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
+			dbLogger = new WorkingMemoryDbLogger(ksession);
+			
+			return ksession.execute(command);
 		} finally {
-			if (logger != null) {
-				logger.close();
+			if (rtLogger != null) {
+				rtLogger.close();
+			}
+			if (dbLogger != null) {
+				dbLogger.dispose();
 			}
 			if (ksession != null) {
 				ksession.dispose();

@@ -1,4 +1,4 @@
-package com.zyeeda.framework.web;
+package com.zyeeda.framework.config.internal;
 
 import javax.servlet.ServletContext;
 
@@ -7,6 +7,7 @@ import org.apache.tapestry5.ioc.MappedConfiguration;
 import org.apache.tapestry5.ioc.ModuleBuilderSource;
 import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceResources;
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.def.ContributionDef;
 
 public class ConfigurationServiceContributionDef implements ContributionDef {
@@ -17,7 +18,7 @@ public class ConfigurationServiceContributionDef implements ContributionDef {
 		this.context = context;
 	}
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	@Override
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			Configuration configuration) {
@@ -25,13 +26,11 @@ public class ConfigurationServiceContributionDef implements ContributionDef {
 		configuration.add(this.context);
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			OrderedConfiguration configuration) {
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			MappedConfiguration configuration) {
@@ -39,7 +38,7 @@ public class ConfigurationServiceContributionDef implements ContributionDef {
 
 	@Override
 	public String getServiceId() {
-		return "DefaultConfigurationServiceProvider";
+		return DefaultConfigurationServiceProvider.class.getAnnotation(ServiceId.class).value();
 	}
 	
 }

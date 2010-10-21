@@ -22,7 +22,7 @@ import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
 @Marker(Primary.class)
-@ServiceId("BitronixTransactionServiceProvider")
+@ServiceId("bitronix-transaction-service-provider")
 public class BitronixTransactionServiceProvider extends AbstractService implements TransactionService {
 
 	private final static String JNDI_USER_TRANSACTION_NAME = "btmTransactionManager";

@@ -15,7 +15,7 @@ import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.validation.ValidationService;
 
-@ServiceId("HibernateValidationServiceProvider")
+@ServiceId("hibernate-validation-service-provider")
 @Marker(Primary.class)
 public class HibernateValidationServiceProvider extends AbstractService	implements ValidationService {
 

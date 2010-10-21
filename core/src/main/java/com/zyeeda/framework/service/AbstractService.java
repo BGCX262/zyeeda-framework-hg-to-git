@@ -15,6 +15,7 @@
  */
 package com.zyeeda.framework.service;
 
+import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.apache.tapestry5.ioc.services.RegistryShutdownListener;
 import org.slf4j.Logger;
@@ -69,6 +70,10 @@ public abstract class AbstractService implements Service, RegistryShutdownListen
 	
 	protected Logger getLogger() {
 		return this.logger;
+	}
+	
+	protected String getServiceId() {
+		return this.getClass().getAnnotation(ServiceId.class).value();
 	}
     
 }

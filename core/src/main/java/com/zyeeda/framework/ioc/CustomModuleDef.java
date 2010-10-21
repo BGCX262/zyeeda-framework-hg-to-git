@@ -1,4 +1,4 @@
-package com.zyeeda.framework.web;
+package com.zyeeda.framework.ioc;
 
 import java.util.HashSet;
 import java.util.Set;

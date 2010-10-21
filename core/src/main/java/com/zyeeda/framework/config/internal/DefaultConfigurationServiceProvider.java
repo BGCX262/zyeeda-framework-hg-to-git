@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.service.AbstractService;
 
-@ServiceId("DefaultConfigurationServiceProvider")
+@ServiceId("default-configuration-service-provider")
 @Marker(Primary.class)
 public class DefaultConfigurationServiceProvider extends AbstractService implements ConfigurationService {
 	

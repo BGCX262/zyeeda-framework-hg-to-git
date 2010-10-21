@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import com.zyeeda.framework.ioc.DroolsTask;
 import com.zyeeda.framework.persistence.PersistenceService;
 
-@ServiceId("DroolsTaskPersistenceServiceProvider")
+@ServiceId("drools-task-persistence-service-provider")
 @Marker(DroolsTask.class)
 public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceServiceProvider
 		implements PersistenceService {
