@@ -32,13 +32,13 @@ public class SecurityFilter implements Filter {
 		this.innerFilter = new IniShiroFilter();
 		
 		Registry reg = (Registry) config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-		SecurityService<?> securityService = reg.getService(SecurityService.class);
-		SecurityManager securityMgr = (SecurityManager) securityService.getSecurityManager();
+		SecurityService<?> securitySvc = reg.getService(SecurityService.class);
+		SecurityManager securityMgr = (SecurityManager) securitySvc.getSecurityManager();
 		if (!(securityMgr instanceof WebSecurityManager)) {
 			throw new ServletException("Incompatible security manager.");
 		}
 		
-		this.innerFilter.setSecurityManager((WebSecurityManager) securityService.getSecurityManager());
+		this.innerFilter.setSecurityManager((WebSecurityManager) securitySvc.getSecurityManager());
 	
 		Ini ini = IniFactorySupport.loadDefaultClassPathIni();
 		if (ini == null || ini.isEmpty()) {

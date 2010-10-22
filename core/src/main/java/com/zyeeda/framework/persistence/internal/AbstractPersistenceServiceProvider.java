@@ -91,6 +91,11 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
         this.sessionThreadLocal.remove();
     }
 	
+	@Override
+	public EntityManager getCurrentSession() {
+		return this.openSession();
+	}
+	
 	protected void setSessionFactory(EntityManagerFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}

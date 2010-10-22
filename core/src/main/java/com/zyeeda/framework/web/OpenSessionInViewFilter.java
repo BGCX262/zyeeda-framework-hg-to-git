@@ -28,6 +28,8 @@ import org.apache.tapestry5.ioc.Registry;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
+import com.zyeeda.framework.utils.IocUtils;
 
 /**
  * Open session in view servlet filter.
@@ -55,8 +57,7 @@ public class OpenSessionInViewFilter implements Filter {
 
         try {
         	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-        	svc = reg.getService("HibernatePersistenceServiceProvider", PersistenceService.class);
-        	//svc = reg.getService(PersistenceService.class);
+        	svc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
             svc.openSession();
             chain.doFilter(request, response);
         } finally {

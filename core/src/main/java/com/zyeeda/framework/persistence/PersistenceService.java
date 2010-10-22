@@ -13,4 +13,6 @@ public interface PersistenceService extends Service {
 	
 	public void closeSession();
 	
+	public EntityManager getCurrentSession();
+	
 }

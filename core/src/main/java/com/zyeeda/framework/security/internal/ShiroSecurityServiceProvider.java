@@ -1,6 +1,7 @@
 package com.zyeeda.framework.security.internal;
 
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
@@ -15,8 +16,8 @@ import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 
-@ServiceId("shiro-security-service-provider")
 @Marker(Primary.class)
+@ServiceId("shiro-security-service-provider")
 public class ShiroSecurityServiceProvider extends AbstractService implements SecurityService<SecurityManager> {
 
 	// Injected
@@ -37,13 +38,12 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		this.persistenceSvc = persistenceSvc;
 		this.txSvc = txSvc;
 		
-		this.roleMgr = new RoleManager(this);
+		this.roleMgr = new RoleManager(this.persistenceSvc.getCurrentSession());
 	}
 
 	@Override
 	public SecurityManager getSecurityManager() {
-		return new ShiroSecurityManager(
-				this.ldapSvc, this.txSvc, this.roleMgr, this.getLogger());
+		return new ShiroSecurityManager();
 	}
 	
 	@Override
@@ -51,18 +51,14 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		return this.roleMgr;
 	}
 	
-	@Override
-	public PersistenceService getPersistenceService() {
-		return this.persistenceSvc;
+	private Realm getRealm() {
+		return new ShiroCombinedRealm(this.ldapSvc, this.txSvc, this.roleMgr, this.getLogger());
 	}
 	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {
 
-		public ShiroSecurityManager(LdapService ldapSvc,
-				TransactionService txSvc,
-				RoleManager roleMgr,
-				Logger logger) {
-			super(new ShiroCombinedRealm(ldapSvc, txSvc, roleMgr, logger));
+		public ShiroSecurityManager() {
+			super(getRealm());
 		}
 		
 	}

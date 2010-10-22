@@ -1,4 +1,4 @@
-package com.zyeeda.framework.ioc;
+package com.zyeeda.framework.ioc.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;

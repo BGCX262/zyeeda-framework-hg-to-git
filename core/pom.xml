@@ -26,7 +26,7 @@
         <artifactId>zyeeda-framework</artifactId>
         <version>1.5-SNAPSHOT</version>
     </parent>
-    
+
     <groupId>com.zyeeda</groupId>
     <artifactId>zyeeda-framework-core</artifactId>
     <version>1.5-SNAPSHOT</version>
@@ -80,9 +80,9 @@
             <version>3.5.6-Final</version>
         </dependency>
         <dependency>
-        	<groupId>org.hibernate</groupId>
-        	<artifactId>hibernate-entitymanager</artifactId>
-        	<version>3.5.6-Final</version>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>3.5.6-Final</version>
         </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -122,57 +122,57 @@
                     <groupId>org.jboss.seam</groupId>
                 </exclusion>
                 <exclusion>
-                	<artifactId>hibernate-entitymanager</artifactId>
-                	<groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <groupId>org.hibernate</groupId>
                 </exclusion>
             </exclusions>
         </dependency>
         <dependency>
-        	<groupId>org.drools</groupId>
-        	<artifactId>drools-persistence-jpa</artifactId>
-        	<version>5.1.1</version>
-        	<exclusions>
-        		<exclusion>
-        			<artifactId>persistence-api</artifactId>
-        			<groupId>javax.persistence</groupId>
-        		</exclusion>
-        		<exclusion>
-        			<groupId>org.hibernate</groupId>
-        			<artifactId>hibernate-entitymanager</artifactId>
-        		</exclusion>
-        		<exclusion>
-        			<artifactId>hibernate-annotations</artifactId>
-        			<groupId>org.hibernate</groupId>
-        		</exclusion>
-        		<exclusion>
-        			<artifactId>hibernate-commons-annotations</artifactId>
-        			<groupId>org.hibernate</groupId>
-        		</exclusion>
-        	</exclusions>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-persistence-jpa</artifactId>
+            <version>5.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>persistence-api</artifactId>
+                    <groupId>javax.persistence</groupId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.hibernate</groupId>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hibernate-annotations</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hibernate-commons-annotations</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-        	<groupId>org.drools</groupId>
-        	<artifactId>drools-bam</artifactId>
-        	<version>5.1.1</version>
-        	<exclusions>
-        		<exclusion>
-        			<artifactId>hibernate-entitymanager</artifactId>
-        			<groupId>org.hibernate</groupId>
-        		</exclusion>
-        		<exclusion>
-        			<artifactId>hibernate-annotations</artifactId>
-        			<groupId>org.hibernate</groupId>
-        		</exclusion>
-        		<exclusion>
-        			<artifactId>hibernate-commons-annotations</artifactId>
-        			<groupId>org.hibernate</groupId>
-        		</exclusion>
-        	</exclusions>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-bam</artifactId>
+            <version>5.1.1</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>hibernate-entitymanager</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hibernate-annotations</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>hibernate-commons-annotations</artifactId>
+                    <groupId>org.hibernate</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>2.2.7</version>
+            <version>2.3.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
@@ -230,10 +230,10 @@
             <version>1.6.7</version>
         </dependency>
         <dependency>
-  			<groupId>org.codehaus.btm</groupId>
-  			<artifactId>btm</artifactId>
-  			<version>2.0.1</version>
-		</dependency>
+            <groupId>org.codehaus.btm</groupId>
+            <artifactId>btm</artifactId>
+            <version>2.0.1</version>
+        </dependency>
         <!-- dependencies for unit test -->
         <dependency>
             <groupId>org.testng</groupId>
@@ -251,20 +251,20 @@
     </dependencies>
 
     <build>
-    	<resources>
-    		<resource>
-    			<directory>src/main/resources</directory>
-    		</resource>
-    		<resource>
-    			<directory>src/main/java</directory>
-    			<includes>
-    				<include>**/*.xml</include>
-    			</includes>
-    		</resource>
-    		<resource>
-    			<directory>src/main/rules</directory>
-    		</resource>
-    	</resources>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/rules</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -300,7 +300,7 @@
                                 ${project.version}
                             </Implementation-Version>
                             <Zyeeda-Framework-Entity-Classes>
-                            	com.zyeeda.framework.entities.Role,org.drools.persistence.session.SessionInfo,org.drools.persistence.processinstance.ProcessInstanceInfo,org.drools.persistence.processinstance.ProcessInstanceEventInfo,org.drools.persistence.processinstance.WorkItemInfo,org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo,org.drools.process.audit.ProcessInstatnceLog,org.drools.process.audit.NodeInstanceLog,org.drools.process.audit.VariableInstanceLog
+                                com.zyeeda.framework.entities.Role,org.drools.persistence.session.SessionInfo,org.drools.persistence.processinstance.ProcessInstanceInfo,org.drools.persistence.processinstance.ProcessInstanceEventInfo,org.drools.persistence.processinstance.WorkItemInfo,org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo,org.drools.process.audit.ProcessInstatnceLog,org.drools.process.audit.NodeInstanceLog,org.drools.process.audit.VariableInstanceLog
                             </Zyeeda-Framework-Entity-Classes>
                             <Drools-Task-Entity-Classes>
                                 org.drools.task.Attachment,org.drools.task.Content,org.drools.task.BooleanExpression,org.drools.task.Comment,org.drools.task.Deadline,org.drools.task.Comment,org.drools.task.Deadlines,org.drools.task.Delegation,org.drools.task.Escalation,org.drools.task.Group,org.drools.task.I18NText,org.drools.task.Notification,org.drools.task.EmailNotification,org.drools.task.EmailNotificationHeader,org.drools.task.PeopleAssignments,org.drools.task.Reassignment,org.drools.task.Status,org.drools.task.Task,org.drools.task.TaskData,org.drools.task.SubTasksStrategy,org.drools.task.OnParentAbortAllSubTasksEndStrategy,org.drools.task.OnAllSubTasksEndParentEndStrategy,org.drools.task.User

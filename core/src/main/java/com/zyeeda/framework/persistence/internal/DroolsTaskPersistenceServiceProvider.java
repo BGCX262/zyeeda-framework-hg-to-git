@@ -6,7 +6,7 @@ import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.hibernate.ejb.Ejb3Configuration;
 import org.slf4j.Logger;
 
-import com.zyeeda.framework.ioc.DroolsTask;
+import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.persistence.PersistenceService;
 
 @ServiceId("drools-task-persistence-service-provider")

@@ -29,7 +29,7 @@ import org.drools.task.service.TaskService;
 import org.drools.task.service.mina.MinaTaskServer;
 import org.slf4j.Logger;
 
-import com.zyeeda.framework.ioc.DroolsTask;
+import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
@@ -113,7 +113,6 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
-			//env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.openSession());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
 			ksession = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
