@@ -14,7 +14,6 @@ import org.drools.builder.KnowledgeBuilderError;
 import org.drools.builder.KnowledgeBuilderErrors;
 import org.drools.builder.KnowledgeBuilderFactory;
 import org.drools.builder.ResourceType;
-import org.drools.command.Command;
 import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
@@ -31,6 +30,7 @@ import org.slf4j.Logger;
 
 import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.knowledge.KnowledgeService;
+import com.zyeeda.framework.knowledge.StatefulKnowledgeSessionCommand;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
@@ -105,7 +105,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	}
 	
 	@Override
-	public <T> T execute(Command<T> command) throws Exception {
+	public <T> T execute(StatefulKnowledgeSessionCommand<T> command) throws Exception {
 		StatefulKnowledgeSession ksession = null;
 		KnowledgeRuntimeLogger rtLogger = null;
 		WorkingMemoryDbLogger dbLogger = null;
@@ -121,7 +121,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			rtLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
 			dbLogger = new WorkingMemoryDbLogger(ksession);
 			
-			return ksession.execute(command);
+			return command.execute(ksession);
 		} finally {
 			if (rtLogger != null) {
 				rtLogger.close();

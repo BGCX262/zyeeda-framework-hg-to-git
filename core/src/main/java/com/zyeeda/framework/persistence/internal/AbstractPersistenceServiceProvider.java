@@ -24,9 +24,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 	private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
 	//private final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
 	
-	protected AbstractPersistenceServiceProvider(Logger logger,
-			RegistryShutdownHub shutdownHub) {
-		
+	protected AbstractPersistenceServiceProvider(Logger logger,	RegistryShutdownHub shutdownHub) {
 		super(logger, shutdownHub);
 	}
 
@@ -73,6 +71,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
             session = this.getSessionFactory().createEntityManager();
+            LoggerHelper.info(this.getLogger(), "Open session on thread [{}].", Thread.currentThread().getName());
             this.sessionThreadLocal.set(session);
         }
 
@@ -89,11 +88,12 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
         
         session.close();
         this.sessionThreadLocal.remove();
+        LoggerHelper.info(this.getLogger(), "Close session on thread [{}].", Thread.currentThread().getName());
     }
 	
 	@Override
 	public EntityManager getCurrentSession() {
-		return this.openSession();
+		return this.sessionThreadLocal.get();
 	}
 	
 	protected void setSessionFactory(EntityManagerFactory sessionFactory) {

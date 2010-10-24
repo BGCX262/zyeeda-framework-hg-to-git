@@ -38,7 +38,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		this.persistenceSvc = persistenceSvc;
 		this.txSvc = txSvc;
 		
-		this.roleMgr = new RoleManager(this.persistenceSvc.getCurrentSession());
+		this.roleMgr = new RoleManager(this.persistenceSvc);
 	}
 
 	@Override

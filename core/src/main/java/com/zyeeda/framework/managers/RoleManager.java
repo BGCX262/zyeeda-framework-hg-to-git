@@ -5,15 +5,17 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.persistence.PersistenceService;
 
 public class RoleManager extends DomainEntityManager {
 	
-	public RoleManager(EntityManager session) {
-		super(session);
+	public RoleManager(PersistenceService persistenceSvc) {
+		super(persistenceSvc);
 	}
 
 	public List<Role> getRolesBySubject(String subject) {
-		List<Role> roles = this.getSession().createNamedQuery("getRolesBySubject", Role.class)
+		EntityManager session = this.getPersistenceService().getCurrentSession();
+		List<Role> roles = session.createNamedQuery("getRolesBySubject", Role.class)
 			.setParameter("subject", subject).getResultList();
 		
 		return roles;

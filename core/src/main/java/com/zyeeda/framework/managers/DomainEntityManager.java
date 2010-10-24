@@ -1,17 +1,17 @@
 package com.zyeeda.framework.managers;
 
-import javax.persistence.EntityManager;
+import com.zyeeda.framework.persistence.PersistenceService;
 
 public class DomainEntityManager {
 
-	private EntityManager session;
+	private PersistenceService persistenceSvc;
 	
-	public DomainEntityManager(EntityManager session) {
-		this.session = session;
+	public DomainEntityManager(PersistenceService persistenceSvc) {
+		this.persistenceSvc = persistenceSvc;
 	}
 	
-	protected EntityManager getSession() {
-		return this.session;
+	protected PersistenceService getPersistenceService() {
+		return this.persistenceSvc;
 	}
 	
 }

@@ -7,12 +7,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.tapestry5.ioc.Registry;
-import org.drools.command.impl.GenericCommand;
 import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.runtime.StatefulKnowledgeSession;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.knowledge.KnowledgeService;
+import com.zyeeda.framework.knowledge.StatefulKnowledgeSessionCommand;
 
 @Path("sample")
 public class SampleFlowResource {
@@ -23,14 +23,12 @@ public class SampleFlowResource {
 		Registry reg = (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
 		KnowledgeService ksvc = reg.getService(KnowledgeService.class);
 		
-		return ksvc.execute(new GenericCommand<String>() {
+		return ksvc.execute(new StatefulKnowledgeSessionCommand<String>() {
 
 			private static final long serialVersionUID = 803619017440949193L;
 
 			@Override
-			public String execute(org.drools.command.Context ctx) {
-				StatefulKnowledgeSession ksession = 
-					((KnowledgeCommandContext) ctx).getStatefulKnowledgesession();
+			public String execute(StatefulKnowledgeSession ksession) {
 				ksession.startProcess("com.zyeeda.system.TestFlow");
 				return "OK";
 			}

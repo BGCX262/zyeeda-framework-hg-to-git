@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+//import javax.persistence.EntityManager;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
@@ -15,6 +16,7 @@ import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.helpers.LoggerHelper;
+//import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 
@@ -28,8 +30,14 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 	private final static String JNDI_USER_TRANSACTION_NAME = "btmTransactionManager";
 	private final static String JNDI_TRANSACTION_SYNCHRONIZATION_REGISTRY_NAME = "btmSynchronizationRegistry";
 	
-	public BitronixTransactionServiceProvider(Logger logger, RegistryShutdownHub shutdownHub) {
+	//private final PersistenceService persistenceSvc;
+	
+	public BitronixTransactionServiceProvider(
+			//@Primary PersistenceService persistenceSvc,
+			Logger logger, RegistryShutdownHub shutdownHub) {
+		
 		super(logger, shutdownHub);
+		//this.persistenceSvc = persistenceSvc;
 	}
 	
 	@Override
@@ -43,14 +51,26 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 		TransactionManagerServices.getTransactionManager();
 	}
 	
+	@Override
+	public void stop() {
+		TransactionManagerServices.getTransactionManager().shutdown();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public UserTransaction getTransaction() throws Exception {
 		Hashtable env = new Hashtable();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
 		Context ctx = new InitialContext(env);
-
-		return (UserTransaction) ctx.lookup(JNDI_USER_TRANSACTION_NAME);
+		
+		UserTransaction utx = (UserTransaction) ctx.lookup(JNDI_USER_TRANSACTION_NAME);
+		/*EntityManager session = this.persistenceSvc.getCurrentSession();
+		if (session != null) {
+			LoggerHelper.info(this.getLogger(), "Session has been open, join this transaction.");
+			session.joinTransaction();
+		}*/
+		
+		return utx;
 	}
 	
 	@Override

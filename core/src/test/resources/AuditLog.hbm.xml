@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+
+	<class name="org.drools.process.audit.ProcessInstanceLog" >
+        <id name="id">
+            <generator class="hilo">
+                <param name="table">PROCESS_INS_LOG_HILO</param>
+                <param name="column">NEXT_VALUE</param>
+                <param name="max_lo">100</param>
+	        </generator>
+        </id>
+        <property name="processInstanceId"/>
+        <property name="processId"/>
+        <property name="start" type="timestamp" column="START_DATE"/>
+        <property name="end" type="timestamp" column="END_DATE"/>
+    </class>
+
+	<class name="org.drools.process.audit.NodeInstanceLog" >
+        <id name="id">
+            <generator class="hilo">
+                <param name="table">NODE_INS_LOG_HILO</param>
+                <param name="column">NEXT_VALUE</param>
+                <param name="max_lo">100</param>
+            </generator>
+        </id>
+        <property name="type"/>
+        <property name="nodeInstanceId"/>
+        <property name="nodeId"/>
+        <property name="processInstanceId"/>
+        <property name="processId"/>
+        <property name="date" type="timestamp" column="DATE"/>
+    </class>
+
+</hibernate-mapping>

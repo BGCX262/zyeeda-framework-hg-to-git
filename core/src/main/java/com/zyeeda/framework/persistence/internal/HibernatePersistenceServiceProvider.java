@@ -57,7 +57,7 @@ public class HibernatePersistenceServiceProvider extends AbstractPersistenceServ
 	@Override
 	public void start() throws Exception {
 		Ejb3Configuration config = new Ejb3Configuration().configure(PERSISTENCE_UNIT_NAME, null);
-    	config.getEventListeners().setPreInsertEventListeners(
+		config.getEventListeners().setPreInsertEventListeners(
     			new PreInsertEventListener[] {
     					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
     	config.getEventListeners().setPreUpdateEventListeners(
