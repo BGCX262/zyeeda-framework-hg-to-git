@@ -7,7 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.tapestry5.ioc.Registry;
-import org.drools.command.impl.KnowledgeCommandContext;
 import org.drools.runtime.StatefulKnowledgeSession;
 
 import com.zyeeda.framework.FrameworkConstants;

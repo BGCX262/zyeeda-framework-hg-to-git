@@ -6,8 +6,8 @@ import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.Registry;
-import org.apache.tapestry5.ioc.LoggerSource;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.aop.Transactional;
@@ -18,15 +18,14 @@ import com.zyeeda.framework.utils.IocUtils;
 
 public aspect TransactionManagementAspect {
 	
+	private final static Logger logger = LoggerFactory.getLogger(TransactionManagementAspect.class);
+	
 	pointcut txEnabledMethod(ServletContext ctx) : 
 		execution(@Transactional public * *.*(ServletContext, ..)) 
 		&& args(ctx);
 	
 	Object around(ServletContext ctx) : txEnabledMethod(ctx) {
 		Registry reg = (Registry) ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-		
-		LoggerSource loggerSource = reg.getService(LoggerSource.class);
-		Logger logger = loggerSource.getLogger(TransactionManagementAspect.class);
 		
 		TransactionService txSvc = reg.getService(IocUtils.getServiceId(BitronixTransactionServiceProvider.class), TransactionService.class);
 		UserTransaction utx = null;

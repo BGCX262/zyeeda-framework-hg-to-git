@@ -23,12 +23,19 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.transaction.Status;
+import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.Registry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.FrameworkConstants;
+import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
+import com.zyeeda.framework.transaction.TransactionService;
+import com.zyeeda.framework.transaction.internal.BitronixTransactionServiceProvider;
 import com.zyeeda.framework.utils.IocUtils;
 
 /**
@@ -39,7 +46,9 @@ import com.zyeeda.framework.utils.IocUtils;
  * @since		1.0
  */
 public class OpenSessionInViewFilter implements Filter {
-
+	
+	private final static Logger logger = LoggerFactory.getLogger(OpenSessionInViewFilter.class);
+	
     private FilterConfig config;
 
     @Override
@@ -53,16 +62,32 @@ public class OpenSessionInViewFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        PersistenceService svc = null;
-
+    	
+    	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+    	
+    	PersistenceService persistenceSvc = null;
+        UserTransaction utx = null;
         try {
-        	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-        	svc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
-            svc.openSession();
+        	TransactionService txSvc = reg.getService(IocUtils.getServiceId(BitronixTransactionServiceProvider.class), TransactionService.class);
+        	persistenceSvc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
+        	
+        	utx = txSvc.getTransaction();
+        	utx.begin();
+            persistenceSvc.openSession();
             chain.doFilter(request, response);
-        } finally {
-            if (svc != null) {
-                svc.closeSession();
+            utx.commit();
+        } catch (Exception e) {
+        	throw new ServletException(e);
+		} finally {
+			try {
+				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
+					utx.rollback();
+				}
+			} catch (Exception e) {
+				LoggerHelper.error(logger, e.getMessage(), e);
+			}
+            if (persistenceSvc != null) {
+                persistenceSvc.closeSession();
             }
         }
     }

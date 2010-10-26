@@ -9,6 +9,6 @@ public interface TransactionService extends Service {
 
 	public TransactionManager getTransactionManager();
 	
-	public UserTransaction getTransaction() throws Exception;
+	public UserTransaction getTransaction() throws TransactionServiceException;
 	
 }

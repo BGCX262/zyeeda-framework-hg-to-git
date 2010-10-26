@@ -5,6 +5,7 @@ import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 //import javax.persistence.EntityManager;
 import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
@@ -19,6 +20,7 @@ import com.zyeeda.framework.helpers.LoggerHelper;
 //import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
+import com.zyeeda.framework.transaction.TransactionServiceException;
 
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
@@ -58,19 +60,18 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public UserTransaction getTransaction() throws Exception {
-		Hashtable env = new Hashtable();
-		env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
-		Context ctx = new InitialContext(env);
-		
-		UserTransaction utx = (UserTransaction) ctx.lookup(JNDI_USER_TRANSACTION_NAME);
-		/*EntityManager session = this.persistenceSvc.getCurrentSession();
-		if (session != null) {
-			LoggerHelper.info(this.getLogger(), "Session has been open, join this transaction.");
-			session.joinTransaction();
-		}*/
-		
-		return utx;
+	public UserTransaction getTransaction() throws TransactionServiceException {
+		try {
+			Hashtable env = new Hashtable();
+			env.put(Context.INITIAL_CONTEXT_FACTORY, "bitronix.tm.jndi.BitronixInitialContextFactory");
+			Context ctx = new InitialContext(env);
+			
+			UserTransaction utx = (UserTransaction) ctx.lookup(JNDI_USER_TRANSACTION_NAME);
+			
+			return utx;
+		} catch (NamingException e) {
+			throw new TransactionServiceException(e);
+		}
 	}
 	
 	@Override

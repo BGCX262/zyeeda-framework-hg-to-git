@@ -6,15 +6,12 @@ import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -26,23 +23,19 @@ import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.RoleManager;
-import com.zyeeda.framework.transaction.TransactionService;
 
 public class ShiroCombinedRealm extends AuthorizingRealm {
 	
 	// Injected
 	private final LdapService ldapSvc;
-	private final TransactionService txSvc;
 	private final RoleManager roleMgr;
 	private final Logger logger;
 	
 	public ShiroCombinedRealm(LdapService ldapSvc,
-			TransactionService txSvc,
 			RoleManager roleMgr,
 			Logger logger) {
 		
 		this.ldapSvc = ldapSvc;
-		this.txSvc = txSvc;
 		this.roleMgr = roleMgr;
 		this.logger = logger;
 	}
@@ -77,37 +70,21 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		UserTransaction utx = null;
-		try {
-			utx = this.txSvc.getTransaction();
-			utx.begin();
-			
-			String username = (String) this.getAvailablePrincipal(principals);
-			List<?> roles = this.roleMgr.getRolesBySubject(username);
-			
-			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-			for (Iterator<?> it = roles.iterator(); it.hasNext(); ) {
-				Role role = (Role) it.next();
-				if (this.logger.isDebugEnabled()) {
-					this.logger.debug("role name = {}", role.getName());
-					this.logger.debug("role perms = {}", role.getPermissions());
-				}
-				info.addRole(role.getName());
-				info.addStringPermissions(role.getPermissionSet());
+		String username = (String) this.getAvailablePrincipal(principals);
+		List<?> roles = this.roleMgr.getRolesBySubject(username);
+		
+		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		for (Iterator<?> it = roles.iterator(); it.hasNext(); ) {
+			Role role = (Role) it.next();
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("role name = {}", role.getName());
+				this.logger.debug("role perms = {}", role.getPermissions());
 			}
-			utx.commit();
-			
-			return info;
-		} catch (Throwable t) {
-			try {
-				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
-					utx.rollback();
-				}
-			} catch (Throwable e) {
-				LoggerHelper.error(this.logger, e.getMessage(), e);
-			}
-			throw new AuthorizationException(t);
+			info.addRole(role.getName());
+			info.addStringPermissions(role.getPermissionSet());
 		}
+		
+		return info;
 	}
 
 }
