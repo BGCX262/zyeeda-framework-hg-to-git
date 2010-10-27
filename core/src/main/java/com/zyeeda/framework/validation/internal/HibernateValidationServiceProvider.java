@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
+import com.zyeeda.framework.validation.ValidationEvent;
 import com.zyeeda.framework.validation.ValidationService;
 
 @ServiceId("hibernate-validation-service-provider")
@@ -22,7 +23,9 @@ public class HibernateValidationServiceProvider extends AbstractService	implemen
 	// Injected
 	private final PersistenceService persistenceSvc;
 	
-	private ValidatorFactory validatorFactory;
+	private ValidatorFactory preInsertValidatorFactory;
+	private ValidatorFactory preUpdateValidatorFactory;
+	private ValidatorFactory preDeleteValidatorFactory;
 	
 	public HibernateValidationServiceProvider(
 			@Primary PersistenceService persistenceSvc, Logger logger, RegistryShutdownHub shutdownHub) {
@@ -32,15 +35,30 @@ public class HibernateValidationServiceProvider extends AbstractService	implemen
 	
     @Override
     public void start() throws Exception {
-        HibernateValidatorConfiguration config = Validation.byProvider(HibernateValidator.class).configure();
-        this.validatorFactory = config.constraintValidatorFactory(
-        		new CustomConstraintValidatorFactory(
-        				this.persistenceSvc, this.getLogger())).buildValidatorFactory();
+        this.preInsertValidatorFactory = this.getValidatorFactory(ValidationEvent.PRE_INSERT);
+        this.preUpdateValidatorFactory = this.getValidatorFactory(ValidationEvent.PRE_UPDATE);
+        this.preDeleteValidatorFactory = this.getValidatorFactory(ValidationEvent.PRE_DELETE);
+    }
+    
+    private ValidatorFactory getValidatorFactory(ValidationEvent event) {
+    	HibernateValidatorConfiguration config = Validation.byProvider(HibernateValidator.class).configure();
+    	return config.constraintValidatorFactory(
+    			new CustomConstraintValidatorFactory(this.persistenceSvc, event)).buildValidatorFactory();
     }
 	
     @Override
-    public ValidatorFactory getValidatorFactory() {
-        return this.validatorFactory;
+    public ValidatorFactory getPreInsertValidatorFactory() {
+    	return this.preInsertValidatorFactory;
+    }
+    
+    @Override
+    public ValidatorFactory getPreUpdateValidatorFactory() {
+    	return this.preUpdateValidatorFactory;
+    }
+    
+    @Override
+    public ValidatorFactory getPreDeleteValidatorFactory() {
+    	return this.preDeleteValidatorFactory;
     }
     
 }

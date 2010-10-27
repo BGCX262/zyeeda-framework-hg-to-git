@@ -59,13 +59,13 @@ public class HibernatePersistenceServiceProvider extends AbstractPersistenceServ
 		Ejb3Configuration config = new Ejb3Configuration().configure(PERSISTENCE_UNIT_NAME, null);
 		config.getEventListeners().setPreInsertEventListeners(
     			new PreInsertEventListener[] {
-    					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
+    					new BeanValidationEventListener(this.validationSvc.getPreInsertValidatorFactory(), new Properties())});
     	config.getEventListeners().setPreUpdateEventListeners(
     			new PreUpdateEventListener[] {
-    					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
+    					new BeanValidationEventListener(this.validationSvc.getPreUpdateValidatorFactory(), new Properties())});
     	config.getEventListeners().setPreDeleteEventListeners(
     			new PreDeleteEventListener[] {
-    					new BeanValidationEventListener(this.validationSvc.getValidatorFactory(), new Properties())});
+    					new BeanValidationEventListener(this.validationSvc.getPreDeleteValidatorFactory(), new Properties())});
         
     	this.addMappingClasses(config, ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME);
     	
