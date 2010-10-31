@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 
 import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.knowledge.KnowledgeService;
-import com.zyeeda.framework.knowledge.StatefulKnowledgeSessionCommand;
+import com.zyeeda.framework.knowledge.StatefulSessionCommand;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
@@ -105,7 +105,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	}
 	
 	@Override
-	public <T> T execute(StatefulKnowledgeSessionCommand<T> command) throws Exception {
+	public <T> T execute(StatefulSessionCommand<T> command) throws Exception {
 		StatefulKnowledgeSession ksession = null;
 		KnowledgeRuntimeLogger rtLogger = null;
 		WorkingMemoryDbLogger dbLogger = null;
@@ -115,7 +115,13 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
-			ksession = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
+			if (command.getSessionId() > 0) {
+				ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(
+						command.getSessionId(), this.getKnowledgeBase(), null, env);
+			} else {
+				ksession = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
+			}
+			
 			ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
 			
 			rtLogger = KnowledgeRuntimeLoggerFactory.newConsoleLogger(ksession);
