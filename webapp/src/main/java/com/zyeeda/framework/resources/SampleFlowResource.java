@@ -11,7 +11,7 @@ import org.drools.runtime.StatefulKnowledgeSession;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.knowledge.KnowledgeService;
-import com.zyeeda.framework.knowledge.StatefulKnowledgeSessionCommand;
+import com.zyeeda.framework.knowledge.AbstractStatefulSessionCommand;
 
 @Path("sample")
 public class SampleFlowResource {
@@ -22,7 +22,7 @@ public class SampleFlowResource {
 		Registry reg = (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
 		KnowledgeService ksvc = reg.getService(KnowledgeService.class);
 		
-		return ksvc.execute(new StatefulKnowledgeSessionCommand<String>() {
+		return ksvc.execute(new AbstractStatefulSessionCommand<String>() {
 
 			private static final long serialVersionUID = 803619017440949193L;
 

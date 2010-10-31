@@ -11,6 +11,6 @@ public interface KnowledgeService extends Service {
 	
 	public TaskService getTaskService();
 	
-	public <T> T execute(StatefulKnowledgeSessionCommand<T> command) throws Exception;
+	public <T> T execute(StatefulSessionCommand<T> command) throws Exception;
 	
 }
