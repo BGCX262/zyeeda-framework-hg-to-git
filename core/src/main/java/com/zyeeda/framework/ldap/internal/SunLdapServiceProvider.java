@@ -12,11 +12,9 @@ import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tapestry5.ioc.Resource;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
-import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 
@@ -59,8 +57,7 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		super(logger, shutdownHub);
 		this.tplSvc = tplSvc;
 		
-		Resource configFile = new ClasspathResource(String.format("%s.properties", this.getServiceId()));
-    	Configuration config = configSvc.getConfiguration(configFile);
+		Configuration config = this.getConfiguration(configSvc);
     	this.init(config);
 	}
 	

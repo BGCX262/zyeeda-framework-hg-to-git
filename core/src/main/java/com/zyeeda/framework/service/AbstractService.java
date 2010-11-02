@@ -15,11 +15,15 @@
  */
 package com.zyeeda.framework.service;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.tapestry5.ioc.Resource;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.apache.tapestry5.ioc.services.RegistryShutdownListener;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.helpers.LoggerHelper;
 
 /**
@@ -74,6 +78,12 @@ public abstract class AbstractService implements Service, RegistryShutdownListen
 	
 	protected String getServiceId() {
 		return this.getClass().getAnnotation(ServiceId.class).value();
+	}
+	
+	protected Configuration getConfiguration(ConfigurationService configSvc) {
+		Resource configFile = new ClasspathResource(String.format("%s.properties", this.getServiceId()));
+    	Configuration config = configSvc.getConfiguration(configFile);
+    	return config;
 	}
     
 }
