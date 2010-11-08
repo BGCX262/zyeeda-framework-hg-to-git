@@ -159,16 +159,16 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
+			env.set(EnvironmentName.TRANSACTION_MANAGER, this.txSvc.getTransactionManager());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
 			if (command.getSessionId() > 0) {
 				ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(
-						command.getSessionId(), this.getKnowledgeBase(), null, env);
+						command.getSessionId(), this.kbase, null, env);
 			} else {
-				ksession = JPAKnowledgeService.newStatefulKnowledgeSession(kbase, null, env);
+				ksession = JPAKnowledgeService.newStatefulKnowledgeSession(this.kbase, null, env);
+				ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
 			}
-			
-			ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
 			
 			rtLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(ksession, this.configSvc.mapPath(this.auditLogFilePath), this.auditLogFlushInterval);
 			dbLogger = new JPAWorkingMemoryDbLogger(ksession);

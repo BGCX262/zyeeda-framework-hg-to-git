@@ -1,5 +1,8 @@
 package com.zyeeda.framework.resources;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -7,6 +10,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.tapestry5.ioc.Registry;
+import org.drools.marshalling.Marshaller;
+import org.drools.marshalling.MarshallerFactory;
+import org.drools.persistence.session.JPASessionMarshallingHelper;
 import org.drools.runtime.StatefulKnowledgeSession;
 
 import com.zyeeda.framework.FrameworkConstants;
@@ -20,9 +26,24 @@ public class SampleFlowResource {
 	@Produces("text/plain")
 	public String start(@Context ServletContext context) throws Exception {
 		Registry reg = (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-		KnowledgeService ksvc = reg.getService(KnowledgeService.class);
+		final KnowledgeService ksvc = reg.getService(KnowledgeService.class);
 		
-		return ksvc.execute(new AbstractStatefulSessionCommand<String>() {
+		AbstractStatefulSessionCommand<String> command = new AbstractStatefulSessionCommand<String>() {
+			private static final long serialVersionUID = 803619017440949193L;
+
+			@Override
+			public String execute(StatefulKnowledgeSession ksession) {
+				//JPASessionMarshallingHelper helper = new JPASessionMarshallingHelper(ksession, null);
+				//System.out.println(helper.getSnapshot());
+				System.out.println(ksession.getId());
+				//ksession.startProcess("com.zyeeda.system.TestFlow");
+				return "OK";
+			}
+		};
+		//command.setSessionId(10);
+		return ksvc.execute(command);
+		
+		/*return ksvc.execute(new AbstractStatefulSessionCommand<String>() {
 
 			private static final long serialVersionUID = 803619017440949193L;
 
@@ -31,6 +52,6 @@ public class SampleFlowResource {
 				ksession.startProcess("com.zyeeda.system.TestFlow");
 				return "OK";
 			}
-		});	
+		});*/
 	}
 }

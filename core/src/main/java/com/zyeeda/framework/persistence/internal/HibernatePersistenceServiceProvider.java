@@ -43,7 +43,7 @@ import com.zyeeda.framework.validation.ValidationService;
 public class HibernatePersistenceServiceProvider extends AbstractPersistenceServiceProvider implements PersistenceService {
 	
 	private final static String PERSISTENCE_UNIT_NAME = "default";
-	private final static String ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Zyeeda-Framework-Entity-Classes";
+	//private final static String ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Zyeeda-Framework-Entity-Classes";
     
     // Injected
     private final ValidationService validationSvc;
@@ -57,6 +57,7 @@ public class HibernatePersistenceServiceProvider extends AbstractPersistenceServ
 	@Override
 	public void start() throws Exception {
 		Ejb3Configuration config = new Ejb3Configuration().configure(PERSISTENCE_UNIT_NAME, null);
+		
 		config.getEventListeners().setPreInsertEventListeners(
     			new PreInsertEventListener[] {
     					new BeanValidationEventListener(this.validationSvc.getPreInsertValidatorFactory(), new Properties())});
@@ -66,8 +67,8 @@ public class HibernatePersistenceServiceProvider extends AbstractPersistenceServ
     	config.getEventListeners().setPreDeleteEventListeners(
     			new PreDeleteEventListener[] {
     					new BeanValidationEventListener(this.validationSvc.getPreDeleteValidatorFactory(), new Properties())});
-        
-    	this.addMappingClasses(config, ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME);
+    	
+    	//this.addMappingClasses(config, ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME);
     	
     	this.setSessionFactory(config.buildEntityManagerFactory());
 	}

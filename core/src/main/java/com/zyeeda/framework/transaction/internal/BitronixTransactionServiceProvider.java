@@ -32,14 +32,11 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 	private final static String JNDI_USER_TRANSACTION_NAME = "btmTransactionManager";
 	private final static String JNDI_TRANSACTION_SYNCHRONIZATION_REGISTRY_NAME = "btmSynchronizationRegistry";
 	
-	//private final PersistenceService persistenceSvc;
 	
 	public BitronixTransactionServiceProvider(
-			//@Primary PersistenceService persistenceSvc,
 			Logger logger, RegistryShutdownHub shutdownHub) {
 		
 		super(logger, shutdownHub);
-		//this.persistenceSvc = persistenceSvc;
 	}
 	
 	@Override
@@ -58,8 +55,8 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 		TransactionManagerServices.getTransactionManager().shutdown();
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public UserTransaction getTransaction() throws TransactionServiceException {
 		try {
 			Hashtable env = new Hashtable();

@@ -4,6 +4,8 @@
 	version="2.0">
 	
 	<persistence-unit name="default" transaction-type="JTA">
+		<mapping-file>META-INF/drools-audit.orm.xml</mapping-file>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="hibernate.ejb.cfgfile" value="/default.hibernate.cfg.xml" />
 		</properties>
@@ -11,6 +13,7 @@
 	
 	<persistence-unit name="drools-task" transaction-type="RESOURCE_LOCAL">
 		<mapping-file>META-INF/drools-task.orm.xml</mapping-file>
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="hibernate.ejb.cfgfile" value="/drools-task.hibernate.cfg.xml" />
 		</properties>

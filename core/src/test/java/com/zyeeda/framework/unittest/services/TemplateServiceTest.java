@@ -14,13 +14,13 @@ import com.zyeeda.framework.unittest.TestSuiteBase;
 @Test
 public class TemplateServiceTest extends TestSuiteBase {
 
-	@Test
+	@Test(enabled = false)
 	public void testGetTemplateService() {
 		TemplateService tplSvc = this.getService();
 		assertNotNull(tplSvc);
 	}
 	
-	@Test
+	@Test(enabled = false)
 	public void testRenderString() throws IOException {
 		TemplateService tplSvc = this.getService();
 		String tpl = "hello ${name}";

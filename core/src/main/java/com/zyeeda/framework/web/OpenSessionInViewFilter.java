@@ -76,16 +76,16 @@ public class OpenSessionInViewFilter implements Filter {
             persistenceSvc.openSession();
             chain.doFilter(request, response);
             utx.commit();
-        } catch (Exception e) {
-        	throw new ServletException(e);
-		} finally {
-			try {
+        } catch (Throwable t) {
+        	try {
 				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
 					utx.rollback();
 				}
 			} catch (Exception e) {
 				LoggerHelper.error(logger, e.getMessage(), e);
 			}
+        	throw new ServletException(t);
+		} finally {
             if (persistenceSvc != null) {
                 persistenceSvc.closeSession();
             }

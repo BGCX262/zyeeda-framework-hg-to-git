@@ -30,7 +30,13 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 
 	protected void addMappingClasses(Ejb3Configuration config, String key) throws IOException {
 		
-		Enumeration<URL> urls = this.getClass().getClassLoader().getResources("META-INF/MANIFEST.MF");
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if (cl == null) {
+			LoggerHelper.debug(this.getLogger(), "context class loader is null, use current class loader instead");
+			cl = this.getClass().getClassLoader();
+		}
+		
+		Enumeration<URL> urls = cl.getResources("META-INF/MANIFEST.MF");
 		while (urls.hasMoreElements()) {
 			URL url = urls.nextElement();
 			
@@ -46,7 +52,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 				String[] classArray = StringUtils.split(classes, ',');
 				for (String className : classArray) {
 					try {
-						Class<?> clazz = this.getClass().getClassLoader().loadClass(className);
+						Class<?> clazz = cl.loadClass(className);
 						config.addAnnotatedClass(clazz);
 					} catch (ClassNotFoundException e) {
 						LoggerHelper.warn(this.getLogger(), e.getMessage(), e);
