@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.Deadline" access="FIELD">
+        <table name="DRL5_DEADLINE" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="deadlineIdGenerator" />
+                <table-generator name="deadlineIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="DEADLINE_ID" />
+            </id>
+            <basic name="date">
+                <column name="F_DATE" />
+            </basic>
+            <basic name="escalated">
+                <column name="F_ESCALATED" />
+            </basic>
+            <one-to-many name="documentation">
+                <join-column name="F_DEADLINE_DOC_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="escalations">
+                <join-column name="F_DEADLINE_ESCALATIONS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

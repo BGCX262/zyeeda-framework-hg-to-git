@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.process.audit.NodeInstanceLog" access="FIELD">
+        <table name="DRL5_NODE_INSTANCE_LOG" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="nodeInstanceLogIdGenerator" />
+                <table-generator name="nodeInstanceLogIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="NODE_INSTANCE_LOG_ID" />
+            </id>
+            <basic name="type">
+                <column name="F_TYPE" />
+            </basic>
+            <basic name="processInstanceId">
+                <column name="F_PROCESS_INS_ID" />
+            </basic>
+            <basic name="processId">
+            	<column name="F_PROCESS_ID" />
+            </basic>
+            <basic name="nodeInstanceId">
+                <column name="F_NODE_INS_ID" />
+            </basic>
+            <basic name="nodeId">
+            	<column name="F_NODE_ID" />
+            </basic>
+            <basic name="date">
+                <column name="F_LOG_DATE" />
+                <temporal>TIMESTAMP</temporal>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

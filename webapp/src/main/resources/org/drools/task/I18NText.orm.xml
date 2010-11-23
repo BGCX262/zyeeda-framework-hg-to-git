@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.I18NText" access="FIELD">
+        <table name="DRL5_I118N_TEXT" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="i18nTextIdGenerator" />
+                <table-generator name="i18nTextIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="I18N_TEXT_ID" />
+            </id>
+            <basic name="language">
+                <column name="F_LANGUAGE" />
+            </basic>
+            <basic name="text">
+                <column name="F_TEXT" />
+                <lob />
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

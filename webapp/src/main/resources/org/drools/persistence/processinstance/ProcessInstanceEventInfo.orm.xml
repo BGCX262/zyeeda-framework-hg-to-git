@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.persistence.processinstance.ProcessInstanceEventInfo" access="FIELD">
+        <table name="DRL5_PROCESS_INS_EVENT_INFO" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="processInstanceEventInfoIdGenerator" />
+                <table-generator name="processInstanceEventInfoIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="PROCESS_INSTANCE_EVENT_INFO_ID" />
+            </id>
+            <basic name="eventType">
+                <column name="F_EVENT_TYPE" />
+            </basic>
+            <basic name="processInstanceId">
+                <column name="F_PROCESS_INS_ID" />
+            </basic>
+            <version name="version">
+                <column name="F_OPTLOCK" />
+            </version>
+        </attributes>
+    </entity>
+</entity-mappings>

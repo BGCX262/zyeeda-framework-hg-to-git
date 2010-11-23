@@ -22,7 +22,6 @@
         <mapping class="org.drools.task.BooleanExpression" />
         <mapping class="org.drools.task.Comment" />
         <mapping class="org.drools.task.Deadline" />
-        <mapping class="org.drools.task.Comment" />
         <mapping class="org.drools.task.Deadlines" />
         <mapping class="org.drools.task.Delegation" />
         <mapping class="org.drools.task.Escalation" />
@@ -33,7 +32,6 @@
         <mapping class="org.drools.task.EmailNotificationHeader" />
         <mapping class="org.drools.task.PeopleAssignments" />
         <mapping class="org.drools.task.Reassignment" />
-        <mapping class="org.drools.task.Status" />
         <mapping class="org.drools.task.Task" />
         <mapping class="org.drools.task.TaskData" />
         <mapping class="org.drools.task.SubTasksStrategy" />

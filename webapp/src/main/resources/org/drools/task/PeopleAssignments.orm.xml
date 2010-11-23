@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <embeddable class="org.drools.task.PeopleAssignments" access="FIELD">
+        <attributes>
+            <many-to-one name="taskInitiator">
+                <join-column name="F_TASK_INITIATOR_ID" />
+            </many-to-one>
+            <many-to-many name="potentialOwners">
+                <join-table name="DRL5_PA_POTENTIAL_OWNERS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+            <many-to-many name="excludedOwners">
+                <join-table name="DRL5_PA_EXCLUDED_OWNERS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+            <many-to-many name="taskStakeholders">
+                <join-table name="DRL5_PA_TASK_STAKEHOLDERS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+            <many-to-many name="businessAdministrators">
+                <join-table name="DRL5_PA_BIZ_ADMINS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+            <many-to-many name="recipients">
+                <join-table name="DRL5_PA_RECIPIENTS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+        </attributes>
+    </embeddable>
+</entity-mappings>

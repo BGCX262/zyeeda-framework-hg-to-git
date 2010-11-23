@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <embeddable class="org.drools.task.Deadlines" access="FIELD">
+        <attributes>
+            <one-to-many name="startDeadlines">
+                <join-column name="F_DEADLINES_START_DEADLINES_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="endDeadlines">
+                <join-column name="F_DEADLINES_END_DEADLINES_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+        </attributes>
+    </embeddable>
+</entity-mappings>

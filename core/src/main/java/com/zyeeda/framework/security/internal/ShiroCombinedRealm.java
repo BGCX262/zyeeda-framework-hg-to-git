@@ -17,6 +17,7 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.drools.process.workitem.email.EmailWorkItemHandler;
 import org.slf4j.Logger;
 
 import com.zyeeda.framework.entities.Role;

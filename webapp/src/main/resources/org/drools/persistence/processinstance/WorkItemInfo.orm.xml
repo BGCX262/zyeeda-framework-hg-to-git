@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.persistence.processinstance.WorkItemInfo" access="FIELD">
+        <table name="DRL5_WORK_ITEM_INFO" />
+
+        <attributes>
+            <id name="workItemId">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="workItemInfoIdGenerator" />
+                <table-generator name="workItemInfoIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="WORK_ITEM_INFO_ID" />
+            </id>
+            <basic name="name">
+                <column name="F_NAME" />
+            </basic>
+            <basic name="creationDate">
+                <column name="F_CREATION_DATE" />
+            </basic>
+            <basic name="processInstanceId">
+                <column name="F_PROCESS_INS_ID" />
+            </basic>
+            <basic name="state">
+                <column name="F_STATE" />
+            </basic>
+            <basic name="workItemByteArray">
+                <column name="F_WORK_ITEM_BYTE_ARRAY" />
+                <lob />
+            </basic>
+            <basic name="externalVariables">
+                <column name="F_EXTERNAL_VERIABLES" />
+            </basic>
+            <version name="version">
+                <column name="F_OPTLOCK" />
+            </version>
+            <one-to-many name="variables">
+                <map-key name="name" />
+                <join-column name="F_WORK_ITEM_ID" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <transient name="workItem" />
+            <transient name="env" />
+        </attributes>
+    </entity>
+</entity-mappings>

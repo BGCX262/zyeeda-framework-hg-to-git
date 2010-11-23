@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+  	<entity class="org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo" access="FIELD">
+        <table name="DRL5_VAR_INS_INFO" />
+        <inheritance strategy="SINGLE_TABLE" />
+        <discriminator-value>GEN</discriminator-value>
+        <discriminator-column discriminator-type="STRING" name="F_DTYPE" length="50" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="variableInstanceInfoIdGenerator" />
+                <table-generator name="variableInstanceInfoIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="VARIABLE_INSTANCE_INFO_ID" />
+            </id>
+            <basic name="name">
+                <column name="F_NAME" />
+            </basic>
+            <basic name="persister">
+                <column name="F_PERSISTER" />
+            </basic>
+            <basic name="processInstanceId">
+                <column name="F_PROCESS_INS_ID" />
+            </basic>
+            <basic name="workItemId">
+                <column name="F_WORK_ITEM_ID" />
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

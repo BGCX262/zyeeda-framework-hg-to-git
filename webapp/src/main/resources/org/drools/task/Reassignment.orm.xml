@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.Reassignment" access="FIELD">
+        <table name="DRL5_REASSIGNMENT" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="reassignmentIdGenerator" />
+                <table-generator name="reassignmentIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="REASSIGNMENT_ID" />
+            </id>
+            <one-to-many name="documentation">
+                <join-column name="F_REASSIGNMENT_DOC_ID" nullable="true" />
+            </one-to-many>
+            <many-to-many name="potentialOwners">
+                <join-table name="DRL5_REASSIGN_POTENTIAL_OWNERS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

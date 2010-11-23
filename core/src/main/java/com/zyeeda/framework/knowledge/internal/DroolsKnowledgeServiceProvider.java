@@ -159,6 +159,8 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
+			env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.getCurrentSession());
+			env.set(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.getCurrentSession());
 			env.set(EnvironmentName.TRANSACTION_MANAGER, this.txSvc.getTransactionManager());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
@@ -167,22 +169,39 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 						command.getSessionId(), this.kbase, null, env);
 			} else {
 				ksession = JPAKnowledgeService.newStatefulKnowledgeSession(this.kbase, null, env);
-				ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
 			}
+			
+			ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
+			
+			//EmailWorkItemHandler emailHandler = new EmailWorkItemHandler();
+			//emailHandler.setConnection("mail.tangrui.net", "21", "webmaster@tangrui.net", "P@$ther0");
+			//ksession.getWorkItemManager().registerWorkItemHandler("Email", emailHandler);
 			
 			rtLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(ksession, this.configSvc.mapPath(this.auditLogFilePath), this.auditLogFlushInterval);
 			dbLogger = new JPAWorkingMemoryDbLogger(ksession);
 			
-			return command.execute(ksession);
+			T result = command.execute(ksession);
+			
+			ksession.dispose();
+			
+			return result;
+		} catch (Throwable t) {
+			this.getLogger().error(t.getMessage(), t);
+			throw new Exception(t);
 		} finally {
 			if (rtLogger != null) {
-				rtLogger.close();
+				try {
+					rtLogger.close();
+				} catch (Throwable t) {
+					this.getLogger().error(t.getMessage(), t);
+				}
 			}
 			if (dbLogger != null) {
-				dbLogger.dispose();
-			}
-			if (ksession != null) {
-				ksession.dispose();
+				try {
+					dbLogger.dispose();
+				} catch (Throwable t) {
+					this.getLogger().error(t.getMessage(), t);
+				}
 			}
 		}
 	}
