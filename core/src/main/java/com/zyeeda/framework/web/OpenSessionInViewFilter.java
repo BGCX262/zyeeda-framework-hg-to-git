@@ -72,17 +72,23 @@ public class OpenSessionInViewFilter implements Filter {
         	persistenceSvc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
         	
         	utx = txSvc.getTransaction();
+        	logger.debug("tx status before begin = {}", utx.getStatus());
         	utx.begin();
+        	logger.debug("tx status after begin = {}", utx.getStatus());
             persistenceSvc.openSession();
             chain.doFilter(request, response);
+            logger.debug("tx status before commit = {}", utx.getStatus());
             utx.commit();
+            logger.debug("tx status after commit = {}", utx.getStatus());
         } catch (Throwable t) {
         	try {
-				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
+				if (utx != null) {
+					logger.debug("tx status before rollback = {}", utx.getStatus());
 					utx.rollback();
+					logger.debug("tx status after successfully rollback = {}", utx.getStatus());
 				}
-			} catch (Exception e) {
-				LoggerHelper.error(logger, e.getMessage(), e);
+			} catch (Throwable t2) {
+				logger.error("Cannot rollback transaction.", t2);
 			}
         	throw new ServletException(t);
 		} finally {
@@ -91,5 +97,4 @@ public class OpenSessionInViewFilter implements Filter {
             }
         }
     }
-
 }

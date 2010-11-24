@@ -77,7 +77,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
             session = this.getSessionFactory().createEntityManager();
-            LoggerHelper.info(this.getLogger(), "Open session on thread [{}].", Thread.currentThread().getName());
+            this.getLogger().info("Open session on thread [{}].", Thread.currentThread().getName());
             this.sessionThreadLocal.set(session);
         }
 
@@ -88,13 +88,13 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
     public void closeSession() {
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
-        	LoggerHelper.warn(this.getLogger(), "No session opened.");
+        	this.getLogger().warn("No session opened on thread [{}].", Thread.currentThread().getName());
         	return;
         }
         
         session.close();
         this.sessionThreadLocal.remove();
-        LoggerHelper.info(this.getLogger(), "Close session on thread [{}].", Thread.currentThread().getName());
+        this.getLogger().info("Close session on thread [{}].", Thread.currentThread().getName());
     }
 	
 	@Override
