@@ -6,19 +6,20 @@
 
 <hibernate-configuration>
     <session-factory>
-    	<!-- MySQL 5.1 -->
+    	<!-- MySQL 5.1 
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</property>
         <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/framework</property>
         <property name="hibernate.connection.username">root</property>
-        <property name="hibernate.connection.password">root</property>
-        <!-- Oracle 10g
+        <property name="hibernate.connection.password">root</property>-->
+        <!-- Oracle 10g -->
         <property name="hibernate.dialect">org.hibernate.dialect.Oracle10gDialect</property>
         <property name="hibernate.connection.driver_class">oracle.jdbc.OracleDriver</property>
-        <property name="hibernate.connection.url">jdbc:oracle:thin:@192.168.1.10:1521:ORCL</property>
+        <property name="hibernate.connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
         <property name="hibernate.connection.username">tangrui</property>
         <property name="hibernate.connection.password">tangrui</property>
-        -->
+        
+        <property name="hibernate.connection.autocommit">false</property>
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">false</property>
@@ -47,31 +48,5 @@
         <mapping resource="org/drools/task/SubTasksStrategy.orm.xml" />
         <mapping resource="org/drools/task/OnParentAbortAllSubTasksEndStrategy.orm.xml" />
         <mapping resource="org/drools/task/OnAllSubTasksEndParentEndStrategy.orm.xml" />
-        
-        <!--
-        <mapping class="org.drools.task.Attachment" />
-        <mapping class="org.drools.task.Content" />
-        <mapping class="org.drools.task.BooleanExpression" />
-        <mapping class="org.drools.task.Comment" />
-        <mapping class="org.drools.task.Deadline" />
-        <mapping class="org.drools.task.Comment" />
-        <mapping class="org.drools.task.Deadlines" />
-        <mapping class="org.drools.task.Delegation" />
-        <mapping class="org.drools.task.Escalation" />
-        <mapping class="org.drools.task.Group" />
-        <mapping class="org.drools.task.I18NText" />
-        <mapping class="org.drools.task.Notification" />
-        <mapping class="org.drools.task.EmailNotification" />
-        <mapping class="org.drools.task.EmailNotificationHeader" />
-        <mapping class="org.drools.task.PeopleAssignments" />
-        <mapping class="org.drools.task.Reassignment" />
-        <mapping class="org.drools.task.Status" />
-        <mapping class="org.drools.task.Task" />
-        <mapping class="org.drools.task.TaskData" />
-        <mapping class="org.drools.task.SubTasksStrategy" />
-        <mapping class="org.drools.task.OnParentAbortAllSubTasksEndStrategy" />
-        <mapping class="org.drools.task.OnAllSubTasksEndParentEndStrategy" />
-        <mapping class="org.drools.task.User" />
-        -->
 	</session-factory>
 </hibernate-configuration>

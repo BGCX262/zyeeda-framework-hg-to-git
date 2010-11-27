@@ -15,7 +15,8 @@ class CustomCommand extends AbstractStatefulSessionCommand<String> {
 	private static final long serialVersionUID = 803619017440949193L;
 
 	public String execute(StatefulKnowledgeSession ksession) {
-		ProcessInstance pi = ksession.startProcess("com.zyeeda.system.TestFlow");
+		//ProcessInstance pi = ksession.startProcess("com.zyeeda.system.TestFlow");
+		ProcessInstance pi = ksession.startProcess("com.zyeeda.system.TaskFlow");
 		return "session id = " + ksession.getId() + " | process id = " + pi.getId();
 	}
 }
