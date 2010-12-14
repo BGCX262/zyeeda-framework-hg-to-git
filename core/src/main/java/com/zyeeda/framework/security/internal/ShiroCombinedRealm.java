@@ -17,43 +17,37 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
-import org.drools.process.workitem.email.EmailWorkItemHandler;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Role;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.RoleManager;
 
 public class ShiroCombinedRealm extends AuthorizingRealm {
 	
+	private static final Logger logger = LoggerFactory.getLogger(ShiroCombinedRealm.class);
+	
 	// Injected
 	private final LdapService ldapSvc;
 	private final RoleManager roleMgr;
-	private final Logger logger;
 	
-	public ShiroCombinedRealm(LdapService ldapSvc,
-			RoleManager roleMgr,
-			Logger logger) {
-		
+	public ShiroCombinedRealm(LdapService ldapSvc, RoleManager roleMgr) {
 		this.ldapSvc = ldapSvc;
 		this.roleMgr = roleMgr;
-		this.logger = logger;
 	}
 	
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-		LoggerHelper.debug(this.logger, "authentication token type = {}", token.getClass().getName());
+		logger.debug("authentication token type = {}", token.getClass().getName());
 		
 		if (!(token instanceof UsernamePasswordToken)) {
 			throw new AuthenticationException("Invalid authentication token.");
 		}
 		
 		UsernamePasswordToken upToken = (UsernamePasswordToken) token;
-		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("username = {}", upToken.getUsername());
-			this.logger.debug("password = ******");
-		}
+		logger.debug("username = {}", upToken.getUsername());
+		logger.debug("password = ******");
 		
 		LdapContext ctx = null;
 		try {
@@ -77,10 +71,8 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		for (Iterator<?> it = roles.iterator(); it.hasNext(); ) {
 			Role role = (Role) it.next();
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("role name = {}", role.getName());
-				this.logger.debug("role perms = {}", role.getPermissions());
-			}
+			logger.debug("role name = {}", role.getName());
+			logger.debug("role perms = {}", role.getPermissions());
 			info.addRole(role.getName());
 			info.addStringPermissions(role.getPermissionSet());
 		}

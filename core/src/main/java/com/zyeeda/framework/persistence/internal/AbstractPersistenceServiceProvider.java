@@ -1,38 +1,32 @@
 package com.zyeeda.framework.persistence.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.Manifest;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
-import org.drools.core.util.StringUtils;
-import org.hibernate.ejb.Ejb3Configuration;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 
 public class AbstractPersistenceServiceProvider extends AbstractService implements PersistenceService {
 	
+	private static final Logger logger = LoggerFactory.getLogger(AbstractPersistenceServiceProvider.class);
+	
 	private EntityManagerFactory sessionFactory;
 	private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
 	//private final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
 	
-	protected AbstractPersistenceServiceProvider(Logger logger,	RegistryShutdownHub shutdownHub) {
-		super(logger, shutdownHub);
+	protected AbstractPersistenceServiceProvider(RegistryShutdownHub shutdownHub) {
+		super(shutdownHub);
 	}
 
-	protected void addMappingClasses(Ejb3Configuration config, String key) throws IOException {
+	/*protected void addMappingClasses(Ejb3Configuration config, String key) throws IOException {
 		
 		ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		if (cl == null) {
-			LoggerHelper.debug(this.getLogger(), "context class loader is null, use current class loader instead");
+			logger.debug("context class loader is null, use current class loader instead");
 			cl = this.getClass().getClassLoader();
 		}
 		
@@ -55,7 +49,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 						Class<?> clazz = cl.loadClass(className);
 						config.addAnnotatedClass(clazz);
 					} catch (ClassNotFoundException e) {
-						LoggerHelper.warn(this.getLogger(), e.getMessage(), e);
+						logger.warn(e.getMessage(), e);
 					}
 				}
 			} finally {
@@ -64,7 +58,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 				}
 			}
 		}
-	}
+	}*/
 	
 	@Override
 	public void stop() throws Exception {
@@ -77,7 +71,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
             session = this.getSessionFactory().createEntityManager();
-            this.getLogger().info("Open session on thread [{}].", Thread.currentThread().getName());
+            logger.info("Open session on thread [{}].", Thread.currentThread().getName());
             this.sessionThreadLocal.set(session);
         }
 
@@ -88,13 +82,13 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
     public void closeSession() {
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
-        	this.getLogger().warn("No session opened on thread [{}].", Thread.currentThread().getName());
+        	logger.warn("No session opened on thread [{}].", Thread.currentThread().getName());
         	return;
         }
         
         session.close();
         this.sessionThreadLocal.remove();
-        this.getLogger().info("Close session on thread [{}].", Thread.currentThread().getName());
+        logger.info("Close session on thread [{}].", Thread.currentThread().getName());
     }
 	
 	@Override

@@ -9,7 +9,6 @@ import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.hibernate.validator.HibernateValidator;
 import org.hibernate.validator.HibernateValidatorConfiguration;
-import org.slf4j.Logger;
 
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
@@ -28,8 +27,8 @@ public class HibernateValidationServiceProvider extends AbstractService	implemen
 	private ValidatorFactory preDeleteValidatorFactory;
 	
 	public HibernateValidationServiceProvider(
-			@Primary PersistenceService persistenceSvc, Logger logger, RegistryShutdownHub shutdownHub) {
-		super(logger, shutdownHub);
+			@Primary PersistenceService persistenceSvc, RegistryShutdownHub shutdownHub) {
+		super(shutdownHub);
 		this.persistenceSvc = persistenceSvc;
 	}
 	

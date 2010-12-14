@@ -25,6 +25,7 @@ import org.slf4j.Logger;
  * @version 	%I%, %G%
  * @since 	 	1.0
  */
+@Deprecated
 public class LoggerHelper {
 
 	public static void trace(Logger logger, String message, Object... args) {

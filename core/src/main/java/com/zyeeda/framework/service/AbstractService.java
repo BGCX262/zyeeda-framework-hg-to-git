@@ -22,9 +22,9 @@ import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.apache.tapestry5.ioc.services.RegistryShutdownListener;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
-import com.zyeeda.framework.helpers.LoggerHelper;
 
 /**
  * Abstract service.
@@ -35,11 +35,11 @@ import com.zyeeda.framework.helpers.LoggerHelper;
  */
 public abstract class AbstractService implements Service, RegistryShutdownListener {
 	
-	private final Logger logger;
+	private final static Logger logger = LoggerFactory.getLogger(AbstractService.class);
+	
     private ServiceState state = ServiceState.NEW;
 
-    protected AbstractService(Logger logger, RegistryShutdownHub shutdownHub) {
-    	this.logger = logger;
+    protected AbstractService(RegistryShutdownHub shutdownHub) {
     	shutdownHub.addRegistryShutdownListener(this);
     }
     
@@ -64,16 +64,12 @@ public abstract class AbstractService implements Service, RegistryShutdownListen
 	@Override
 	public void registryDidShutdown() {
 		try {
-			LoggerHelper.info(logger, "{} stopping", this.getClass().getSimpleName());
+			logger.info("{} stopping", this.getClass().getSimpleName());
 			this.stop();
-			LoggerHelper.info(logger, "{} stopped", this.getClass().getSimpleName());
+			logger.info("{} stooped", this.getClass().getSimpleName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-	}
-	
-	protected Logger getLogger() {
-		return this.logger;
 	}
 	
 	protected String getServiceId() {

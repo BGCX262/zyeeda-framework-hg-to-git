@@ -14,7 +14,6 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
-import org.slf4j.Logger;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.service.AbstractService;
@@ -26,9 +25,9 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 	private ServletContext context;
 	
 	public DefaultConfigurationServiceProvider(
-			Collection<ServletContext> contexts, Logger logger, RegistryShutdownHub shutdownHub) {
+			Collection<ServletContext> contexts, RegistryShutdownHub shutdownHub) {
 		
-		super(logger, shutdownHub);
+		super(shutdownHub);
 		
 		if (contexts.size() != 1) {
 			throw new IllegalStateException("There should be one and only one context.");
@@ -66,6 +65,10 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 	public File getApplicationRoot() {
 		String contextRoot = this.context.getRealPath("/");
 		return new File(contextRoot);
+	}
+	
+	public String getContextPath() {
+		return this.context.getContextPath();
 	}
 	
 	@Override

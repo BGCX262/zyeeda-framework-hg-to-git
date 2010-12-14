@@ -7,7 +7,6 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
-import org.slf4j.Logger;
 
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.RoleManager;
@@ -27,10 +26,9 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	
 	public ShiroSecurityServiceProvider(LdapService ldapSvc,
 			@Primary PersistenceService persistenceSvc,
-			Logger logger,
 			RegistryShutdownHub shutdownHub) {
 		
-		super(logger, shutdownHub);
+		super(shutdownHub);
 		this.ldapSvc = ldapSvc;
 		this.persistenceSvc = persistenceSvc;
 		
@@ -48,7 +46,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	}
 	
 	private Realm getRealm() {
-		return new ShiroCombinedRealm(this.ldapSvc, this.roleMgr, this.getLogger());
+		return new ShiroCombinedRealm(this.ldapSvc, this.roleMgr);
 	}
 	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {

@@ -29,7 +29,6 @@ import org.apache.tapestry5.ioc.def.ContributionDef;
 
 import com.zyeeda.framework.config.internal.ConfigurationServiceContributionDef;
 import com.zyeeda.framework.FrameworkConstants;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ioc.CustomModuleDef;
 
 /**
@@ -48,7 +47,7 @@ public class ContextListener implements ServletContextListener {
     
     @Override
     public void contextInitialized(ServletContextEvent event) {
-    	LoggerHelper.info(logger, "context initialized");
+    	logger.info("context initialized");
     	
     	try {
         	ServletContext context = event.getServletContext();
@@ -63,14 +62,14 @@ public class ContextListener implements ServletContextListener {
             
             registry.performRegistryStartup();
     	} catch (Throwable t) {
-    		LoggerHelper.error(logger, t.getMessage(), t);
+    		logger.error("Initialize context failed.", t);
     		System.exit(1);
     	}
     }
     
     @Override
     public void contextDestroyed(ServletContextEvent event) {
-    	LoggerHelper.info(logger, "context destroyed");
+    	logger.info("context destroyed");
     	
     	try {
 	    	ServletContext context = event.getServletContext();
@@ -78,7 +77,7 @@ public class ContextListener implements ServletContextListener {
 	    	registry.shutdown();
 	    	context.removeAttribute(FrameworkConstants.SERVICE_REGISTRY);
     	} catch (Throwable t) {
-    		LoggerHelper.error(logger, t.getMessage(), t);
+    		logger.error("destroy context failed.", t);
     		System.exit(1);
     	}
     }

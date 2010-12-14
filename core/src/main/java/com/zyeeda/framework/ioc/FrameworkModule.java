@@ -4,10 +4,10 @@ import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
@@ -27,11 +27,7 @@ import com.zyeeda.framework.validation.internal.HibernateValidationServiceProvid
 
 public class FrameworkModule {
 	
-	private final Logger logger;
-	
-	public FrameworkModule(Logger logger) {
-		this.logger = logger;
-	}
+	private final static Logger logger = LoggerFactory.getLogger(FrameworkModule.class);
 	
 	public static void bind(ServiceBinder binder) {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
@@ -72,7 +68,7 @@ public class FrameworkModule {
 					securitySvc.start();
 					knowledgeSvc.start();
 				} catch (Throwable t) {
-					LoggerHelper.error(logger, t.getMessage(), t);
+					logger.error("Service repository start up failed.", t);
 					throw new RuntimeException(t);
 				}
 			}

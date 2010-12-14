@@ -23,7 +23,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.Registry;
@@ -31,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.FrameworkConstants;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
 import com.zyeeda.framework.transaction.TransactionService;

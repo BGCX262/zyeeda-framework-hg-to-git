@@ -30,9 +30,9 @@ import org.drools.task.service.TaskServer;
 import org.drools.task.service.TaskService;
 import org.drools.task.service.mina.MinaTaskServer;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.StatefulSessionCommand;
@@ -43,6 +43,8 @@ import com.zyeeda.framework.transaction.TransactionService;
 @ServiceId("drools-knowledge-service-provider")
 @Marker(Primary.class)
 public class DroolsKnowledgeServiceProvider extends AbstractService implements KnowledgeService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DroolsKnowledgeServiceProvider.class);
 	
 	private static final String AUDIT_LOG_FILE_PATH = "auditLogFilePath";
 	private static final String AUDIT_LOG_FLUSH_INTERVAL = "auditLogFlushInterval";
@@ -67,9 +69,9 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			@DroolsTask PersistenceService droolsTaskPersistenceSvc,
 			@Primary PersistenceService defaultPersistenceSvc,
 			@Primary TransactionService txSvc,
-			Logger logger, RegistryShutdownHub shutdownHub) throws Exception {
+			RegistryShutdownHub shutdownHub) throws Exception {
 		
-		super(logger, shutdownHub);
+		super(shutdownHub);
 		
 		this.configSvc = configSvc;
 		this.defaultPersistenceSvc = defaultPersistenceSvc;
@@ -84,21 +86,18 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		this.auditLogFilePath = config.getString(AUDIT_LOG_FILE_PATH, DEFAUL_AUDIT_LOG_FILE_PATH);
 		this.auditLogFlushInterval = config.getInt(AUDIT_LOG_FLUSH_INTERVAL, DEFAULT_AUDIT_LOG_FLUSH_INTERVAL);
 		
-		if (this.getLogger().isDebugEnabled()) {
-			this.getLogger().debug("{} = {}", AUDIT_LOG_FILE_PATH, this.auditLogFilePath);
-			this.getLogger().debug("{} = {}", AUDIT_LOG_FLUSH_INTERVAL, this.auditLogFlushInterval);
-		}
+		logger.debug("{} = {}", AUDIT_LOG_FILE_PATH, this.auditLogFilePath);
+		logger.debug("{} = {}", AUDIT_LOG_FLUSH_INTERVAL, this.auditLogFlushInterval);
 		
 		File auditLogFile = new File(this.configSvc.getApplicationRoot(), this.auditLogFilePath);
 		if (!auditLogFile.exists()) {
 			File logDir = auditLogFile.getParentFile();
 			if (!logDir.exists()) {
-				LoggerHelper.info(this.getLogger(), "Audit log file container {} does not exist, make dir first.", logDir);
+				logger.info("Audit log file container {} does not exist, make dir first.", logDir);
 				logDir.mkdirs();
 			} else {
 				if (!logDir.isDirectory()) {
-					LoggerHelper.warn(this.getLogger(), 
-							"Audit log file container {} should be a directory but a file found instead, delete the file then make dir.", logDir);
+					logger.warn("Audit log file container {} should be a directory but a file found instead, delete the file then make dir.", logDir);
 					logDir.delete();
 					logDir.mkdirs();
 				}
@@ -113,10 +112,8 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		kbuilder.add(ResourceFactory.newClassPathResource("META-INF/drools-changeset.xml"), ResourceType.CHANGE_SET);
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (errors.size() > 0) {
-			if (this.getLogger().isErrorEnabled()) {
-				for (KnowledgeBuilderError error: errors) {
-					this.getLogger().error(error.toString());
-				}
+			for (KnowledgeBuilderError error: errors) {
+				logger.error(error.toString());
 			}
 			
 			throw new IllegalArgumentException("Could not parse knowledge changeset.");
@@ -159,8 +156,6 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
-			env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.getCurrentSession());
-			env.set(EnvironmentName.CMD_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.getCurrentSession());
 			env.set(EnvironmentName.TRANSACTION_MANAGER, this.txSvc.getTransactionManager());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
 			
@@ -186,21 +181,21 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			
 			return result;
 		} catch (Throwable t) {
-			this.getLogger().error(t.getMessage(), t);
+			logger.error("Execute command failed.", t);
 			throw new Exception(t);
 		} finally {
 			if (rtLogger != null) {
 				try {
 					rtLogger.close();
 				} catch (Throwable t) {
-					this.getLogger().error(t.getMessage(), t);
+					logger.error("Close knowledge runtime logger failed.", t);
 				}
 			}
 			if (dbLogger != null) {
 				try {
 					dbLogger.dispose();
 				} catch (Throwable t) {
-					this.getLogger().error(t.getMessage(), t);
+					logger.error("Dispose working memory database logger failed.", t);
 				}
 			}
 		}

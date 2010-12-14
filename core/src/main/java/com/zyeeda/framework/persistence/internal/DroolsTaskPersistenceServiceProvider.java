@@ -4,7 +4,6 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.hibernate.ejb.Ejb3Configuration;
-import org.slf4j.Logger;
 
 import com.zyeeda.framework.ioc.annotations.DroolsTask;
 import com.zyeeda.framework.persistence.PersistenceService;
@@ -17,10 +16,9 @@ public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceSer
 	private final static String PERSISTENCE_UNIT_NAME = "drools-task";
 	//private final static String DROOLS_TASK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Drools-Task-Entity-Classes";
 	
-	public DroolsTaskPersistenceServiceProvider(Logger logger,
-			RegistryShutdownHub shutdownHub) {
+	public DroolsTaskPersistenceServiceProvider(RegistryShutdownHub shutdownHub) {
 		
-		super(logger, shutdownHub);
+		super(shutdownHub);
 	}
 	
 	@Override

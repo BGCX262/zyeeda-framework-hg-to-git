@@ -26,7 +26,6 @@ import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PreInsertEventListener;
 import org.hibernate.event.PreUpdateEventListener;
-import org.slf4j.Logger;
 
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.validation.ValidationService;
@@ -49,8 +48,8 @@ public class HibernatePersistenceServiceProvider extends AbstractPersistenceServ
     private final ValidationService validationSvc;
     
     public HibernatePersistenceServiceProvider(
-    		ValidationService validationSvc, Logger logger, RegistryShutdownHub shutdownHub) {
-    	super(logger, shutdownHub);
+    		ValidationService validationSvc, RegistryShutdownHub shutdownHub) {
+    	super(shutdownHub);
     	this.validationSvc = validationSvc;
     }
 

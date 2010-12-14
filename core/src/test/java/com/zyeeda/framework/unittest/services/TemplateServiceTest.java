@@ -24,7 +24,7 @@ public class TemplateServiceTest extends TestSuiteBase {
 	public void testRenderString() throws IOException {
 		TemplateService tplSvc = this.getService();
 		String tpl = "hello ${name}";
-		Map<String, String> args = new HashMap<String, String>(1);
+		Map<String, Object> args = new HashMap<String, Object>(1);
 		args.put("name", "world");
 		String result = tplSvc.render(tpl, args);
 		assertEquals(result, "hello world");
