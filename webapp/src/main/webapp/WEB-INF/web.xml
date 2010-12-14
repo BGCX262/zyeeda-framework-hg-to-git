@@ -19,6 +19,7 @@
     </filter-mapping>
     -->
 
+	<!-- 
     <filter>
         <filter-name>CharacterEncodingFilter</filter-name>
         <display-name>Character Encoding Filter</display-name>
@@ -28,6 +29,7 @@
         <filter-name>CharacterEncodingFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
     
     <filter>
     	<filter-name>OSiVFilter</filter-name>
