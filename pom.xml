@@ -20,7 +20,7 @@
     xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <modelVersion>4.0.0</modelVersion>
-    
+
     <groupId>com.zyeeda</groupId>
     <artifactId>zyeeda-framework</artifactId>
     <version>1.5</version>
@@ -72,15 +72,16 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-		<version>2.4.3</version>
+                <version>2.4.3</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
+                    <includeEmptyDirs>true</includeEmptyDirs>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-		<version>2.3.2</version>
+                <version>2.3.2</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>

@@ -41,7 +41,7 @@ public class TemplateHelper {
 	private static final Logger logger = LoggerFactory.getLogger(TemplateHelper.class);
 
 	public static void paintException(TemplateService tplSvc, PrintWriter out, List<String> errorMessages) throws IOException, TemplateException {
-		LoggerHelper.debug(logger, "errorMessages = {}", errorMessages);
+		logger.debug("errorMessages = {}", errorMessages);
 		
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("errorMessages", errorMessages);
@@ -50,7 +50,7 @@ public class TemplateHelper {
 	}
 	
 	public static void paintException(TemplateService tplSvc, PrintWriter out, String errorMessage) throws IOException, TemplateException {
-		LoggerHelper.debug(logger, "errorMessage = {}", errorMessage);
+		logger.debug("errorMessage = {}", errorMessage);
 		
 		if (errorMessage == null) {
 			paintException(tplSvc, out, (List<String>) null);

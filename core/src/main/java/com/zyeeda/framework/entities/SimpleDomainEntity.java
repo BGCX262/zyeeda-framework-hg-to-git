@@ -3,7 +3,7 @@ package com.zyeeda.framework.entities;
 import javax.validation.constraints.NotNull;
 
 @javax.persistence.MappedSuperclass
-public class LiteDomainEntity extends DomainEntity {
+public class SimpleDomainEntity extends DomainEntity {
 
     private static final long serialVersionUID = -2200108673372668900L;
 	

@@ -10,12 +10,12 @@ import javax.transaction.TransactionManager;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.annotations.Marker;
-import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.ioc.annotations.BTM;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 import com.zyeeda.framework.transaction.TransactionServiceException;
@@ -23,8 +23,8 @@ import com.zyeeda.framework.transaction.TransactionServiceException;
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;
 
-@Marker(Primary.class)
-@ServiceId("bitronix-transaction-service-provider")
+@Marker(BTM.class)
+@ServiceId("bitronix-transaction-service")
 public class BitronixTransactionServiceProvider extends AbstractService implements TransactionService {
 
 	private static final Logger logger = LoggerFactory.getLogger(BitronixTransactionServiceProvider.class);

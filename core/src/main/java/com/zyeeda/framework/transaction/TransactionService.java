@@ -7,7 +7,7 @@ import com.zyeeda.framework.service.Service;
 
 public interface TransactionService extends Service {
 
-	public TransactionManager getTransactionManager();
+	public TransactionManager getTransactionManager() throws TransactionServiceException;
 	
 	public UserTransaction getTransaction() throws TransactionServiceException;
 	

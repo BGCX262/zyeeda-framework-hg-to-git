@@ -56,4 +56,10 @@ public class TestSuiteBase {
 		return (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
 	}
 	
+	private void bindJndi() {
+		StandardXAPoolDataSource defaultXads = null;
+		StandardXADataSource defaultDs = null;
+		defaultDs.setDriverName("oracle.jdbc.OracleDriver");
+	}
+	
 }

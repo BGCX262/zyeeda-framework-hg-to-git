@@ -40,7 +40,7 @@ import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 
-@ServiceId("drools-knowledge-service-provider")
+@ServiceId("drools-knowledge-service")
 @Marker(Primary.class)
 public class DroolsKnowledgeServiceProvider extends AbstractService implements KnowledgeService {
 	
@@ -109,7 +109,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	public void start() throws Exception {
 		// add knowledge changeset
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource("META-INF/drools-changeset.xml"), ResourceType.CHANGE_SET);
+		kbuilder.add(ResourceFactory.newClassPathResource("/drools-changeset.xml"), ResourceType.CHANGE_SET);
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (errors.size() > 0) {
 			for (KnowledgeBuilderError error: errors) {

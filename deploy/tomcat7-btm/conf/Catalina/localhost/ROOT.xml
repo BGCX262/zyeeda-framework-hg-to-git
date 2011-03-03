@@ -1,0 +1,20 @@
+<Context allowLinking="true" reloadable="true"
+    docBase="/media/Exchange/workspace/zyeeda/zyeeda-framework/branches/1.5.x/webapp/src/main/webapp">
+
+    <Resource name="jdbc/defaultDS" auth="Container" type="javax.sql.XADataSource"
+        factory="bitronix.tm.resource.ResourceObjectFactory"
+        uniqueName="jdbc/defaultDS" />
+
+    <Resource name="jdbc/droolsTaskDS" auth="Container" type="javax.sql.XADataSource"
+        factory="bitronix.tm.resource.ResourceObjectFactory"
+        uniqueName="jdbc/droolsTaskDS" />
+
+    <Resource name="UserTransaction" auth="Container"
+        type="javax.transaction.UserTransaction" />
+    <Transaction factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
+        
+    <Resource name="TransactionManager" auth="Container"
+    	type="javax.transaction.TransactionManager"
+    	factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
+
+</Context>

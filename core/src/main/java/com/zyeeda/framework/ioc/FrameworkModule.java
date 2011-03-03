@@ -21,7 +21,7 @@ import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider;
 import com.zyeeda.framework.transaction.TransactionService;
-import com.zyeeda.framework.transaction.internal.BitronixTransactionServiceProvider;
+import com.zyeeda.framework.transaction.internal.DefaultTransactionServiceProvider;
 import com.zyeeda.framework.validation.ValidationService;
 import com.zyeeda.framework.validation.internal.HibernateValidationServiceProvider;
 
@@ -38,7 +38,7 @@ public class FrameworkModule {
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
 		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
-		binder.bind(TransactionService.class, BitronixTransactionServiceProvider.class);
+		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 	}
 	
 	public void contributeRegistryStartup(

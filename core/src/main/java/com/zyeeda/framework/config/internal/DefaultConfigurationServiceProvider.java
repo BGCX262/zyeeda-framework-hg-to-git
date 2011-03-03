@@ -18,7 +18,7 @@ import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.service.AbstractService;
 
-@ServiceId("default-configuration-service-provider")
+@ServiceId("default-configuration-service")
 @Marker(Primary.class)
 public class DefaultConfigurationServiceProvider extends AbstractService implements ConfigurationService {
 	

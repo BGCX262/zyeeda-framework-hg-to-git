@@ -22,7 +22,7 @@ import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.scripting.ScriptingService;
 import com.zyeeda.framework.service.AbstractService;
 
-@ServiceId("jsr223-scripting-service-provider")
+@ServiceId("jsr223-scripting-service")
 @Marker(Primary.class)
 public class Jsr223ScriptingServiceProvider extends AbstractService implements ScriptingService {
 

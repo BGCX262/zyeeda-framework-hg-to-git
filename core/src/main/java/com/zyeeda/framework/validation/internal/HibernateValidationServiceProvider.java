@@ -15,7 +15,7 @@ import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.validation.ValidationEvent;
 import com.zyeeda.framework.validation.ValidationService;
 
-@ServiceId("hibernate-validation-service-provider")
+@ServiceId("hibernate-validation-service")
 @Marker(Primary.class)
 public class HibernateValidationServiceProvider extends AbstractService	implements ValidationService {
 

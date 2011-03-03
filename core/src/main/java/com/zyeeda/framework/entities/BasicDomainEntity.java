@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.persistence.TemporalType;
 
 @javax.persistence.MappedSuperclass
-public class BasicDomainEntity extends LiteDomainEntity {
+public class BasicDomainEntity extends SimpleDomainEntity {
 
     private static final long serialVersionUID = 2055338408696881639L;
 	

@@ -31,7 +31,7 @@ import org.apache.shiro.util.CollectionUtils;
 		name = "getRoles",
 		query = "SELECT r FROM Role r"
 )
-public class Role extends LiteDomainEntity {
+public class Role extends SimpleDomainEntity {
 
 	private static final long serialVersionUID = 1665902703034523260L;
 	private static final char PERMISSION_SEPARATOR = ';';

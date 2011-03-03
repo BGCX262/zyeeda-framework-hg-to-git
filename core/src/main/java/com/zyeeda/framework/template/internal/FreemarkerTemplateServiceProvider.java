@@ -49,7 +49,7 @@ import freemarker.template.TemplateExceptionHandler;
  * @version		%I%, %G%
  * @since		1.0
  */
-@ServiceId("freemarker-template-service-provider")
+@ServiceId("freemarker-template-service")
 @Marker(Primary.class)
 public class FreemarkerTemplateServiceProvider extends AbstractService implements TemplateService {
 

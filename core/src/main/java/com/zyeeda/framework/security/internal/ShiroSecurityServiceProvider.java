@@ -15,7 +15,7 @@ import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.service.AbstractService;
 
 @Marker(Primary.class)
-@ServiceId("shiro-security-service-provider")
+@ServiceId("shiro-security-service")
 public class ShiroSecurityServiceProvider extends AbstractService implements SecurityService<SecurityManager> {
 
 	// Injected

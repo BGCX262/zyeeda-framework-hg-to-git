@@ -23,7 +23,7 @@ import com.zyeeda.framework.ldap.LdapServiceException;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.template.TemplateServiceException;
 
-@ServiceId("sun-ldap-service-provider")
+@ServiceId("sun-ldap-service")
 @Marker(Primary.class)
 public class SunLdapServiceProvider extends AbstractService implements LdapService {
 	
