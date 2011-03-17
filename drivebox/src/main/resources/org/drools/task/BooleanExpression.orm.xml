@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm classpath:///META-INF/schema/orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.BooleanExpression" access="FIELD">
+        <table name="DRL5_BOOLEAN_EXPRESSION" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="boolExpIdGenerator" />
+                <table-generator name="boolExpIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="BOOL_EXP_ID" />
+            </id>
+            <basic name="type">
+                <column name="F_TYPE" />
+            </basic>
+            <basic name="expression">
+                <column name="F_EXPRESSION" />
+                <lob />
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

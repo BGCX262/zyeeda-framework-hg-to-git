@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.Escalation" access="FIELD">
+        <table name="DRL5_ESCALATION" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="escalationIdGenerator" />
+                <table-generator name="escalationIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="ESCALATION_ID" />
+            </id>
+            <basic name="name">
+                <column name="F_NAME" />
+            </basic>
+            <one-to-many name="constraints">
+                <join-column name="F_ESCALATION_CONSTRAINTS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="notifications">
+                <join-column name="F_ESCALATION_NOTIFICATIONS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="reassignments">
+                <join-column name="F_ESCALATION_REASSIGNMENTS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

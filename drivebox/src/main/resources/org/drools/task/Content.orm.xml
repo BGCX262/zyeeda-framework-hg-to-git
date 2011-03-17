@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm classpath:///META-INF/schema/orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.Content" access="FIELD">
+        <table name="DRL5_CONTENT" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="contentIdGenerator" />
+                <table-generator name="contentIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="CONTENT_ID" />
+            </id>
+            <basic name="content">
+                <column name="F_CONTENT" />
+                <lob />
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>
