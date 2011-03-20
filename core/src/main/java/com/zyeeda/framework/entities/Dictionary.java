@@ -6,6 +6,8 @@ package com.zyeeda.framework.entities;
 @javax.persistence.DiscriminatorColumn(name = "F_DICT_TYPE")
 public class Dictionary extends SimpleDomainEntity {
 
+	private static final long serialVersionUID = 5516157716776374792L;
+
 	private String value;
 	
 	public void setValue(String value) {

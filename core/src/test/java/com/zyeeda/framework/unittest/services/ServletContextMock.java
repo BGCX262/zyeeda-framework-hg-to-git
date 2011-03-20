@@ -23,7 +23,7 @@ public class ServletContextMock implements ServletContext {
 	}
 
 	@Override
-	public Enumeration getAttributeNames() {
+	public Enumeration<?> getAttributeNames() {
 		return null;
 	}
 
@@ -43,8 +43,8 @@ public class ServletContextMock implements ServletContext {
 	}
 
 	@Override
-	public Enumeration getInitParameterNames() {
-		return new Enumeration() {
+	public Enumeration<?> getInitParameterNames() {
+		return new Enumeration<Object>() {
 
 			@Override
 			public boolean hasMoreElements() {
@@ -100,7 +100,7 @@ public class ServletContextMock implements ServletContext {
 	}
 
 	@Override
-	public Set getResourcePaths(String arg0) {
+	public Set<?> getResourcePaths(String arg0) {
 		return null;
 	}
 
@@ -120,12 +120,12 @@ public class ServletContextMock implements ServletContext {
 	}
 
 	@Override
-	public Enumeration getServletNames() {
+	public Enumeration<?> getServletNames() {
 		return null;
 	}
 
 	@Override
-	public Enumeration getServlets() {
+	public Enumeration<?> getServlets() {
 		return null;
 	}
 

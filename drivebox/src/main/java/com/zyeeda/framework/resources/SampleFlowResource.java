@@ -1,8 +1,5 @@
 package com.zyeeda.framework.resources;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,9 +7,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.tapestry5.ioc.Registry;
-import org.drools.marshalling.Marshaller;
-import org.drools.marshalling.MarshallerFactory;
-import org.drools.persistence.session.JPASessionMarshallingHelper;
 import org.drools.runtime.StatefulKnowledgeSession;
 
 import com.zyeeda.framework.FrameworkConstants;

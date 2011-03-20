@@ -13,8 +13,10 @@
 	<jaxrs:server id="restContainer" address="/">
 		<jaxrs:serviceBeans>
 			<ref bean="roleService" />
+			<ref bean="dictService" />
 		</jaxrs:serviceBeans>
 	</jaxrs:server>
 
 	<bean id="roleService" class="com.zyeeda.framework.resources.RoleResource" />
+	<bean id="dictService" class="com.zyeeda.drivebox.services.DictionaryService" />
 </beans>

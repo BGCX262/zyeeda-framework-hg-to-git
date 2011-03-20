@@ -5,7 +5,13 @@
 <%@page import="com.zyeeda.framework.template.TemplateService" %>
 
 <%
-Registry reg = (Registry) application.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-TemplateService tplSvc = reg.getService(TemplateService.class);
-tplSvc.paint("/index.ftl", out);
+//Registry reg = (Registry) application.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+//TemplateService tplSvc = reg.getService(TemplateService.class);
+//tplSvc.paint("/index.ftl", out);
+String param = request.getParameter("num");
+if ("1".equals(param)) {
+	throw new ServletException("Hello World!");
+} else {
+	out.println("Hello World!");
+}
 %>
