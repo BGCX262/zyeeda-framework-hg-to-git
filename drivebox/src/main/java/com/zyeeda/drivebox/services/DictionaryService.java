@@ -1,42 +1,47 @@
 package com.zyeeda.drivebox.services;
 
-import javax.persistence.EntityManager;
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.apache.tapestry5.ioc.Registry;
+import com.googlecode.genericdao.search.Search;
+import com.zyeeda.drivebox.entities.Dictionary;
+import com.zyeeda.drivebox.managers.DictionaryManager;
+import com.zyeeda.drivebox.managers.internal.DefaultDictionaryManager;
 
-import com.zyeeda.drivebox.entities.Priority;
-import com.zyeeda.framework.FrameworkConstants;
-import com.zyeeda.framework.entities.Dictionary;
-import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
-import com.zyeeda.framework.utils.IocUtils;
-
-public class DictionaryService {
-
+public class DictionaryService extends ResourceService {
+	
+	public DictionaryService(@Context ServletContext ctx) {
+		super(ctx);
+	}
+	
 	@GET
-	@Path("/dict/{name}")
-	public Dictionary getDictionary(@PathParam("name") String name) {
-		throw new RuntimeException(name);
+	@Path("/dict/{type}")
+	@Produces("application/xml")
+	public List<Dictionary> getDictionary(@PathParam("type") String type) {
+		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
+		
+		Search search = new Search();
+		search.addFilterEqual("type", type);
+		List<Dictionary> dicts = dictMgr.search(search);
+		return dicts;
 	}
 	
 	@POST
 	@Path("/dicts")
-	public Dictionary createDictionary(@Context ServletContext ctx, @FormParam("") Dictionary dict) {
-		Registry reg = (Registry) ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-		PersistenceService persistenceSvc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
-		EntityManager session = persistenceSvc.openSession();
-		Priority p = new Priority();
-		p.setName(dict.getName());
-		p.setValue(dict.getValue());
-		session.persist(p);
-		session.flush();
-		return session.find(Dictionary.class, p.getId());
+	@Produces("application/xml")
+	public Dictionary createDictionary(@FormParam("") Dictionary dict) {
+		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
+		dictMgr.persist(dict);
+		this.getPersistenceService().getCurrentSession().flush();
+		return dictMgr.find(dict.getId());
 	}
+	
 }

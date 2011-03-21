@@ -7,10 +7,12 @@
 
     <display-name>Zyeeda Framework Web Application</display-name>
 
+	<!-- 
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>WEB-INF/spring-beans.xml</param-value>
     </context-param>
+    -->
 
     <resource-ref>
         <description>Default Data Source</description>
@@ -30,11 +32,13 @@
             com.zyeeda.framework.web.ContextListener
         </listener-class>
     </listener>
+    <!-- 
     <listener>
         <listener-class>
             org.springframework.web.context.ContextLoaderListener
         </listener-class>
     </listener>
+    -->
 
     <!--
     <filter>
@@ -80,7 +84,6 @@
     </filter-mapping>
     -->
 
-    <!-- 
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
@@ -89,38 +92,13 @@
         <init-param>
             <param-name>jaxrs.serviceClasses</param-name>
             <param-value>
-                com.zyeeda.framework.resources.RoleResource 
-                com.zyeeda.framework.resources.SampleFlowResource
-            </param-value>
-        </init-param>
-        <init-param>
-            <param-name>jaxrs.providers</param-name>
-            <param-value>
-                org.apache.cxf.jaxrs.provider.JAXBElementProvider
-            </param-value>
-        </init-param>
-        <init-param>
-            <param-name>jaxrs.schemaLocations</param-name>
-            <param-value>
-                classpath:/WEB-INF/schemas/schema1.xsd
-                classpath:/WEB-INF/schemas/schema2.xsd		      
-            </param-value>
-        </init-param>
-        <init-param>
-            <param-name>jaxrs.inInterceptors</param-name>
-            <param-value>
-                org.apache.cxf.systest.jaxrs.CustomInInterceptor
-            </param-value>
-        </init-param>
-        <init-param>
-            <param-name>jaxrs.outInterceptors</param-name>
-            <param-value>
-                org.apache.cxf.systest.jaxrs.CustomOutInterceptor
+                com.zyeeda.drivebox.services.DictionaryService
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    -->
+    
+    <!-- 
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>
@@ -128,6 +106,7 @@
         </servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    -->
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
