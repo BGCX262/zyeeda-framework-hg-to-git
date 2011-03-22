@@ -24,7 +24,7 @@ public class DictionaryService extends ResourceService {
 	
 	@GET
 	@Path("/dict/{type}")
-	@Produces("application/xml")
+	@Produces("application/json")
 	public List<Dictionary> getDictionary(@PathParam("type") String type) {
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
 		

@@ -16,7 +16,7 @@ public class ResourceService {
 
 	public ResourceService(ServletContext ctx) {
 		this.ctx = ctx;
-		this.reg = (Registry) ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+		this.reg = (Registry) this.ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
 	}
 	
 	protected ServletContext getServletContext() {

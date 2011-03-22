@@ -66,7 +66,7 @@ public abstract class AbstractService implements Service, RegistryShutdownListen
 		try {
 			logger.info("{} stopping", this.getClass().getSimpleName());
 			this.stop();
-			logger.info("{} stooped", this.getClass().getSimpleName());
+			logger.info("{} stopped", this.getClass().getSimpleName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
