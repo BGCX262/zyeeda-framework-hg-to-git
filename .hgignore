@@ -1,0 +1,20 @@
+syntax: glob
+
+.*
+*.class
+.classpath
+.project
+.settings
+*.swp
+*.~ml
+*.bak
+*.orig
+*.tlog
+MANIFEST.MF
+
+target
+bin
+WEB-INF/classes
+WEB-INF/lib
+private
+work
