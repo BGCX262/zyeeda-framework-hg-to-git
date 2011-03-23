@@ -24,7 +24,7 @@
     <parent>
         <groupId>com.zyeeda</groupId>
         <artifactId>zyeeda-framework</artifactId>
-        <version>1.6.0</version>
+        <version>1.6.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>zyeeda-framework-core</artifactId>
