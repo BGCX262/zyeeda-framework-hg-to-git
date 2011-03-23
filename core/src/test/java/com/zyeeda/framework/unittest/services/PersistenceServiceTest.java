@@ -6,7 +6,7 @@ import org.testng.annotations.Test;
 
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
+import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 import com.zyeeda.framework.utils.IocUtils;
 
@@ -32,6 +32,6 @@ public class PersistenceServiceTest extends TestSuiteBase {
 	}
 	
 	private PersistenceService getService() {
-		return getRegistry().getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
+		return getRegistry().getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
 	}
 }

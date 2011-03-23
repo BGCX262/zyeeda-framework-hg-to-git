@@ -15,7 +15,7 @@ import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
-import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
+import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.ShiroSecurityServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
@@ -32,7 +32,7 @@ public class FrameworkModule {
 	public static void bind(ServiceBinder binder) {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
 		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
-		binder.bind(PersistenceService.class, HibernatePersistenceServiceProvider.class);
+		binder.bind(PersistenceService.class, DefaultPersistenceServiceProvider.class);
 		binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);

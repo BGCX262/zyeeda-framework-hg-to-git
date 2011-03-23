@@ -37,9 +37,9 @@ import com.zyeeda.framework.validation.ValidationService;
  * @version 	%I%, %G%
  * @since		1.0
  */
-@ServiceId("hibernate-persistence-service")
+@ServiceId("default-persistence-service")
 @Marker(Primary.class)
-public class HibernatePersistenceServiceProvider extends AbstractPersistenceServiceProvider implements PersistenceService {
+public class DefaultPersistenceServiceProvider extends AbstractPersistenceServiceProvider implements PersistenceService {
 	
 	private final static String PERSISTENCE_UNIT_NAME = "default";
 	//private final static String ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Zyeeda-Framework-Entity-Classes";
@@ -47,7 +47,7 @@ public class HibernatePersistenceServiceProvider extends AbstractPersistenceServ
     // Injected
     private final ValidationService validationSvc;
     
-    public HibernatePersistenceServiceProvider(
+    public DefaultPersistenceServiceProvider(
     		ValidationService validationSvc, RegistryShutdownHub shutdownHub) {
     	super(shutdownHub);
     	this.validationSvc = validationSvc;

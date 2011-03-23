@@ -6,7 +6,7 @@ import org.apache.tapestry5.ioc.Registry;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
+import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class ResourceService {
@@ -28,7 +28,7 @@ public class ResourceService {
 	}
 	
 	protected PersistenceService getPersistenceService() {
-		return this.reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
+		return this.reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
 	}
 	
 }
