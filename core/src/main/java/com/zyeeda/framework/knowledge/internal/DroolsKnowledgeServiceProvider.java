@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
-import com.zyeeda.framework.ioc.annotations.DroolsTask;
+import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.StatefulSessionCommand;
 import com.zyeeda.framework.persistence.PersistenceService;
@@ -66,7 +66,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	
 	public DroolsKnowledgeServiceProvider(
 			@Primary ConfigurationService configSvc,
-			@DroolsTask PersistenceService droolsTaskPersistenceSvc,
+			@DroolsTaskPersistence PersistenceService droolsTaskPersistenceSvc,
 			@Primary PersistenceService defaultPersistenceSvc,
 			@Primary TransactionService txSvc,
 			RegistryShutdownHub shutdownHub) throws Exception {

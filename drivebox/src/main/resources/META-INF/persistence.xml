@@ -82,5 +82,29 @@
             <property name="hibernate.validator.apply_to_ddl" value="false" />
         </properties>
     </persistence-unit>
+    
+    <persistence-unit name="attachment" transaction-type="JTA">
+        <provider>org.hibernate.ejb.HibernatePersistence</provider>
+        <jta-data-source>java:comp/env/jdbc/attachmentDS</jta-data-source>
+
+        <class>com.zyeeda.framework.entities.Attachment</class>
+        <exclude-unlisted-classes>true</exclude-unlisted-classes>
+
+        <properties>
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect" />
+            <!-- 
+            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
+            -->
+            <property name="hibernate.hbm2ddl.auto" value="update" />
+            <property name="hibernate.show_sql" value="false" />
+            <property name="hibernate.format_sql" value="false" />
+            <property name="hibernate.use_sql_comments" value="false" />
+            <property name="hibernate.id.new_generator_mappings" value="true" />
+            <property name="hibernate.validator.apply_to_ddl" value="false" />
+            <property name="hibernate.current_session_context_class" value="jta" />
+            <property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
+            <property name="hibernate.transaction.factory_class" value="org.hibernate.ejb.transaction.JoinableCMTTransactionFactory" />
+        </properties>
+    </persistence-unit>
 
 </persistence>

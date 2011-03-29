@@ -63,18 +63,26 @@ public class OpenSessionInViewFilter implements Filter {
     	
     	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
     	
-    	PersistenceService persistenceSvc = null;
+    	PersistenceService defaultPersistenceSvc = null;
+    	PersistenceService attachmentPersistenceSvc = null;
         UserTransaction utx = null;
+        
         try {
         	TransactionService txSvc = reg.getService(IocUtils.getServiceId(DefaultTransactionServiceProvider.class), TransactionService.class);
-        	persistenceSvc = reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
+        	defaultPersistenceSvc = reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
+        	attachmentPersistenceSvc = reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
         	
         	utx = txSvc.getTransaction();
+        	
         	logger.debug("tx status before begin = {}", utx.getStatus());
         	utx.begin();
         	logger.debug("tx status after begin = {}", utx.getStatus());
-            persistenceSvc.openSession();
+        	
+        	defaultPersistenceSvc.openSession();
+        	attachmentPersistenceSvc.openSession();
+        	
             chain.doFilter(request, response);
+            
             logger.debug("tx status before commit = {}", utx.getStatus());
             utx.commit();
             logger.debug("tx status after commit = {}", utx.getStatus());
@@ -90,8 +98,11 @@ public class OpenSessionInViewFilter implements Filter {
 			}
         	throw new ServletException(t);
 		} finally {
-            if (persistenceSvc != null) {
-                persistenceSvc.closeSession();
+			if (attachmentPersistenceSvc != null) {
+				attachmentPersistenceSvc.closeSession();
+			}
+            if (defaultPersistenceSvc != null) {
+            	defaultPersistenceSvc.closeSession();
             }
         }
     }

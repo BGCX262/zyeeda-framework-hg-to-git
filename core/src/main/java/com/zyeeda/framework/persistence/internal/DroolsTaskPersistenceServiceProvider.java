@@ -5,11 +5,11 @@ import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.hibernate.ejb.Ejb3Configuration;
 
-import com.zyeeda.framework.ioc.annotations.DroolsTask;
+import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
 import com.zyeeda.framework.persistence.PersistenceService;
 
 @ServiceId("drools-task-persistence-service")
-@Marker(DroolsTask.class)
+@Marker(DroolsTaskPersistence.class)
 public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceServiceProvider
 		implements PersistenceService {
 
@@ -17,7 +17,6 @@ public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceSer
 	//private final static String DROOLS_TASK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Drools-Task-Entity-Classes";
 	
 	public DroolsTaskPersistenceServiceProvider(RegistryShutdownHub shutdownHub) {
-		
 		super(shutdownHub);
 	}
 	

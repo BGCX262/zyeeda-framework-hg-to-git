@@ -17,6 +17,8 @@ import javax.persistence.Transient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
 
+import com.zyeeda.framework.entities.base.SimpleDomainEntity;
+
 @Entity
 @Table(name = "SYS_ROLE")
 @NamedNativeQuery(

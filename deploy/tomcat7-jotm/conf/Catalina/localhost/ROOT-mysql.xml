@@ -1,17 +1,23 @@
-<Context allowLinking="true" reloadable="true"
-    docBase="/media/Exchange/workspace/zyeeda/zyeeda-framework/branches/1.5.x/webapp/src/main/webapp">
+<Context allowLinking="true" reloadable="false"
+    docBase="{YOUR WEBAPP BASE}">
 
     <Resource name="jdbc/defaultDS" auth="Container" type="javax.sql.XADataSource"
         factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-        driverClassName="oracle.jdbc.OracleDriver"
-        url="jdbc:oracle:thin:@localhost:1521:XE"
-        username="tangrui" password="tangrui" />
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/framework"
+        username="root" password="root" />
 
     <Resource name="jdbc/droolsTaskDS" auth="Container" type="javax.sql.DataSource"
         factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
-        driverClassName="oracle.jdbc.OracleDriver"
-        url="jdbc:oracle:thin:@localhost:1521:XE"
-        username="tangrui" password="tangrui" />
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/framework"
+        username="root" password="root" />
+
+    <Resource name="jdbc/attachmentDS" auth="Container" type="javax.sql.DataSource"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/framework-attachment"
+        username="root" password="root" />
 
     <Resource name="UserTransaction" auth="Container"
         type="javax.transaction.UserTransaction" />

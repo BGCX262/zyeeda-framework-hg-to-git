@@ -1,4 +1,4 @@
-package com.zyeeda.framework.entities;
+package com.zyeeda.framework.entities.base;
 
 import java.io.Serializable;
 

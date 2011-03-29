@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.persistence.PersistenceService;
 
-public class RoleManager extends DomainEntityManager {
+public class RoleManager extends DomainEntityManager<Role, String> {
 	
 	public RoleManager(PersistenceService persistenceSvc) {
 		super(persistenceSvc);

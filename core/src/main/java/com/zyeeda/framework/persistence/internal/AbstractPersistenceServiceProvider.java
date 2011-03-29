@@ -18,7 +18,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 	private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
 	//private final ThreadLocal<Integer> countThreadLocal = new ThreadLocal<Integer>();
 	
-	protected AbstractPersistenceServiceProvider(RegistryShutdownHub shutdownHub) {
+	public AbstractPersistenceServiceProvider(RegistryShutdownHub shutdownHub) {
 		super(shutdownHub);
 	}
 

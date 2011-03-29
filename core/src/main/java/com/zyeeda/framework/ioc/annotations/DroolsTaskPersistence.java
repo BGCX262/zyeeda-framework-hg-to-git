@@ -9,6 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface DroolsTask {
+public @interface DroolsTaskPersistence {
 
 }

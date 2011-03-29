@@ -1,11 +1,11 @@
-package com.zyeeda.framework.entities;
+package com.zyeeda.framework.entities.base;
 
 import java.util.Date;
 
 import javax.persistence.TemporalType;
 
 @javax.persistence.MappedSuperclass
-public class BasicDomainEntity extends SimpleDomainEntity {
+public class RevisionDomainEntity extends SimpleDomainEntity {
 
     private static final long serialVersionUID = 2055338408696881639L;
 	

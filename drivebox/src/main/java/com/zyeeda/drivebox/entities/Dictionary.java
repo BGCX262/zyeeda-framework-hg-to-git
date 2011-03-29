@@ -5,7 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.zyeeda.framework.entities.SimpleDomainEntity;
+import com.zyeeda.framework.entities.base.SimpleDomainEntity;
 
 @Entity
 @Table(name = "ZDA_SYS_DICT")
