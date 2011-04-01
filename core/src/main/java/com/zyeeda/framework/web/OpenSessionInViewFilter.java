@@ -23,7 +23,6 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.Registry;
@@ -31,7 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.FrameworkConstants;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
 import com.zyeeda.framework.transaction.TransactionService;
@@ -65,31 +63,41 @@ public class OpenSessionInViewFilter implements Filter {
     	
     	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
     	
-    	PersistenceService persistenceSvc = null;
+    	PersistenceService defaultPersistenceSvc = null;
         UserTransaction utx = null;
+        
         try {
         	TransactionService txSvc = reg.getService(IocUtils.getServiceId(BitronixTransactionServiceProvider.class), TransactionService.class);
-        	persistenceSvc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
+        	defaultPersistenceSvc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
         	
         	utx = txSvc.getTransaction();
+        	
+        	logger.debug("tx status before begin = {}", utx.getStatus());
         	utx.begin();
-            persistenceSvc.openSession();
+        	logger.debug("tx status after begin = {}", utx.getStatus());
+        	
+        	defaultPersistenceSvc.openSession();
+        	
             chain.doFilter(request, response);
+            
+            logger.debug("tx status before commit = {}", utx.getStatus());
             utx.commit();
-        } catch (Exception e) {
-        	throw new ServletException(e);
-		} finally {
-			try {
-				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
+            logger.debug("tx status after commit = {}", utx.getStatus());
+        } catch (Throwable t) {
+        	try {
+				if (utx != null) {
+					logger.debug("tx status before rollback = {}", utx.getStatus());
 					utx.rollback();
+					logger.debug("tx status after successfully rollback = {}", utx.getStatus());
 				}
-			} catch (Exception e) {
-				LoggerHelper.error(logger, e.getMessage(), e);
+			} catch (Throwable t2) {
+				logger.error("Cannot rollback transaction.", t2);
 			}
-            if (persistenceSvc != null) {
-                persistenceSvc.closeSession();
+        	throw new ServletException(t);
+		} finally {
+            if (defaultPersistenceSvc != null) {
+            	defaultPersistenceSvc.closeSession();
             }
         }
     }
-
 }
