@@ -1,7 +1,9 @@
 package com.zyeeda.framework.security.internal;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
@@ -43,6 +45,16 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	@Override
 	public RoleManager getRoleManager() {
 		return this.roleMgr;
+	}
+	
+	/**
+	 * 获取当前登录用户的唯一标识。
+	 * 如果是匿名用户，则返回 null。
+	 */
+	@Override
+	public String getCurrentUser() {
+		Subject current = SecurityUtils.getSubject();
+		return current.getPrincipal().toString();
 	}
 	
 	private Realm getRealm() {
