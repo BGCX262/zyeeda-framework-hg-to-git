@@ -49,5 +49,8 @@ public class RevisionDomainEntity extends SimpleDomainEntity {
     public void setLastModifiedTime(Date lastModifiedTime) {
         this.lastModifiedTime = lastModifiedTime;
     }
+    
+    public void prePersist(RevisionDomainEntity e) {
+    }
 	
 }
