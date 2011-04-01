@@ -96,7 +96,8 @@
         <init-param>
             <param-name>jaxrs.serviceClasses</param-name>
             <param-value>
-                com.zyeeda.drivebox.services.DictionaryService
+                com.zyeeda.drivebox.services.DictionaryService 
+                com.zyeeda.drivebox.services.DocumentService
             </param-value>
         </init-param>
         <init-param>
@@ -134,5 +135,10 @@
         </user-data-constraint>
     </security-constraint>
     -->
+
+    <mime-mapping>
+        <extension>manifest</extension>
+        <mime-type>test/manifest</mime-type>
+    </mime-mapping>
 
 </web-app>

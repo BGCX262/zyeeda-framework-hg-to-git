@@ -1,4 +1,4 @@
-package com.zyeeda.framework.entities;
+package com.zyeeda.drivebox.entities;
 
 import java.sql.Blob;
 
@@ -12,8 +12,8 @@ import javax.persistence.Table;
 import com.zyeeda.framework.entities.base.RevisionDomainEntity;
 
 @Entity
-@Table(name = "ZDA_SYS_ATTACHMENTS")
-public class Attachment extends RevisionDomainEntity {
+@Table(name = "ZDA_SYS_DOCUMENTS")
+public class Document extends RevisionDomainEntity {
 
 	private static final long serialVersionUID = -5913731949268189623L;
 	

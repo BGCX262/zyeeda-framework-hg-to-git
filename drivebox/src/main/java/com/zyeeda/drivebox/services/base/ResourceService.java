@@ -1,4 +1,4 @@
-package com.zyeeda.drivebox.services;
+package com.zyeeda.drivebox.services.base;
 
 import javax.servlet.ServletContext;
 

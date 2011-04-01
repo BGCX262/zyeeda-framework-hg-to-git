@@ -87,7 +87,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:comp/env/jdbc/attachmentDS</jta-data-source>
 
-        <class>com.zyeeda.framework.entities.Attachment</class>
+        <class>com.zyeeda.framework.entities.Document</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>

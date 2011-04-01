@@ -15,7 +15,9 @@ import com.googlecode.genericdao.search.Search;
 import com.zyeeda.drivebox.entities.Dictionary;
 import com.zyeeda.drivebox.managers.DictionaryManager;
 import com.zyeeda.drivebox.managers.internal.DefaultDictionaryManager;
+import com.zyeeda.drivebox.services.base.ResourceService;
 
+@Path("/dicts")
 public class DictionaryService extends ResourceService {
 	
 	public DictionaryService(@Context ServletContext ctx) {
@@ -23,7 +25,7 @@ public class DictionaryService extends ResourceService {
 	}
 	
 	@GET
-	@Path("/dict/{type}")
+	@Path("/{type}")
 	@Produces("application/json")
 	public List<Dictionary> getDictionary(@PathParam("type") String type) {
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
@@ -35,7 +37,7 @@ public class DictionaryService extends ResourceService {
 	}
 	
 	@POST
-	@Path("/dicts")
+	@Path("/")
 	@Produces("application/xml")
 	public Dictionary createDictionary(@FormParam("") Dictionary dict) {
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
