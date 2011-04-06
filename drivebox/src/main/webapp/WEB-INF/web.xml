@@ -96,14 +96,15 @@
         <init-param>
             <param-name>jaxrs.serviceClasses</param-name>
             <param-value>
-                com.zyeeda.drivebox.services.DictionaryService 
-                com.zyeeda.drivebox.services.DocumentService
+                com.zyeeda.framework.ws.DictionaryService 
+                com.zyeeda.framework.ws.DocumentService 
+                com.zyeeda.framework.ws.DepartmentService
             </param-value>
         </init-param>
         <init-param>
             <param-name>jaxrs.providers</param-name>
             <param-value>
-                com.zyeeda.drivebox.cxf.DedicatedJsonProvider
+                com.zyeeda.framework.cxf.DedicatedJsonProvider
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>

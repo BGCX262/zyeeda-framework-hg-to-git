@@ -17,7 +17,7 @@
         <mapping-file>org/drools/process/audit/VariableInstanceLog.orm.xml</mapping-file>
         <mapping-file>/META-INF/orm/drools-process.orm.xml</mapping-file>
         <class>com.zyeeda.framework.entities.Role</class>
-        <class>com.zyeeda.drivebox.entities.Dictionary</class>
+        <class>com.zyeeda.framework.entities.Dictionary</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

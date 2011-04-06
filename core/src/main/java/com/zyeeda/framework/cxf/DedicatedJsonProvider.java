@@ -1,4 +1,4 @@
-package com.zyeeda.drivebox.cxf;
+package com.zyeeda.framework.cxf;
 
 import org.apache.cxf.jaxrs.provider.JSONProvider;
 

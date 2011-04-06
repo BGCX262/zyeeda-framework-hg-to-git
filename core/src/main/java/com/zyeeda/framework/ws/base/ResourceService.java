@@ -1,10 +1,12 @@
-package com.zyeeda.drivebox.services.base;
+package com.zyeeda.framework.ws.base;
 
 import javax.servlet.ServletContext;
 
 import org.apache.tapestry5.ioc.Registry;
 
 import com.zyeeda.framework.FrameworkConstants;
+import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
@@ -35,6 +37,10 @@ public class ResourceService {
 	
 	protected SecurityService<?> getSecurityService() {
 		return this.reg.getService(IocUtils.getServiceId(ShiroSecurityServiceProvider.class), SecurityService.class);
+	}
+	
+	protected LdapService getLdapService() {
+		return this.reg.getService(IocUtils.getServiceId(SunLdapServiceProvider.class), LdapService.class);
 	}
 	
 }

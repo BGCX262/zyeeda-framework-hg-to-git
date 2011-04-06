@@ -15,8 +15,8 @@ import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
-import com.zyeeda.framework.vos.Roles;
 import com.zyeeda.framework.utils.IocUtils;
+import com.zyeeda.framework.vos.Roles;
 
 @Path("/hello")
 public class RoleResource {

@@ -132,9 +132,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	
 	@Override
 	public void stop() throws Exception {
-		if (this.taskServer != null) {
-			this.taskServer.stop();
-		}
+		this.taskServer.stop();
 	}
 
 	@Override

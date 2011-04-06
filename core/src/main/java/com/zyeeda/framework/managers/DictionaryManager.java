@@ -1,7 +1,7 @@
-package com.zyeeda.drivebox.managers;
+package com.zyeeda.framework.managers;
 
 import com.googlecode.genericdao.dao.jpa.GenericDAO;
-import com.zyeeda.drivebox.entities.Dictionary;
+import com.zyeeda.framework.entities.Dictionary;
 
 public interface DictionaryManager extends GenericDAO<Dictionary, String> {
 

@@ -1,12 +1,9 @@
-package com.zyeeda.drivebox.services;
+package com.zyeeda.framework.ws;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
@@ -18,14 +15,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
-import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
-import com.zyeeda.drivebox.entities.Document;
-import com.zyeeda.drivebox.managers.DocumentManager;
-import com.zyeeda.drivebox.managers.internal.DocumentManagerImpl;
-import com.zyeeda.drivebox.services.base.ResourceService;
+import com.zyeeda.framework.entities.Document;
+import com.zyeeda.framework.managers.DocumentManager;
+import com.zyeeda.framework.managers.internal.RdbmsDocumentManager;
+import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/docs")
 public class DocumentService extends ResourceService {
@@ -45,7 +40,7 @@ public class DocumentService extends ResourceService {
 			IOUtils.copy(is, os);
 			os.flush();
 			
-			DocumentManager docMgr = new DocumentManagerImpl(this.getPersistenceService());
+			DocumentManager docMgr = new RdbmsDocumentManager(this.getPersistenceService());
 			docMgr.persist(doc);
 		} finally {
 			if (is != null) {

@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 
 import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.managers.base.DomainEntityManager;
 import com.zyeeda.framework.persistence.PersistenceService;
 
 public class RoleManager extends DomainEntityManager<Role, String> {

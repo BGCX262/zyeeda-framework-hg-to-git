@@ -1,4 +1,4 @@
-package com.zyeeda.drivebox.services;
+package com.zyeeda.framework.ws;
 
 import java.util.List;
 
@@ -12,10 +12,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import com.googlecode.genericdao.search.Search;
-import com.zyeeda.drivebox.entities.Dictionary;
-import com.zyeeda.drivebox.managers.DictionaryManager;
-import com.zyeeda.drivebox.managers.internal.DefaultDictionaryManager;
-import com.zyeeda.drivebox.services.base.ResourceService;
+import com.zyeeda.framework.entities.Dictionary;
+import com.zyeeda.framework.managers.DictionaryManager;
+import com.zyeeda.framework.managers.internal.DefaultDictionaryManager;
+import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/dicts")
 public class DictionaryService extends ResourceService {

@@ -1,4 +1,4 @@
-package com.zyeeda.drivebox.entities;
+package com.zyeeda.framework.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

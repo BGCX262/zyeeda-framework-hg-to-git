@@ -1,4 +1,4 @@
-package com.zyeeda.framework.managers;
+package com.zyeeda.framework.managers.base;
 
 import java.io.Serializable;
 
