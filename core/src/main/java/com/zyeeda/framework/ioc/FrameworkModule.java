@@ -1,10 +1,11 @@
 package com.zyeeda.framework.ioc;
 
-import org.apache.tapestry5.ioc.OrderedConfiguration;
+//import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.tapestry5.ioc.annotations.Startup;
+//import org.slf4j.Logger;
+//import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
@@ -29,7 +30,7 @@ import com.zyeeda.framework.validation.internal.HibernateValidationServiceProvid
 
 public class FrameworkModule {
 	
-	private final static Logger logger = LoggerFactory.getLogger(FrameworkModule.class);
+	//private final static Logger logger = LoggerFactory.getLogger(FrameworkModule.class);
 	
 	public static void bind(ServiceBinder binder) {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
@@ -44,7 +45,33 @@ public class FrameworkModule {
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 	}
 	
-	public void contributeRegistryStartup(
+	@Startup
+	public static void startServices(
+			@Primary final ConfigurationService configSvc,
+			@Primary final TemplateService tplSvc,
+			@Primary final TransactionService txSvc,
+			@Primary final ValidationService validationSvc,
+			@Primary final PersistenceService defaultPersistenceSvc,
+			@DroolsTaskPersistence final PersistenceService droolsTaskPersistenceSvc,
+			@AttachmentPersistence final PersistenceService attachPersistenceSvc,
+			@Primary final LdapService ldapSvc,
+			@Primary final SecurityService<?> securitySvc,
+			@Primary final KnowledgeService knowledgeSvc) throws Exception {
+		
+		configSvc.start();
+		tplSvc.start();
+		txSvc.start();
+		validationSvc.start();
+		defaultPersistenceSvc.start();
+		droolsTaskPersistenceSvc.start();
+		attachPersistenceSvc.start();
+		ldapSvc.start();
+		securitySvc.start();
+		knowledgeSvc.start();
+		
+	}
+	
+	/*public void contributeRegistryStartup(
 			OrderedConfiguration<Runnable> configuration,
 			@Primary final ConfigurationService configSvc,
 			@Primary final TemplateService tplSvc,
@@ -79,6 +106,6 @@ public class FrameworkModule {
 			}
 			
 		});
-	}
+	}*/
 
 }

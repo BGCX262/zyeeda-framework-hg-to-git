@@ -119,6 +119,5 @@
 
     <modules>
         <module>core</module>
-        <module>drivebox</module>
     </modules>
 </project>
