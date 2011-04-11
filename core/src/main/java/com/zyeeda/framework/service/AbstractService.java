@@ -39,7 +39,7 @@ public abstract class AbstractService implements Service, RegistryShutdownListen
 	
     private ServiceState state = ServiceState.NEW;
 
-    protected AbstractService(RegistryShutdownHub shutdownHub) {
+    public AbstractService(RegistryShutdownHub shutdownHub) {
     	shutdownHub.addRegistryShutdownListener(this);
     }
     

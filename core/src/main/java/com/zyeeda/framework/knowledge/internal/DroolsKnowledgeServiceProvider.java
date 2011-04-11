@@ -133,6 +133,10 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	@Override
 	public void stop() throws Exception {
 		this.taskServer.stop();
+		// Because MinaTaskServer checks running status every 100ms,
+		// so we wait here for 150ms to ensure that the task server thread
+		// has been completely stopped.
+		Thread.sleep(150);
 	}
 
 	@Override
