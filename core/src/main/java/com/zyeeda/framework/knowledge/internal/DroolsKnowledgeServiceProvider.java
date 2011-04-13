@@ -21,7 +21,6 @@ import org.drools.io.ResourceFactory;
 import org.drools.logger.KnowledgeRuntimeLogger;
 import org.drools.logger.KnowledgeRuntimeLoggerFactory;
 import org.drools.persistence.jpa.JPAKnowledgeService;
-import org.drools.process.audit.JPAWorkingMemoryDbLogger;
 import org.drools.process.workitem.wsht.WSHumanTaskHandler;
 import org.drools.runtime.Environment;
 import org.drools.runtime.EnvironmentName;
@@ -153,7 +152,6 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	public <T> T execute(StatefulSessionCommand<T> command) throws Exception {
 		StatefulKnowledgeSession ksession = null;
 		KnowledgeRuntimeLogger rtLogger = null;
-		JPAWorkingMemoryDbLogger dbLogger = null;
 
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
@@ -175,7 +173,8 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			//ksession.getWorkItemManager().registerWorkItemHandler("Email", emailHandler);
 			
 			rtLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(ksession, this.configSvc.mapPath(this.auditLogFilePath), this.auditLogFlushInterval);
-			dbLogger = new JPAWorkingMemoryDbLogger(ksession);
+			//new JPAWorkingMemoryDbLogger(ksession);
+			new HistoryLogger(ksession, this.defaultPersistenceSvc);
 			
 			T result = command.execute(ksession);
 			
@@ -191,13 +190,6 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 					rtLogger.close();
 				} catch (Throwable t) {
 					logger.error("Close knowledge runtime logger failed.", t);
-				}
-			}
-			if (dbLogger != null) {
-				try {
-					dbLogger.dispose();
-				} catch (Throwable t) {
-					logger.error("Dispose working memory database logger failed.", t);
 				}
 			}
 		}
