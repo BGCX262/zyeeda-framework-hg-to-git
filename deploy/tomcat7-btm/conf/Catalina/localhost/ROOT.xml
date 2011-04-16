@@ -12,13 +12,17 @@
     <Resource name="jdbc/attachmentDS" auth="Container" type="javax.sql.XADataSource"
         factory="bitronix.tm.resource.ResourceObjectFactory"
         uniqueName="jdbc/attachmentDS" />
+        
+    <Resource name="TransactionManager" auth="Container"
+        type="javax.transaction.TransactionManager"
+        factory="bitronix.tm.BitronixTransactionManagerObjectFactory" />
+        
+    <Resource name="TransactionSynchronizationRegistry" auth="Container"
+        type="javax.transaction.TransactionSynchronizationRegistry"
+        factory="bitronix.tm.BitronixTransactionSynchronizationRegistryObjectFactory" />
 
     <Resource name="UserTransaction" auth="Container"
         type="javax.transaction.UserTransaction" />
     <Transaction factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
-        
-    <Resource name="TransactionManager" auth="Container"
-    	type="javax.transaction.TransactionManager"
-    	factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
 
 </Context>
