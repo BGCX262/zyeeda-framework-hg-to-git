@@ -7,6 +7,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
+import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.annotations.Marker;
@@ -71,6 +72,12 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 	@Override
 	public TransactionManager getTransactionManager() {
 		return TransactionManagerServices.getTransactionManager();
+	}
+
+	@Override
+	public TransactionSynchronizationRegistry getTransactionSynchronizationRegistry()
+			throws TransactionServiceException {
+		return TransactionManagerServices.getTransactionSynchronizationRegistry();
 	}
 	
 }

@@ -30,17 +30,6 @@ public class AutoRevisionEventListener implements PreInsertEventListener, PreUpd
 			rev.setCreatedTime(now);
 			rev.setLastModifier(this.securitySvc.getCurrentUser());
 			rev.setLastModifiedTime(now);
-			return true;
-		}
-		return false;
-	}
-	
-	private boolean setLastRevisionInfo(Object e) {
-		if (e instanceof RevisionDomainEntity) {
-			RevisionDomainEntity rev = (RevisionDomainEntity) e;
-			rev.setLastModifier(this.securitySvc.getCurrentUser());
-			rev.setLastModifiedTime(new Date());
-			return true;
 		}
 		return false;
 	}
@@ -48,7 +37,12 @@ public class AutoRevisionEventListener implements PreInsertEventListener, PreUpd
 	@Override
 	public boolean onPreUpdate(PreUpdateEvent event) {
 		Object e = event.getEntity();
-		return this.setLastRevisionInfo(e);
+		if (e instanceof RevisionDomainEntity) {
+			RevisionDomainEntity rev = (RevisionDomainEntity) e;
+			rev.setLastModifier(this.securitySvc.getCurrentUser());
+			rev.setLastModifiedTime(new Date());
+		}
+		return false;
 	}
 
 }

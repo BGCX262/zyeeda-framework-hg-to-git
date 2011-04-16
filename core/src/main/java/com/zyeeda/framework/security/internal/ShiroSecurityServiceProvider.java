@@ -1,9 +1,7 @@
 package com.zyeeda.framework.security.internal;
 
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
-import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
@@ -53,8 +51,9 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	 */
 	@Override
 	public String getCurrentUser() {
-		Subject current = SecurityUtils.getSubject();
-		return current.getPrincipal().toString();
+		return "admin";
+		//Subject current = SecurityUtils.getSubject();
+		//return current.getPrincipal().toString();
 	}
 	
 	private Realm getRealm() {

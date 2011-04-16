@@ -6,6 +6,8 @@ import org.drools.audit.event.LogEvent;
 import org.drools.audit.event.RuleFlowLogEvent;
 import org.drools.audit.event.RuleFlowNodeLogEvent;
 import org.drools.event.KnowledgeRuntimeEventManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.ActionHistory;
 import com.zyeeda.framework.entities.ProcessHistory;
@@ -16,6 +18,8 @@ import com.zyeeda.framework.managers.internal.DefaultProcessHistoryManager;
 import com.zyeeda.framework.persistence.PersistenceService;
 
 public class HistoryLogger extends WorkingMemoryLogger {
+	
+	private final static Logger logger = LoggerFactory.getLogger(HistoryLogger.class);
 	
 	private PersistenceService persistenceSvc;
 	
@@ -37,8 +41,8 @@ public class HistoryLogger extends WorkingMemoryLogger {
 	}
 	
 	private void init() {
-		this.pHisMgr = new DefaultProcessHistoryManager(persistenceSvc);
-		this.aHisMgr = new DefaultActionHistoryManager(persistenceSvc);
+		this.pHisMgr = new DefaultProcessHistoryManager(this.persistenceSvc);
+		this.aHisMgr = new DefaultActionHistoryManager(this.persistenceSvc);
 	}
 	
 	@Override
@@ -46,6 +50,15 @@ public class HistoryLogger extends WorkingMemoryLogger {
 		switch (logEvent.getType()) {
 			case LogEvent.BEFORE_RULEFLOW_CREATED: {
 				RuleFlowLogEvent event = (RuleFlowLogEvent) logEvent;
+				
+				if (logger.isDebugEnabled()) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("BEFORE RULEFLOW CREATED\n");
+					sb.append(String.format("\tprocess id = %s\n", event.getProcessId()));
+					sb.append(String.format("\tprocess name = %s\n", event.getProcessName()));
+					sb.append(String.format("\tprocess instance id = %s", event.getProcessInstanceId()));
+					logger.debug(sb.toString());
+				}
 				
 				ProcessHistory history = new ProcessHistory();
 				history.setProcessId(event.getProcessId());
@@ -57,6 +70,15 @@ public class HistoryLogger extends WorkingMemoryLogger {
 			case LogEvent.AFTER_RULEFLOW_COMPLETED: {
 				RuleFlowLogEvent event = (RuleFlowLogEvent) logEvent;
 				
+				if (logger.isDebugEnabled()) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("AFTER RULEFLOW COMPLETED\n");
+					sb.append(String.format("\tprocess id = %s\n", event.getProcessId()));
+					sb.append(String.format("\tprocess name = %s\n", event.getProcessName()));
+					sb.append(String.format("\tprocess instance id = %s", event.getProcessInstanceId()));
+					logger.debug(sb.toString());
+				}
+				
 				ProcessHistory history = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
 				history.setEnded(true);
 				this.pHisMgr.save(history);
@@ -64,6 +86,18 @@ public class HistoryLogger extends WorkingMemoryLogger {
 			}
 			case LogEvent.BEFORE_RULEFLOW_NODE_TRIGGERED: {
 				RuleFlowNodeLogEvent event = (RuleFlowNodeLogEvent) logEvent;
+				
+				if (logger.isDebugEnabled()) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("BEFORE RULEFLOW NODE TRIGGERED\n");
+					sb.append(String.format("\tprocess id = %s\n", event.getProcessId()));
+					sb.append(String.format("\tprocess name = %s\n", event.getProcessName()));
+					sb.append(String.format("\tprocess instance id = %s\n", event.getProcessInstanceId()));
+					sb.append(String.format("\tnode id = %s\n", event.getNodeId()));
+					sb.append(String.format("\tnode name = %s\n", event.getNodeName()));
+					sb.append(String.format("\tnode istance id = %s", event.getNodeInstanceId()));
+					logger.debug(sb.toString());
+				}
 				
 				ProcessHistory proHist = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
 				proHist.setCurrentState(event.getNodeName());
@@ -81,6 +115,18 @@ public class HistoryLogger extends WorkingMemoryLogger {
 			}
 			case LogEvent.BEFORE_RULEFLOW_NODE_EXITED: {
 				RuleFlowNodeLogEvent event = (RuleFlowNodeLogEvent) logEvent;
+				
+				if (logger.isDebugEnabled()) {
+					StringBuilder sb = new StringBuilder();
+					sb.append("BEFORE RULEFLOW NODE EXITED\n");
+					sb.append(String.format("\tprocess id = %s\n", event.getProcessId()));
+					sb.append(String.format("\tprocess name = %s\n", event.getProcessName()));
+					sb.append(String.format("\tprocess instance id = %s\n", event.getProcessInstanceId()));
+					sb.append(String.format("\tnode id = %s\n", event.getNodeId()));
+					sb.append(String.format("\tnode name = %s\n", event.getNodeName()));
+					sb.append(String.format("\tnode istance id = %s", event.getNodeInstanceId()));
+					logger.debug(sb.toString());
+				}
 				
 				ProcessHistory proHist = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
 				this.pHisMgr.save(proHist);

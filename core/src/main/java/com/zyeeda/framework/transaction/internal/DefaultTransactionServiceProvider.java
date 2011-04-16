@@ -5,6 +5,7 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 import javax.transaction.TransactionManager;
 
@@ -47,9 +48,25 @@ public class DefaultTransactionServiceProvider extends AbstractService implement
 			Hashtable env = new Hashtable();
 			Context ctx = new InitialContext(env);
 			
-			TransactionManager tm = (TransactionManager) ctx.lookup("java:comp/TransactionManager");
+			TransactionManager tm = (TransactionManager) ctx.lookup("java:comp/env/TransactionManager");
 			
 			return tm;
+		} catch (NamingException e) {
+			throw new TransactionServiceException(e);
+		}
+	}
+
+	@SuppressWarnings("rawtypes")
+	@Override
+	public TransactionSynchronizationRegistry getTransactionSynchronizationRegistry()
+			throws TransactionServiceException {
+		try {
+			Hashtable env = new Hashtable();
+			Context ctx = new InitialContext(env);
+			
+			TransactionSynchronizationRegistry tsr = (TransactionSynchronizationRegistry) ctx.lookup("java:comp/env/TransactionSynchronizationRegistry");
+			
+			return tsr;
 		} catch (NamingException e) {
 			throw new TransactionServiceException(e);
 		}

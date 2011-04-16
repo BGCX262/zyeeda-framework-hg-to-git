@@ -156,8 +156,10 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
 			env.set(EnvironmentName.ENTITY_MANAGER_FACTORY, this.defaultPersistenceSvc.getSessionFactory());
+			env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.getCurrentSession());
 			env.set(EnvironmentName.TRANSACTION_MANAGER, this.txSvc.getTransactionManager());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
+			env.set(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, this.txSvc.getTransactionSynchronizationRegistry());
 			
 			if (command.getSessionId() > 0) {
 				ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(
@@ -178,8 +180,6 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			
 			T result = command.execute(ksession);
 			
-			ksession.dispose();
-			
 			return result;
 		} catch (Throwable t) {
 			logger.error("Execute command failed.", t);
@@ -191,6 +191,9 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 				} catch (Throwable t) {
 					logger.error("Close knowledge runtime logger failed.", t);
 				}
+			}
+			if (ksession != null) {
+				ksession.dispose();
 			}
 		}
 	}
