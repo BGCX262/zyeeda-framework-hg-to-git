@@ -1,8 +1,6 @@
 package com.zyeeda.framework.web;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -10,15 +8,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tapestry5.ioc.Registry;
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.openid.OpenIdConsumer;
-import com.zyeeda.framework.template.TemplateService;
-import com.zyeeda.framework.utils.IocUtils;
 
 public class OpenIdConsumerServlet extends HttpServlet {
 
@@ -56,16 +51,6 @@ public class OpenIdConsumerServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.debug("servlet path info = {}", request.getPathInfo());
-		
-		if ("/redirect".equals(request.getPathInfo())) {
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("message", request.getAttribute("message"));
-
-			Registry registry = IocUtils.getRegistry(this.getServletContext());
-			TemplateService tplSvc = registry.getService(TemplateService.class);
-			tplSvc.paint(request.getServletPath() + "/redirect.ftl", response.getWriter(), args);
-			return;
-		}
 		
 		if ("/verify".equals(request.getServletPath())) {
 			logger.info("Verify OpenId auth response.");
