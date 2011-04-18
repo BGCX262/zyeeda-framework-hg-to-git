@@ -30,6 +30,24 @@
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+    <resource-ref>
+        <description>User Transaction</description>
+        <res-ref-name>UserTransaction</res-ref-name>
+        <res-type>javax.transaction.UserTransaction</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    <resource-ref>
+        <description>Transaction Manager</description>
+        <res-ref-name>TransactionManager</res-ref-name>
+        <res-type>javax.transaction.TransactionManager</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+    <resource-ref>
+        <description>Transaction Synchronization Registry</description>
+        <res-ref-name>TransactionSynchronizationRegistry</res-ref-name>
+        <res-type>javax.transaction.TransactionSynchronizationRegistry</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
 
     <listener>
         <listener-class>
@@ -76,7 +94,7 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- 
+    <!--
     <filter>
         <filter-name>SecurityFilter</filter-name>
         <display-name>Security Filter</display-name>
@@ -87,7 +105,34 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
     -->
-
+    
+    <!--
+    <servlet>
+        <servlet-name>OpenIdConsumer</servlet-name>
+        <servlet-class>
+            com.zyeeda.framework.web.OpenIdConsumerServlet
+        </servlet-class>
+        <init-param>
+            <param-name>redirect.to.url</param-name>
+            <param-value>/openid_redirect.jsp</param-value>
+        </init-param>
+        <init-param>
+            <param-name>return.to.url</param-name>
+            <param-value>http://localhost:8080/accounts/openid/verify</param-value>
+        </init-param>
+        <init-param>
+            <param-name>public.identifier</param-name>
+            <param-value>http://yahoo.com</param-value>
+            <param-value>https://www.google.com/accounts/o8/id</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>OpenIdConsumer</servlet-name>
+        <url-pattern>/accounts/openid/*</url-pattern>
+    </servlet-mapping>
+    -->
+    
     <servlet>
         <servlet-name>CXFServlet</servlet-name>
         <servlet-class>

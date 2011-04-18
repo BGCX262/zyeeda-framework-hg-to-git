@@ -18,14 +18,16 @@
         <mapping-file>/META-INF/orm/drools-process.orm.xml</mapping-file>
         <class>com.zyeeda.framework.entities.Role</class>
         <class>com.zyeeda.framework.entities.Dictionary</class>
+        <class>com.zyeeda.framework.entities.ProcessHistory</class>
+        <class>com.zyeeda.framework.entities.ActionHistory</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
+            <!--
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect" />
-			<!-- 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
             -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
             <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.format_sql" value="false" />
@@ -69,10 +71,10 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
+            <!--
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect" />
-			<!-- 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
             -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
             <property name="hibernate.current_session_context_class" value="thread" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
             <property name="hibernate.show_sql" value="false" />
@@ -91,10 +93,10 @@
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
         <properties>
+            <!--
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect" />
-            <!-- 
-            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
             -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
             <property name="hibernate.show_sql" value="false" />
             <property name="hibernate.format_sql" value="false" />
