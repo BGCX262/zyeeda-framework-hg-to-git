@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.openid4java.OpenIDException;
 import org.openid4java.consumer.ConsumerException;
+import org.openid4java.discovery.Identifier;
+import org.openid4java.message.AuthRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,24 +24,24 @@ public class OpenIdConsumerServlet extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(OpenIdConsumerServlet.class);
 	
 	private static final String OPENID_CONSUMER_KEY = "openid.consumer";
-	//private static final String IDENTIFIER_KEY = "openid.identifier";
 	private static final String REDIRECT_TO_URL_KEY = "redirect.to.url";
 	private static final String RETURN_TO_URL_KEY = "return.to.url";
 	private static final String PUBLIC_IDENTIFIER_KEY = "public.identifier";
 	
 	private String publicIdentifier;
+	private String returnToUrl;
 	private OpenIdConsumer consumer;
 	
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
 		
 		this.publicIdentifier = config.getInitParameter(PUBLIC_IDENTIFIER_KEY);
+		this.returnToUrl = config.getInitParameter(REDIRECT_TO_URL_KEY);
 		
 		this.consumer = (OpenIdConsumer) this.getServletContext().getAttribute(OPENID_CONSUMER_KEY);
 		if (this.consumer == null) {
 			try {
 				this.consumer = new OpenIdConsumer();
-				this.consumer.setRedirectUrl(config.getInitParameter(REDIRECT_TO_URL_KEY));
 				this.consumer.setReturnToUrl(config.getInitParameter(RETURN_TO_URL_KEY));
 				this.getServletContext().setAttribute(OPENID_CONSUMER_KEY, this.consumer);
 			} catch (ConsumerException e) {
@@ -52,13 +54,29 @@ public class OpenIdConsumerServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		logger.debug("servlet path info = {}", request.getPathInfo());
 		
-		if ("/verify".equals(request.getServletPath())) {
+		if ("/verify".equals(request.getPathInfo())) {
 			logger.info("Verify OpenId auth response.");
-			return;
+			
+			try {
+				Identifier id = this.consumer.verifyResponse(request);
+				if (id == null) {
+					response.getWriter().println("Failed");
+					//request.getRequestDispatcher("signin").forward(request, response);
+					return;
+				}
+				
+				response.getWriter().println(id.getIdentifier());
+				return;
+			} catch (OpenIDException e) {
+				throw new ServletException(e);
+			}
 		}
 		
 		try {
-			this.consumer.authRequest(this.publicIdentifier, request, response);
+			logger.info("Send OpenId auth request.");
+			AuthRequest authReq = this.consumer.authRequest(this.publicIdentifier, request, response);
+			request.setAttribute("message", authReq);
+			request.getRequestDispatcher(this.returnToUrl).forward(request, response);
 		} catch (OpenIDException e) {
 			throw new ServletException(e);
 		}		

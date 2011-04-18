@@ -384,7 +384,6 @@
                     <groupId>commons-logging</groupId>
                     <artifactId>commons-logging</artifactId>
                 </exclusion>
-                
                 <!--
             	<exclusion>
             		<artifactId>spring-beans</artifactId>

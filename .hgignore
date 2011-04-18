@@ -18,3 +18,4 @@ WEB-INF/classes
 WEB-INF/lib
 private
 work
+drools_audit.log

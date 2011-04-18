@@ -15,6 +15,8 @@ import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
+import com.zyeeda.framework.openid.OpenIdConsumerService;
+import com.zyeeda.framework.openid.internal.DefaultOpenIdConsumerServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.AttachmentPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
@@ -43,6 +45,7 @@ public class FrameworkModule {
 		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
+		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
 	}
 	
 	@Startup
@@ -56,7 +59,8 @@ public class FrameworkModule {
 			@AttachmentPersistence final PersistenceService attachPersistenceSvc,
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc,
-			@Primary final KnowledgeService knowledgeSvc) throws Exception {
+			@Primary final KnowledgeService knowledgeSvc,
+			@Primary final OpenIdConsumerService consumerSvc) throws Exception {
 		
 		configSvc.start();
 		tplSvc.start();
@@ -68,6 +72,7 @@ public class FrameworkModule {
 		ldapSvc.start();
 		securitySvc.start();
 		knowledgeSvc.start();
+		consumerSvc.start();
 		
 	}
 	
