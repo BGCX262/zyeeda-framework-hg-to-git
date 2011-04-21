@@ -34,7 +34,7 @@ public class DocumentService extends ResourceService {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces(MediaType.APPLICATION_XML)
 	public void upload(@FormParam("") Document doc, @Multipart("file1") InputStream is) throws IOException, SQLException {
-		OutputStream os = null;
+		/*OutputStream os = null;
 		try {
 			os = doc.getContent().setBinaryStream(0);
 			IOUtils.copy(is, os);
@@ -52,7 +52,7 @@ public class DocumentService extends ResourceService {
 		}
 		
 		System.out.println("name = " + doc.getName());
-		System.out.println("desc = " + doc.getDescription());
+		System.out.println("desc = " + doc.getDescription());*/
 	}
 
 }

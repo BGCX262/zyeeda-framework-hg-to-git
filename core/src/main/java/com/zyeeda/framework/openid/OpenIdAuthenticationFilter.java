@@ -51,7 +51,7 @@ public class OpenIdAuthenticationFilter extends AuthenticatingFilter {
 		// 如果请求的是登录地址
 		if (this.isLoginRequest(httpReq, httpRes)) {
 			// 继续进入 OpenID 的登录界面
-			logger.debug("OpenID auth request detected, redirect to OP endpoint.");
+			logger.debug("OpenID login request detected, redirect to OP endpoint.");
 			AuthRequest authReq = openidConsumer.authRequest(httpReq, httpRes);
 			httpReq.setAttribute("message", authReq);
 			httpReq.getRequestDispatcher(this.redirectToUrl).forward(httpReq, httpRes);
@@ -59,18 +59,19 @@ public class OpenIdAuthenticationFilter extends AuthenticatingFilter {
 		}
 		
 		logger.debug("return to url = {}", this.returnToUrl);
-		logger.debug("auth response url = {}", httpReq.getRequestURL().toString());
+		logger.debug("auth response url = {}", httpReq.getRequestURI());
 		
 		// 如果请求的是验证地址
-		if (this.returnToUrl.equals(httpReq.getRequestURL().toString())) {
-			logger.debug("OpenID auth response detected, attempt to perform signin.");
-			this.executeLogin(httpReq, httpRes);
+		if (this.returnToUrl.equals(httpReq.getRequestURI())) {
+			logger.debug("OpenID verify request detected, attempt to perform signin.");
+			return this.executeLogin(httpReq, httpRes);
 		}
 		
 		// 请求其它地址
 		logger.debug("Permission denied on visiting resource [{}].", httpReq.getPathInfo());
 		logger.debug("Forward to authentication url [{}].", this.getLoginUrl());
-		this.saveRequestAndRedirectToLogin(httpReq, httpRes);
+		this.saveRequest(request);
+		httpRes.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
 	}
 	

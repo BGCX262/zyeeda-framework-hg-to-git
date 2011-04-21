@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.openid.OpenIdConsumer;
 
-public class OpenIdConsumerServlet extends HttpServlet {
+public abstract class OpenIdConsumerServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 6393634729613708155L;
 	
@@ -27,6 +27,7 @@ public class OpenIdConsumerServlet extends HttpServlet {
 	private static final String REDIRECT_TO_URL_KEY = "redirect.to.url";
 	private static final String RETURN_TO_URL_KEY = "return.to.url";
 	private static final String PUBLIC_IDENTIFIER_KEY = "public.identifier";
+	protected static final String OPENID_IDENTIFIER_KEY = "openid.identifier";
 	
 	private String publicIdentifier;
 	private String returnToUrl;
@@ -60,12 +61,13 @@ public class OpenIdConsumerServlet extends HttpServlet {
 			try {
 				Identifier id = this.consumer.verifyResponse(request);
 				if (id == null) {
-					response.getWriter().println("Failed");
-					//request.getRequestDispatcher("signin").forward(request, response);
+					logger.info("Access denied");
+					this.onAccessDenied(request, response);
 					return;
 				}
 				
-				response.getWriter().println(id.getIdentifier());
+				logger.info("openid identifier = {}", id.getIdentifier());
+				this.onAccessGranted(request, response);
 				return;
 			} catch (OpenIDException e) {
 				throw new ServletException(e);
@@ -79,7 +81,11 @@ public class OpenIdConsumerServlet extends HttpServlet {
 			request.getRequestDispatcher(this.returnToUrl).forward(request, response);
 		} catch (OpenIDException e) {
 			throw new ServletException(e);
-		}		
+		}
 	}
+	
+	protected abstract void onAccessGranted(HttpServletRequest request, HttpServletResponse response);
+	
+	protected abstract void onAccessDenied(HttpServletRequest request, HttpServletResponse response);
 
 }
