@@ -7,6 +7,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:comp/env/jdbc/defaultDS</jta-data-source>
 
+        <mapping-file>/META-INF/persistence-unit-metadata.orm.xml</mapping-file>
         <mapping-file>org/drools/persistence/session/SessionInfo.orm.xml</mapping-file>
         <mapping-file>org/drools/persistence/processinstance/ProcessInstanceInfo.orm.xml</mapping-file>
         <mapping-file>org/drools/persistence/processinstance/ProcessInstanceEventInfo.orm.xml</mapping-file>
@@ -44,6 +45,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <non-jta-data-source>java:comp/env/jdbc/droolsTaskDS</non-jta-data-source>
 
+        <mapping-file>/META-INF/persistence-unit-metadata.orm.xml</mapping-file>
         <mapping-file>org/drools/task/Attachment.orm.xml</mapping-file>
         <mapping-file>org/drools/task/Content.orm.xml</mapping-file>
         <mapping-file>org/drools/task/BooleanExpression.orm.xml</mapping-file>
@@ -89,6 +91,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:comp/env/jdbc/attachmentDS</jta-data-source>
 
+        <mapping-file>/META-INF/persistence-unit-metadata.orm.xml</mapping-file>
         <class>com.zyeeda.framework.entities.Document</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 

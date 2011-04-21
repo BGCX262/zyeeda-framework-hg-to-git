@@ -94,23 +94,20 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!--
     <filter>
         <filter-name>SecurityFilter</filter-name>
-        <display-name>Security Filter</display-name>
         <filter-class>com.zyeeda.framework.web.SecurityFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>SecurityFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    -->
     
     <!--
     <servlet>
         <servlet-name>OpenIdConsumer</servlet-name>
         <servlet-class>
-            com.zyeeda.framework.web.OpenIdConsumerServlet
+            com.zyeeda.framework.web.demo.DemoOpenIdConsumerServlet
         </servlet-class>
         <init-param>
             <param-name>redirect.to.url</param-name>
