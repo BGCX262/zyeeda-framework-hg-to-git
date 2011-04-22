@@ -1,15 +1,11 @@
 package com.zyeeda.framework.ioc;
 
-//import org.apache.tapestry5.ioc.OrderedConfiguration;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.Startup;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
-import com.zyeeda.framework.ioc.annotations.AttachmentPersistence;
 import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
@@ -18,7 +14,6 @@ import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.openid.OpenIdConsumerService;
 import com.zyeeda.framework.openid.internal.DefaultOpenIdConsumerServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.AttachmentPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
@@ -39,7 +34,6 @@ public class FrameworkModule {
 		binder.bind(TemplateService.class, FreemarkerTemplateServiceProvider.class);
 		binder.bind(PersistenceService.class, DefaultPersistenceServiceProvider.class);
 		binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
-		binder.bind(PersistenceService.class, AttachmentPersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
 		binder.bind(SecurityService.class, ShiroSecurityServiceProvider.class);
@@ -56,7 +50,6 @@ public class FrameworkModule {
 			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService defaultPersistenceSvc,
 			@DroolsTaskPersistence final PersistenceService droolsTaskPersistenceSvc,
-			@AttachmentPersistence final PersistenceService attachPersistenceSvc,
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc,
 			@Primary final KnowledgeService knowledgeSvc,
@@ -68,7 +61,6 @@ public class FrameworkModule {
 		validationSvc.start();
 		defaultPersistenceSvc.start();
 		droolsTaskPersistenceSvc.start();
-		attachPersistenceSvc.start();
 		ldapSvc.start();
 		securitySvc.start();
 		knowledgeSvc.start();

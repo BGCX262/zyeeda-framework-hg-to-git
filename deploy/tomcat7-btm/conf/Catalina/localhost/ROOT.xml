@@ -9,10 +9,6 @@
         factory="bitronix.tm.resource.ResourceObjectFactory"
         uniqueName="jdbc/droolsTaskDS" />
 
-    <Resource name="jdbc/attachmentDS" auth="Container" type="javax.sql.XADataSource"
-        factory="bitronix.tm.resource.ResourceObjectFactory"
-        uniqueName="jdbc/attachmentDS" />
-        
     <Resource name="TransactionManager" auth="Container"
         type="javax.transaction.TransactionManager"
         factory="bitronix.tm.BitronixTransactionManagerObjectFactory" />
