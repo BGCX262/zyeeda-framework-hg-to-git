@@ -24,11 +24,13 @@ public class DefaultOpenIdConsumerServiceProvider extends AbstractService
 
 	private final static String RETURN_TO_URL_KEY = "returnToUrl";
 	private final static String PUBLIC_IDENTIFIER_KEY = "publicIdentifier";
+	private final static String REALM_KEY = "realm";
 	
 	private final static String DEFAULT_RETURN_TO_URL = "/accounts/openid/verify";
 	
 	private String returnToUrl;
 	private String publicIdentifier;
+	private String realm;
 	
 	private OpenIdConsumer consumer;
 	
@@ -45,12 +47,14 @@ public class DefaultOpenIdConsumerServiceProvider extends AbstractService
 	private void init(Configuration config) {
 		this.returnToUrl = config.getString(RETURN_TO_URL_KEY, DEFAULT_RETURN_TO_URL);
 		this.publicIdentifier = config.getString(PUBLIC_IDENTIFIER_KEY);
+		this.realm = config.getString(REALM_KEY);
 	}
 	
 	@Override
 	public void start() throws Exception {
 		this.consumer = new OpenIdConsumer();
 		this.consumer.setReturnToUrl(this.returnToUrl);
+		this.consumer.setRealm(this.realm);
 	}
 	
 	@Override

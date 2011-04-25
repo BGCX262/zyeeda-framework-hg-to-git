@@ -26,6 +26,7 @@ public class OpenIdConsumer {
 	
 	//private String redirectUrl;
 	private String returnToUrl;
+	private String realm;
 	
 	private ConsumerManager manager;
 	
@@ -48,6 +49,7 @@ public class OpenIdConsumer {
 		DiscoveryInformation discovered = this.manager.associate(discos);
 		request.getSession().setAttribute(OPENID_DISCOVERED_KEY, discovered);
 		AuthRequest authReq = this.manager.authenticate(discovered, this.returnToUrl);
+		authReq.setRealm(this.realm);
 		
 		return authReq;
 		/*
@@ -88,6 +90,14 @@ public class OpenIdConsumer {
 	
 	public String getReturnToUrl() {
 		return this.returnToUrl;
+	}
+
+	public String getRealm() {
+		return realm;
+	}
+
+	public void setRealm(String realm) {
+		this.realm = realm;
 	}
 	
 }

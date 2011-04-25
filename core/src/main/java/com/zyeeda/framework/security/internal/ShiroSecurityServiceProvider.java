@@ -7,9 +7,12 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.openid.OpenIdConsumerRealm;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.service.AbstractService;
@@ -18,6 +21,8 @@ import com.zyeeda.framework.service.AbstractService;
 @ServiceId("shiro-security-service")
 public class ShiroSecurityServiceProvider extends AbstractService implements SecurityService<SecurityManager> {
 
+	private static final Logger logger = LoggerFactory.getLogger(ShiroSecurityServiceProvider.class);
+	
 	// Injected
 	private final LdapService ldapSvc;
 	private final PersistenceService persistenceSvc;
@@ -57,7 +62,8 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	}
 	
 	private Realm getRealm() {
-		return new ShiroCombinedRealm(this.ldapSvc, this.roleMgr);
+		return new OpenIdConsumerRealm();
+		//return new ShiroCombinedRealm(this.ldapSvc, this.roleMgr);
 	}
 	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {
