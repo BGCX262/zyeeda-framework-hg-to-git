@@ -156,7 +156,11 @@
             <artifactId>freemarker</artifactId>
             <version>2.3.16</version>
         </dependency>
-
+		<dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb</artifactId>
+            <version>2.5.3</version>
+        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -167,6 +171,7 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.6.1</version>
         </dependency>
+        
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jcl</artifactId>
@@ -378,7 +383,7 @@
         <dependency>
             <groupId>org.openid4java</groupId>
             <artifactId>openid4java-nodeps</artifactId>
-            <version>0.9.6-SNAPSHOT</version>
+            <version>0.9.6</version>
             <exclusions>
                 <exclusion>
                     <groupId>commons-logging</groupId>
