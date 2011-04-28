@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<permissions>
+	<p id="a1" name="四维度">
+		<p id="a2" name="问卷">
+			<p2 id="a3" name="创建问卷" />
+			<p2 id="a4" name="更新问卷" />
+		</p>
+		<p id="a5" name="答卷">
+			<p2 id="a6" name="创建答卷" />
+			<p2 id="a7" name="更新答卷" />
+		</p>
+	</p>
+	<p id="b1" name="四维度">
+		<p id="b2" name="问卷">
+			<p2 id="b3" name="创建问卷" />
+			<p2 id="b4" name="更新问卷" />
+		</p>
+		<p id="b5" name="答卷">
+			<p2 id="b6" name="创建答卷" />
+			<p2 id="b7" name="更新答卷" />
+		</p>
+
+	</p>
+</permissions>

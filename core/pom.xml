@@ -172,7 +172,7 @@
             <artifactId>slf4j-jcl</artifactId>
             <version>1.6.1</version>
             <scope>runtime</scope>
-        </dependency>
+        </dependency><!-- -->
 
         <dependency>
             <groupId>org.hibernate</groupId>

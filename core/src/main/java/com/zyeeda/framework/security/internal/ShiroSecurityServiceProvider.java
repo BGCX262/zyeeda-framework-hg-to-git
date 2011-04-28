@@ -1,5 +1,6 @@
 package com.zyeeda.framework.security.internal;
 
+
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
@@ -11,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.openid.OpenIdConsumerRealm;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
@@ -27,7 +27,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 	private final LdapService ldapSvc;
 	private final PersistenceService persistenceSvc;
 	
-	private RoleManager roleMgr;
+	//private RoleManager roleMgr;
 	
 	public ShiroSecurityServiceProvider(LdapService ldapSvc,
 			@Primary PersistenceService persistenceSvc,
@@ -37,7 +37,7 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		this.ldapSvc = ldapSvc;
 		this.persistenceSvc = persistenceSvc;
 		
-		this.roleMgr = new RoleManager(this.persistenceSvc);
+		//this.roleMgr = new RoleManager(this.persistenceSvc);
 	}
 
 	@Override
@@ -45,10 +45,10 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		return new ShiroSecurityManager();
 	}
 	
-	@Override
-	public RoleManager getRoleManager() {
-		return this.roleMgr;
-	}
+//	@Override
+//	public RoleManager getRoleManager() {
+//		return this.roleMgr;
+//	}
 	
 	/**
 	 * 获取当前登录用户的唯一标识。
@@ -61,17 +61,19 @@ public class ShiroSecurityServiceProvider extends AbstractService implements Sec
 		//return current.getPrincipal().toString();
 	}
 	
-	private Realm getRealm() {
-		return new OpenIdConsumerRealm();
-		//return new ShiroCombinedRealm(this.ldapSvc, this.roleMgr);
-	}
-	
+//	private Realm getRealm() {
+//		return new OpenIdConsumerRealm();
+//		return new ShiroCombinedRealm(this.ldapSvc, this.roleMgr);
+//		
+//	}
+//	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {
 
-		public ShiroSecurityManager() {
-			super(getRealm());
-		}
+//		public ShiroSecurityManager() {
+//			super(getRealm());
+//		}
 		
 	}
+
 
 }

@@ -2,6 +2,9 @@ package com.zyeeda.framework.entities.base;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
+
+
 @javax.persistence.MappedSuperclass
 public class DomainEntity implements Serializable {
 
@@ -9,15 +12,17 @@ public class DomainEntity implements Serializable {
 
     private String id;
 
+	
+
     @javax.persistence.Id
     @javax.persistence.Column(name = "F_ID")
     @javax.persistence.GeneratedValue(generator="system-uuid")
     @org.hibernate.annotations.GenericGenerator(name="system-uuid", strategy = "uuid")
-    public String getId() {
-        return this.id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
+	   public String getId() {
+			return id;
+		}
 	
+		public void setId(String id) {
+			this.id = id;
+		}
 }
