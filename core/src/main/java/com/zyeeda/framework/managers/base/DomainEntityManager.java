@@ -24,6 +24,7 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 		MetadataUtil util = HibernateMetadataUtil.getInstanceForEntityManagerFactory(emf);
 		JPASearchProcessor processor = new JPASearchProcessor(util);
 		this.setSearchProcessor(processor);
+		
 	}
 	
 	protected PersistenceService getPersistenceService() {

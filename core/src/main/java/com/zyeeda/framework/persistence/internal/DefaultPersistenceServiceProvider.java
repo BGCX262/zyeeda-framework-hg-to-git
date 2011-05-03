@@ -27,7 +27,7 @@ import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PreInsertEventListener;
 import org.hibernate.event.PreUpdateEventListener;
 
-import com.zyeeda.framework.persistence.AutoRevisionEventListener;
+//import com.zyeeda.framework.persistence.AutoRevisionEventListener;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.validation.ValidationService;
@@ -64,13 +64,13 @@ public class DefaultPersistenceServiceProvider extends AbstractPersistenceServic
 		
 		config.getEventListeners().setPreInsertEventListeners(
     			new PreInsertEventListener[] {
-    					new BeanValidationEventListener(this.validationSvc.getPreInsertValidatorFactory(), new Properties()),
-    					new AutoRevisionEventListener(this.securitySvc)
+    					new BeanValidationEventListener(this.validationSvc.getPreInsertValidatorFactory(), new Properties())/*,
+    					new AutoRevisionEventListener(this.securitySvc)*/
     			});
     	config.getEventListeners().setPreUpdateEventListeners(
     			new PreUpdateEventListener[] {
-    					new BeanValidationEventListener(this.validationSvc.getPreUpdateValidatorFactory(), new Properties()),
-    					new AutoRevisionEventListener(this.securitySvc)
+    					new BeanValidationEventListener(this.validationSvc.getPreUpdateValidatorFactory(), new Properties()),/*
+    					new AutoRevisionEventListener(this.securitySvc)*/
     			});
     	config.getEventListeners().setPreDeleteEventListeners(
     			new PreDeleteEventListener[] {
