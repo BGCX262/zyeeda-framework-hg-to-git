@@ -2,7 +2,9 @@ package com.zyeeda.framework.entities;
 
 import java.io.Serializable;
 
-public class User implements Serializable {
+import com.zyeeda.framework.entities.base.SimpleDomainEntity;
+
+public class User extends SimpleDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = -411862891641683217L;
 

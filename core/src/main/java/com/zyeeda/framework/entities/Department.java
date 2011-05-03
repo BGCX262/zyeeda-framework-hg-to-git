@@ -2,9 +2,16 @@ package com.zyeeda.framework.entities;
 
 import java.io.Serializable;
 
-public class Department implements Serializable {
+import javax.xml.bind.annotation.XmlRootElement;
 
+import com.zyeeda.framework.entities.base.SimpleDomainEntity;
+
+@XmlRootElement(name  = "department")
+public class Department extends SimpleDomainEntity implements Serializable {
+	
 	private static final long serialVersionUID = 8606771207286469030L;
+	
+	private String baseDn;
 	
 	private String parent;
 	
@@ -22,6 +29,14 @@ public class Department implements Serializable {
 
 	public void setParent(String parent) {
 		this.parent = parent;
+	}
+
+	public String getBaseDn() {
+		return baseDn;
+	}
+
+	public void setBaseDn(String baseDn) {
+		this.baseDn = baseDn;
 	}
 
 	public String getName() {
