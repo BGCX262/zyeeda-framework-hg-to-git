@@ -69,7 +69,7 @@ public class DefaultUserManager implements UserManager {
 	public UserVo update(User user) throws NamingException {
 		LdapContext ctx = null;
 		try {
-			String uid = this.findById(user.getId()).getLabel().replaceAll("<a>", "");
+			String uid = this.findById(user.getId()).getUid();
 			logger.debug("the value of the uid is = {} ", uid);
 			
 			ctx = this.ldapSvc.getLdapContext();
@@ -95,17 +95,15 @@ public class DefaultUserManager implements UserManager {
 	}
 	
 	@Override
-	public UserVo findById(String id) throws NamingException {
+	public User findById(String id) throws NamingException {
 		LdapContext cxt = null;
 		try {
 			cxt = this.ldapSvc.getLdapContext();
 			Attributes attrs = cxt.getAttributes(id);
 			
 			User user = marshal(attrs);
-			UserVo userVo = new UserVo();
-			userVo = this.fillUserPropertiesToVo(user);
 			
-			return userVo;
+			return user;
 		} finally {
 			LdapUtils.closeContext(cxt);
 		}
@@ -180,9 +178,7 @@ public class DefaultUserManager implements UserManager {
 				
 				userList.add(userVo);
 			}
-			if (userList != null) {
-				logger.debug("**********the userList's size is = {}  ", userList.size());
-			}
+			logger.debug("**********the userList's size is = {}  ", userList.size());
 			
 			return userList;
 		} finally {

@@ -11,7 +11,7 @@ public interface UserManager {
 
 	public UserVo persist(User user) throws NamingException;
 	
-	public UserVo findById(String id) throws NamingException;
+	public User findById(String id) throws NamingException;
 	
 	public void remove(String id) throws NamingException;
 	

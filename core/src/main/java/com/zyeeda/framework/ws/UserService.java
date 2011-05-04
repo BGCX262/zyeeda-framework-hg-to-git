@@ -68,7 +68,7 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
-	public UserVo getUserById(@PathParam("id") String id) throws NamingException {
+	public User getUserById(@PathParam("id") String id) throws NamingException {
 		// 传入参数类似uid=XXX,ou=YYY,o=广州局
 		logger.debug("==================== getUserById the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
