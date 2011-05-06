@@ -23,7 +23,7 @@ public class RevisionDomainEntity extends SimpleDomainEntity {
         this.creator = creator;
     }
     
-    @javax.persistence.Temporal(TemporalType.TIME)
+    @javax.persistence.Temporal(TemporalType.TIMESTAMP)
     @javax.persistence.Column(name = "F_CREATED_TIME")
     public Date getCreatedTime() {
         return this.createdTime;
@@ -41,7 +41,7 @@ public class RevisionDomainEntity extends SimpleDomainEntity {
         this.lastModifier = lastModifier;
     }
     
-    @javax.persistence.Temporal(TemporalType.TIME)
+    @javax.persistence.Temporal(TemporalType.TIMESTAMP)
     @javax.persistence.Column(name = "F_LAST_MODIFIED_TIME")
     public Date getLastModifiedTime() {
         return this.lastModifiedTime;
