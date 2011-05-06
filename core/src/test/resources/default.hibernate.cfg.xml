@@ -26,7 +26,6 @@
         <mapping class="org.drools.process.audit.ProcessInstanceLog" />
         <mapping class="org.drools.process.audit.NodeInstanceLog" />
         <mapping class="org.drools.process.audit.VariableInstanceLog" />
-        
         <mapping class="com.zyeeda.framework.entities.Role"/>
     </session-factory>
 </hibernate-configuration>

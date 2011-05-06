@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.Basic;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
@@ -33,11 +34,13 @@ import com.zyeeda.framework.entities.base.SimpleDomainEntity;
 		name = "getRoles",
 		query = "SELECT r FROM Role r"
 )
+@XmlRootElement(name = "role")
 public class Role extends SimpleDomainEntity {
 
 	private static final long serialVersionUID = 1665902703034523260L;
 	private static final char PERMISSION_SEPARATOR = ';';
-	
+	//add by dengjiu 2011-05-56
+//	private String state;
 	private Set<String> subjects;
 	private String permissions;
 	private String scopeType;
@@ -86,5 +89,13 @@ public class Role extends SimpleDomainEntity {
 	public void setScopeId(String scopeId) {
 		this.scopeId = scopeId;
 	}
-
+	
+//	@Basic
+//	@Column(name = "F_STATE")
+//	public String getState() {
+//		return state;
+//	}
+//	public void setState(String state) {
+//		this.state = state;
+//	}
 }

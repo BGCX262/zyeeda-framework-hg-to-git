@@ -69,7 +69,7 @@ public class DefaultPersistenceServiceProvider extends AbstractPersistenceServic
     			});
     	config.getEventListeners().setPreUpdateEventListeners(
     			new PreUpdateEventListener[] {
-    					new BeanValidationEventListener(this.validationSvc.getPreUpdateValidatorFactory(), new Properties()),/*
+    					//new BeanValidationEventListener(this.validationSvc.getPreUpdateValidatorFactory(), new Properties()),
     					new AutoRevisionEventListener(this.securitySvc)*/
     			});
     	config.getEventListeners().setPreDeleteEventListeners(
