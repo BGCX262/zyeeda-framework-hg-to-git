@@ -16,6 +16,10 @@ public class DateParameterHandler implements ParameterHandler<Date> {
 	@Override
 	public Date fromString(String str) {
 		logger.debug("date/datetime string = {}", str);
+		if (StringUtils.isBlank(str)) {
+			return null;
+		}
+		
 		String[] parts = StringUtils.split(str);
 		SimpleDateFormat sdf = null;
 		try {

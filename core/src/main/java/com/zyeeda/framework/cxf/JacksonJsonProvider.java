@@ -1,6 +1,7 @@
 package com.zyeeda.framework.cxf;
 
 import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 
