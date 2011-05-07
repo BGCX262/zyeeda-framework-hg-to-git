@@ -15,9 +15,7 @@ public class JacksonJsonProvider extends JacksonJaxbJsonProvider {
 			m = this._mapperConfig.getDefaultMapper();
 		}
 		m.getSerializationConfig().setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
-		m.configure(Feature.WRITE_DATES_AS_TIMESTAMPS, true);
-		m.getSerializationConfig().withDateFormat(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
 		m.configure(Feature.FAIL_ON_EMPTY_BEANS, false);
+		m.setSerializationConfig(m.getSerializationConfig().withDateFormat(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")));
 	}
-	
 }

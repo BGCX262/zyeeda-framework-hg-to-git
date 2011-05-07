@@ -40,7 +40,7 @@ public class Role extends SimpleDomainEntity {
 	private static final long serialVersionUID = 1665902703034523260L;
 	private static final char PERMISSION_SEPARATOR = ';';
 	//add by dengjiu 2011-05-56
-//	private String state;
+	//private String state;
 	private Set<String> subjects;
 	private String permissions;
 	private String scopeType;
@@ -90,12 +90,14 @@ public class Role extends SimpleDomainEntity {
 		this.scopeId = scopeId;
 	}
 	
-//	@Basic
-//	@Column(name = "F_STATE")
-//	public String getState() {
-//		return state;
-//	}
-//	public void setState(String state) {
-//		this.state = state;
-//	}
+	/*
+	@Basic
+	@Column(name = "F_STATE")
+	public String getState() {
+		return state;
+	}
+	public void setState(String state) {
+		this.state = state;
+	}
+	*/
 }
