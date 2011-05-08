@@ -1,6 +1,7 @@
 package com.zyeeda.framework.config.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import javax.servlet.ServletContext;
@@ -45,20 +46,25 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 			throw new RuntimeException(String.format("Resource [%s] not found.", resource.toString()));
 		}
 		
-		Configuration config = null;
 		try {
             if (resource.getFile().endsWith(".xml")) {
-                config = new XMLConfiguration(resource.toURL());
-            } else if (resource.getFile().endsWith(".properties")) {
-            	config = new PropertiesConfiguration(resource.toURL());
-            } else {
-                throw new RuntimeException(String.format("Unsupported configuration file type. [%s]", resource.toString()));
+            	XMLConfiguration xmlConfig = new XMLConfiguration();
+            	xmlConfig.load(resource.openStream(), "UTF-8");
+            	return xmlConfig;
             }
+            
+            if (resource.getFile().endsWith(".properties")) {
+            	PropertiesConfiguration propConfig = new PropertiesConfiguration();
+            	propConfig.load(resource.openStream(), "UTF-8");
+            	return propConfig;
+            }
+            
+            throw new RuntimeException(String.format("Unsupported configuration file type. [%s]", resource.toString()));
         } catch (ConfigurationException e) {
             throw new RuntimeException(e);
-        }
-
-        return config;
+        } catch (IOException e) {
+        	throw new RuntimeException(e);
+		}
 	}
 
 	@Override
