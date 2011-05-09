@@ -1,6 +1,7 @@
 package com.zyeeda.framework.security.realms;
 
 import java.io.IOException;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -20,9 +21,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.RoleManager;
 
 public class ShiroCombinedRealm extends AuthorizingRealm {
 	
@@ -30,11 +29,11 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 	
 	// Injected
 	private final LdapService ldapSvc;
-	private final RoleManager roleMgr;
+	//private final RoleManager roleMgr;
 	
-	public ShiroCombinedRealm(LdapService ldapSvc, RoleManager roleMgr) {
+	public ShiroCombinedRealm(LdapService ldapSvc) {
 		this.ldapSvc = ldapSvc;
-		this.roleMgr = roleMgr;
+		//this.roleMgr = roleMgr;
 	}
 	
 	@Override
@@ -66,17 +65,17 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		String username = (String) this.getAvailablePrincipal(principals);
-		List<?> roles = this.roleMgr.getRolesBySubject(username);
+		//List<?> roles = this.roleMgr.getRolesBySubject(username);
 		
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-		for (Iterator<?> it = roles.iterator(); it.hasNext(); ) {
-			Role role = (Role) it.next();
-			logger.debug("role name = {}", role.getName());
-			logger.debug("role perms = {}", role.getPermissions());
-			info.addRole(role.getName());
-			info.addStringPermissions(role.getPermissionSet());
-		}
-		
+//		for (Iterator<?> it = roles.iterator(); it.hasNext(); ) {
+//			Role role = (Role) it.next();
+//			logger.debug("role name = {}", role.getName());
+//			logger.debug("role perms = {}", role.getPermissions());
+//			info.addRole(role.getName());
+//			info.addStringPermissions(role.getPermissionSet());
+//		}
+//		
 		return info;
 	}
 

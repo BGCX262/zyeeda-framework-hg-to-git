@@ -108,7 +108,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	public void start() throws Exception {
 		// add knowledge changeset
 		KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-		kbuilder.add(ResourceFactory.newClassPathResource("/drools-changeset.xml"), ResourceType.CHANGE_SET);
+		kbuilder.add(ResourceFactory.newClassPathResource("drools-changeset.xml"), ResourceType.CHANGE_SET);
 		KnowledgeBuilderErrors errors = kbuilder.getErrors();
 		if (errors.size() > 0) {
 			for (KnowledgeBuilderError error: errors) {

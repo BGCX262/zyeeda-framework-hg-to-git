@@ -3,6 +3,7 @@ package com.zyeeda.framework.cxf;
 import java.text.SimpleDateFormat;
 
 import org.codehaus.jackson.jaxrs.JacksonJaxbJsonProvider;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -22,8 +23,7 @@ public class JacksonJsonProvider extends JacksonJaxbJsonProvider {
 		/*
 		m.getSerializationConfig().setSerializationInclusion(JsonSerialize.Inclusion.NON_NULL);
 		m.configure(Feature.FAIL_ON_EMPTY_BEANS, false);
-		m.setSerializationConfig(m.getSerializationConfig().withDateFormat(new SimpleDateFormat("yyyy-MM-dd")));
+		m.setSerializationConfig(m.getSerializationConfig().withDateFormat(new SimpleDateFormat("yyyy-MM-dd hh:mm:ss")));
 		*/
 	}
-	
 }

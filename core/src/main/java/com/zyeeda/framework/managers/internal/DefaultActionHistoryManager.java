@@ -1,5 +1,7 @@
 package com.zyeeda.framework.managers.internal;
 
+import java.util.List;
+
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.ActionHistory;
 import com.zyeeda.framework.managers.ActionHistoryManager;
@@ -20,12 +22,18 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 		return this.searchUnique(search);
 	}
 	
-	public ActionHistory findAlive(Long processInsId, Long nodeInsId) {
+	public ActionHistory findAlive(Long processInsId, String nodeInsId) {
 		Search search = new Search();
 		search.addFilterEqual("processInstanceId", processInsId);
 		search.addFilterEqual("nodeInstanceId", nodeInsId);
 		search.addFilterEqual("alive", true);
 		return this.searchUnique(search);
 	}
+	public List<ActionHistory> findListByProcessId(Long processInsId){
+		Search search = new Search();
+		search.addFilterEqual("processInstanceId", processInsId);
+		return this.search(search);
+	}
+
 
 }

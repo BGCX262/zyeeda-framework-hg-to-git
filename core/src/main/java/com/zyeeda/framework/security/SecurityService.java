@@ -8,4 +8,5 @@ public interface SecurityService<T> extends Service {
 	
 	public String getCurrentUser();
 
+	
 }
