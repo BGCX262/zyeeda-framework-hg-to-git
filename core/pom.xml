@@ -495,6 +495,7 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
             </plugin>
             -->
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -510,18 +511,19 @@
                             <Implementation-Version>
                                 ${project.version}
                             </Implementation-Version>
-                            <!-- 
+                            
                             <Zyeeda-Framework-Entity-Classes>
                                 com.zyeeda.framework.entities.Role,org.drools.persistence.session.SessionInfo,org.drools.persistence.processinstance.ProcessInstanceInfo,org.drools.persistence.processinstance.ProcessInstanceEventInfo,org.drools.persistence.processinstance.WorkItemInfo,org.drools.persistence.processinstance.variabletypes.VariableInstanceInfo,org.drools.process.audit.ProcessInstanceLog,org.drools.process.audit.NodeInstanceLog,org.drools.process.audit.VariableInstanceLog
                             </Zyeeda-Framework-Entity-Classes>
                             <Drools-Task-Entity-Classes>
                                 org.drools.task.Attachment,org.drools.task.Content,org.drools.task.BooleanExpression,org.drools.task.Comment,org.drools.task.Deadline,org.drools.task.Comment,org.drools.task.Deadlines,org.drools.task.Delegation,org.drools.task.Escalation,org.drools.task.Group,org.drools.task.I18NText,org.drools.task.Notification,org.drools.task.EmailNotification,org.drools.task.EmailNotificationHeader,org.drools.task.PeopleAssignments,org.drools.task.Reassignment,org.drools.task.Status,org.drools.task.Task,org.drools.task.TaskData,org.drools.task.SubTasksStrategy,org.drools.task.OnParentAbortAllSubTasksEndStrategy,org.drools.task.OnAllSubTasksEndParentEndStrategy,org.drools.task.User
                             </Drools-Task-Entity-Classes>
-                            -->
+                            
                         </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

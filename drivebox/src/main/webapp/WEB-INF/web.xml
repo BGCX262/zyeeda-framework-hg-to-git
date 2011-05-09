@@ -7,11 +7,6 @@
 
     <display-name>Zyeeda Framework Web Application</display-name>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/spring-beans.xml</param-value>
-    </context-param>
-
     <resource-ref>
         <description>Default Data Source</description>
         <res-ref-name>jdbc/defaultDS</res-ref-name>
@@ -48,24 +43,6 @@
             com.zyeeda.framework.web.ContextListener
         </listener-class>
     </listener>
-    <!--
-    <listener>
-        <listener-class>
-            org.springframework.web.context.ContextLoaderListener
-        </listener-class>
-    </listener>
-    -->
-
-    <!--
-    <filter>
-        <filter-name>Remote User Mock Filter</filter-name>
-        <filter-class>com.zyeeda.framework.web.mock.RemoteUserMockFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>Remote User Mock Filter</filter-name>
-        <url-pattern>*.jsp</url-pattern>
-    </filter-mapping>
-    -->
 
     <!-- 
     <filter>
@@ -79,6 +56,7 @@
     </filter-mapping>
     -->
 
+    <!--
     <filter>
         <filter-name>OSiVFilter</filter-name>
         <filter-class>com.zyeeda.framework.web.OpenSessionInViewFilter</filter-class>
@@ -87,17 +65,16 @@
         <filter-name>OSiVFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
 
-    <!--
     <filter>
         <filter-name>SecurityFilter</filter-name>
-        <filter-class>com.zyeeda.framework.web.SecurityFilter</filter-class>
+        <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>SecurityFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    -->
     
     <!--
     <servlet>
@@ -176,10 +153,5 @@
         </user-data-constraint>
     </security-constraint>
     -->
-
-    <mime-mapping>
-        <extension>manifest</extension>
-        <mime-type>test/manifest</mime-type>
-    </mime-mapping>
 
 </web-app>

@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid;
+package com.zyeeda.framework.openid.consumer;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.utils.IocUtils;
 
-public class OpenIdAuthenticationFilter extends AuthenticatingFilter {
+public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 	
-	private static final Logger logger = LoggerFactory.getLogger(OpenIdAuthenticationFilter.class);
+	private static final Logger logger = LoggerFactory.getLogger(OpenIdConsumerAuthcFilter.class);
 	
 	private String returnToUrl;
 	
@@ -97,7 +97,7 @@ public class OpenIdAuthenticationFilter extends AuthenticatingFilter {
 	@Override
 	protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         boolean result = super.isAccessAllowed(request, response, mappedValue);
-        logger.debug("isAccessAllowed = {}", result);
+        logger.debug("is access allowed = {}", result);
         return result;
     }
 	

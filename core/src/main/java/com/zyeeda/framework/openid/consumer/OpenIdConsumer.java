@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid;
+package com.zyeeda.framework.openid.consumer;
 
 import java.util.List;
 

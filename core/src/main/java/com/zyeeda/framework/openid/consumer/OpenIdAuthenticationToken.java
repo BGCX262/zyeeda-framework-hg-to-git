@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid;
+package com.zyeeda.framework.openid.consumer;
 
 import org.apache.shiro.authc.AuthenticationToken;
 import org.openid4java.discovery.Identifier;

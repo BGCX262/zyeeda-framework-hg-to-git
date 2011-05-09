@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid;
+package com.zyeeda.framework.openid.consumer;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -9,6 +9,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 public class OpenIdConsumerRealm extends AuthorizingRealm {
 	

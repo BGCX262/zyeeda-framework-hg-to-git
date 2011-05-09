@@ -15,7 +15,7 @@ import org.openid4java.message.AuthRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.openid.OpenIdConsumer;
+import com.zyeeda.framework.openid.consumer.OpenIdConsumer;
 
 public abstract class OpenIdConsumerServlet extends HttpServlet {
 
