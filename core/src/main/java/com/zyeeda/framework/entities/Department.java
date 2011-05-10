@@ -11,32 +11,18 @@ public class Department extends SimpleDomainEntity implements Serializable {
 	
 	private static final long serialVersionUID = 8606771207286469030L;
 	
-	private String baseDn;
-	
 	private String parent;
 	
 	private String name;
 	
 	private String description;
 	
-	private String fax;
-	
-	private String telephoneNumber;
-
 	public String getParent() {
 		return parent;
 	}
 
 	public void setParent(String parent) {
 		this.parent = parent;
-	}
-
-	public String getBaseDn() {
-		return baseDn;
-	}
-
-	public void setBaseDn(String baseDn) {
-		this.baseDn = baseDn;
 	}
 
 	public String getName() {
@@ -53,22 +39,6 @@ public class Department extends SimpleDomainEntity implements Serializable {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getFax() {
-		return fax;
-	}
-
-	public void setFax(String fax) {
-		this.fax = fax;
-	}
-
-	public String getTelephoneNumber() {
-		return telephoneNumber;
-	}
-
-	public void setTelephoneNumber(String telephoneNumber) {
-		this.telephoneNumber = telephoneNumber;
 	}
 
 }

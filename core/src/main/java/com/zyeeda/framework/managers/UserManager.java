@@ -1,5 +1,6 @@
 package com.zyeeda.framework.managers;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -11,11 +12,11 @@ public interface UserManager {
 
 	public UserVo persist(User user) throws NamingException;
 	
-	public User findById(String id) throws NamingException;
+	public User findById(String id) throws NamingException, ParseException;
 	
 	public void remove(String id) throws NamingException;
 	
-	public UserVo update(User user) throws NamingException;
+	public UserVo update(User user) throws NamingException, ParseException;
 	
 	public List<UserVo> getUserListByDepartmentId(String id) throws NamingException;
 	

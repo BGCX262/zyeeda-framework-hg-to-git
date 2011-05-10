@@ -19,8 +19,8 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.internal.DefaultDepartmentManager;
-import com.zyeeda.framework.managers.internal.DefaultUserManager;
+import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
+import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.DepartmentVo;
 import com.zyeeda.framework.viewmodels.OrganizationNodeVo;
 import com.zyeeda.framework.viewmodels.UserVo;
@@ -29,7 +29,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/depts")
 public class DepartmentService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(DefaultDepartmentManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public DepartmentService(@Context ServletContext ctx) {
 		super(ctx);
@@ -42,7 +42,7 @@ public class DepartmentService extends ResourceService {
 		// 传入类似参数ou=dada,o=广州局,在ou=datda,o=广州局下创建部门
 		logger.debug("=====================create method==========================" + parent);
 		LdapService ldapSvc = this.getLdapService();
-		DefaultDepartmentManager deptMgr = new DefaultDepartmentManager(ldapSvc);
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		dept.setParent(parent);
 		return deptMgr.persist(dept);
 	}
@@ -54,7 +54,7 @@ public class DepartmentService extends ResourceService {
 		// 传入类似参数ou=dada,o=广州局
 		logger.debug("=====================remove method==========================" + id);
 		LdapService ldapSvc = this.getLdapService();
-		DefaultDepartmentManager deptMgr = new DefaultDepartmentManager(ldapSvc);
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptMgr.remove(id);
 	}
 	
@@ -65,7 +65,7 @@ public class DepartmentService extends ResourceService {
 		// 传入类似参数ou=dada,o=广州局
 		logger.debug("=====================edit method==========================" + id);
 		LdapService ldapSvc = this.getLdapService();
-		DefaultDepartmentManager deptMgr = new DefaultDepartmentManager(ldapSvc);
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		dept.setId(id);
 		return deptMgr.update(dept);
 	}
@@ -77,7 +77,7 @@ public class DepartmentService extends ResourceService {
 		// 传入类似参数ou=dada,o=广州局
 		logger.debug("=====================getDeptMent by id method==========================" + id);
 		LdapService ldapSvc = this.getLdapService();
-		DefaultDepartmentManager deptMgr = new DefaultDepartmentManager(ldapSvc);
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return deptMgr.findById(id);
 	}
 	
@@ -88,7 +88,7 @@ public class DepartmentService extends ResourceService {
 		// 传入类似参数dada(单纯名称就可以)
 		logger.debug("=====================getDepartmentListByName method==========================" + name);
 		LdapService ldapSvc = this.getLdapService();
-		DefaultDepartmentManager deptMgr = new DefaultDepartmentManager(ldapSvc);
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return deptMgr.getDepartmentListByName(name);
 	}
 	
@@ -99,10 +99,10 @@ public class DepartmentService extends ResourceService {
 		logger.debug("=====================getDepartmentList method==========================id = {} ", id);
 		LdapService ldapSvc = this.getLdapService();
 		
-		DefaultDepartmentManager deptMgr = new DefaultDepartmentManager(ldapSvc);
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		List<DepartmentVo> deptList = deptMgr.getDepartmentListById(id);
 		
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		List<UserVo> userList = userMgr.getUserListByDepartmentId(id);
 		
 		List<OrganizationNodeVo> orgList = deptMgr.mergeDepartmentVoAndUserVo(deptList, userList);

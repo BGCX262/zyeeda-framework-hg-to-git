@@ -1,6 +1,7 @@
 package com.zyeeda.framework.entities;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import com.zyeeda.framework.entities.base.SimpleDomainEntity;
 
@@ -8,104 +9,76 @@ public class User extends SimpleDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = -411862891641683217L;
 
-	private String department;
-	
-	private String commonName;
-	
-	private String surname;
-	
-	private String description;
-	
-	private String displayName;
-	
-	private String employeeNumber;
-	
-	private String fax;
-	
-	private String givenName;
-	
-	private String mail;
-	
+	private String id;
+	private String username;
+	private String password;
+	private String gender;
+	private String position;
+	private String degree;
+	private String email;
 	private String mobile;
-	
-	private String telephoneNumber;
-	
-	private String title;
-	
-	private String uid;
-	
-	private String userPassword;
+	private Date birthday;
+	private Date dateOfWork;
+	private Boolean status;
+	private Boolean postStatus;
+	private byte[] photo;
+	private String departmentName;
+	private String deptFullPath;
 
-	public String getDepartment() {
-		return department;
+	public String getId() {
+		return id;
 	}
 
-	public void setDepartment(String department) {
-		this.department = department;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public String getCommonName() {
-		return commonName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setCommonName(String commonName) {
-		this.commonName = commonName;
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
-	public String getSurname() {
-		return surname;
+	public String getPassword() {
+		return password;
 	}
 
-	public void setSurname(String surname) {
-		this.surname = surname;
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getGender() {
+		return gender;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setGender(String gender) {
+		this.gender = gender;
 	}
 
-	public String getDisplayName() {
-		return displayName;
+	public String getPosition() {
+		return position;
 	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setPosition(String position) {
+		this.position = position;
 	}
 
-	public String getEmployeeNumber() {
-		return employeeNumber;
+	public String getDegree() {
+		return degree;
 	}
 
-	public void setEmployeeNumber(String employeeNumber) {
-		this.employeeNumber = employeeNumber;
+	public void setDegree(String degree) {
+		this.degree = degree;
 	}
 
-	public String getFax() {
-		return fax;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setFax(String fax) {
-		this.fax = fax;
-	}
-
-	public String getGivenName() {
-		return givenName;
-	}
-
-	public void setGivenName(String givenName) {
-		this.givenName = givenName;
-	}
-
-	public String getMail() {
-		return mail;
-	}
-
-	public void setMail(String mail) {
-		this.mail = mail;
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public String getMobile() {
@@ -116,36 +89,60 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.mobile = mobile;
 	}
 
-	public String getTelephoneNumber() {
-		return telephoneNumber;
+	public Date getBirthday() {
+		return birthday;
 	}
 
-	public void setTelephoneNumber(String telephoneNumber) {
-		this.telephoneNumber = telephoneNumber;
+	public void setBirthday(Date birthday) {
+		this.birthday = birthday;
 	}
 
-	public String getTitle() {
-		return title;
+	public Date getDateOfWork() {
+		return dateOfWork;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setDateOfWork(Date dateOfWork) {
+		this.dateOfWork = dateOfWork;
 	}
 
-	public String getUid() {
-		return uid;
+	public Boolean getStatus() {
+		return status;
 	}
 
-	public void setUid(String uid) {
-		this.uid = uid;
+	public void setStatus(Boolean status) {
+		this.status = status;
 	}
 
-	public String getUserPassword() {
-		return userPassword;
+	public Boolean getPostStatus() {
+		return postStatus;
 	}
 
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
+	public void setPostStatus(Boolean postStatus) {
+		this.postStatus = postStatus;
 	}
-	
+
+	public byte[] getPhoto() {
+		return photo;
+	}
+
+	public void setPhoto(byte[] photo) {
+		this.photo = photo;
+	}
+
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public String getDeptFullPath() {
+		return deptFullPath;
+	}
+
+	public void setDeptFullPath(String deptFullPath) {
+		this.deptFullPath = deptFullPath;
+	}
+
 }

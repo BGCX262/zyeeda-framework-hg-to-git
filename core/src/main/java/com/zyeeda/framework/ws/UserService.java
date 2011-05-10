@@ -1,5 +1,6 @@
 package com.zyeeda.framework.ws;
 
+import java.text.ParseException;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -14,20 +15,21 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+import org.drools.lang.dsl.DSLMapParser.comment_return;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.internal.DefaultDepartmentManager;
-import com.zyeeda.framework.managers.internal.DefaultUserManager;
+import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
+import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/users")
 public class UserService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(DefaultDepartmentManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
@@ -39,8 +41,8 @@ public class UserService extends ResourceService {
 	public UserVo createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException {
 		logger.debug("=====================create method==========================");
 		LdapService ldapSvc = this.getLdapService();
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
-		user.setDepartment(parent);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		user.setDepartmentName(parent);
 		return userMgr.persist(user);
 	}
 	
@@ -49,18 +51,18 @@ public class UserService extends ResourceService {
 	public void removeUser(@PathParam("id") String id) throws NamingException {
 		logger.debug("==================== remove the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		userMgr.remove(id);
 	}
 	
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public UserVo editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException {
+	public UserVo editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
 		// 传入参数类似uid=XXX,ou=YYY,o=广州局
 		logger.debug("==================== edit the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		user.setId(id);
 		return userMgr.update(user);
 	}
@@ -68,11 +70,11 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
-	public User getUserById(@PathParam("id") String id) throws NamingException {
+	public User getUserById(@PathParam("id") String id) throws NamingException, ParseException {
 		// 传入参数类似uid=XXX,ou=YYY,o=广州局
 		logger.debug("==================== getUserById the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.findById(id);
 	}
 	
@@ -83,7 +85,7 @@ public class UserService extends ResourceService {
 		// 传入参数：名称
 		logger.debug("==================== getUserListByName the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.getUserListByName(name);
 	}
 	
@@ -94,7 +96,7 @@ public class UserService extends ResourceService {
 		// 传入参数类似ou=YYY,o=广州局
 		logger.debug("==================== getUserListByDepartmentId the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
-		DefaultUserManager userMgr = new DefaultUserManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.getUserListByDepartmentId(deptId);
 	}
 	
