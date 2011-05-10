@@ -46,7 +46,7 @@ public class DefaultDepartmentManager implements DepartmentManager {
 			String dn = String.format("ou=%s", dept.getName());
 			logger.debug("the value of the dn and parent is = {}   {}  ", dn, parent);
 			
-			Attributes attrs = unmarshal(dept);
+			Attributes attrs = DefaultDepartmentManager.unmarshal(dept);
 			parentCtx = (LdapContext) ctx.lookup(parent);
 			parentCtx.createSubcontext(dn, attrs);
 		
@@ -245,8 +245,6 @@ public class DefaultDepartmentManager implements DepartmentManager {
 		attrs.put("objectClass", "organizationalUnit");
 		attrs.put("ou", dept.getName());
 		attrs.put("description", dept.getDescription());
-		attrs.put("fax", dept.getFax());
-		attrs.put("telephoneNumber", dept.getTelephoneNumber());
 		
 		return attrs;
 	}
@@ -256,8 +254,6 @@ public class DefaultDepartmentManager implements DepartmentManager {
 		
 		dept.setName((String) attrs.get("ou").get());
 		dept.setDescription((String) attrs.get("description").get());
-		dept.setFax((String) attrs.get("fax").get());
-		dept.setTelephoneNumber((String) attrs.get("telephoneNumber").get());
 		
 		return dept;
 	}

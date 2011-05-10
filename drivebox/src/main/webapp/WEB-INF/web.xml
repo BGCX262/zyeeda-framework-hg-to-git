@@ -147,7 +147,6 @@
         <init-param>
             <param-name>jaxrs.providers</param-name>
             <param-value>
-                com.zyeeda.framework.cxf.DedicatedJsonProvider
 				com.zyeeda.framework.cxf.DateParameterHandler
             </param-value>
         </init-param>
