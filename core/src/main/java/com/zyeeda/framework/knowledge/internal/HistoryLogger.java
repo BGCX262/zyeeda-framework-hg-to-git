@@ -108,7 +108,7 @@ public class HistoryLogger extends WorkingMemoryLogger {
 				actHist.setProcessName(event.getProcessName());
 				actHist.setProcessInstanceId(event.getProcessInstanceId());
 				actHist.setNodeId(event.getNodeId());
-				actHist.setNodeInstanceId(Long.parseLong(event.getNodeInstanceId()));
+				actHist.setNodeInstanceId(event.getNodeInstanceId());
 				actHist.setName(event.getNodeName());
 				this.aHisMgr.persist(actHist);
 				break;
@@ -131,7 +131,7 @@ public class HistoryLogger extends WorkingMemoryLogger {
 				ProcessHistory proHist = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
 				this.pHisMgr.save(proHist);
 				
-				ActionHistory actHist = aHisMgr.findAlive(event.getProcessInstanceId(), Long.parseLong(event.getNodeInstanceId()));
+				ActionHistory actHist = aHisMgr.findAlive(event.getProcessInstanceId(), event.getNodeInstanceId());
 				actHist.setAlive(false);
 				this.aHisMgr.save(actHist);
 				break;
