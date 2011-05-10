@@ -134,10 +134,10 @@
         <init-param>
             <param-name>jaxrs.serviceClasses</param-name>
             <param-value>
-                com.zyeeda.framework.ws.TestService 
                 com.zyeeda.framework.ws.DictionaryService 
                 com.zyeeda.framework.ws.DocumentService 
-                com.zyeeda.framework.ws.DepartmentService
+                com.zyeeda.framework.ws.DepartmentService 
+                com.zyeeda.framework.ws.UserService 
             </param-value>
         </init-param>
         <init-param>

@@ -1,5 +1,6 @@
 package com.zyeeda.framework.entities;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -22,6 +23,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 	private Boolean status;
 	private Boolean postStatus;
 	private byte[] photo;
+	private File file;
 	private String departmentName;
 	private String deptFullPath;
 
@@ -143,6 +145,14 @@ public class User extends SimpleDomainEntity implements Serializable {
 
 	public void setDeptFullPath(String deptFullPath) {
 		this.deptFullPath = deptFullPath;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
 	}
 
 }

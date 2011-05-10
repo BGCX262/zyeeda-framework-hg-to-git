@@ -1,10 +1,14 @@
 package com.zyeeda.framework.ws;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.util.List;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -15,7 +19,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.drools.lang.dsl.DSLMapParser.comment_return;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,6 +101,30 @@ public class UserService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.getUserListByDepartmentId(deptId);
+	}
+	
+	@POST
+	@Path("/{id}")
+	@Produces("application/json")
+	public void uploadPhoto(@Context HttpServletRequest request, @PathParam("id") String id) throws Throwable {
+		InputStream in = request.getInputStream();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+	    byte[] b = new byte[1024];  
+	    int len = 0;  
+	  
+	    while ((len = in.read(b, 0, 1024)) != -1) {  
+	        baos.write(b, 0, len);  
+	    }  
+	    baos.flush();  
+	  
+	    byte[] bytes = baos.toByteArray();
+	    LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		User user = new User();
+		user.setId("china");
+		user.setPhoto(bytes);
+		
+		userMgr.update(user);
 	}
 	
 	
