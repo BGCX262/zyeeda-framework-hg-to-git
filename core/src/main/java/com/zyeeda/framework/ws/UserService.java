@@ -7,6 +7,8 @@ import java.text.ParseException;
 import java.util.List;
 
 import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -66,8 +68,16 @@ public class UserService extends ResourceService {
 		logger.debug("==================== edit the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		user.setId(id);
-		return userMgr.update(user);
+		UserVo userVo = null;
+		if (id.substring(id.indexOf("=") + 1, id.indexOf(",")).equals(user.getId())) {
+			user.setId(id);
+			userVo = userMgr.update(user);
+		} else {
+			user.setId("uid=" + user.getId() + id.substring(id.indexOf(","), id.length()));
+			userVo = userMgr.persist(user);
+			userMgr.remove(id);
+		}
+		return userVo;
 	}
 	
 	@GET

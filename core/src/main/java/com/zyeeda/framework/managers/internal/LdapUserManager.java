@@ -92,18 +92,8 @@ public class LdapUserManager implements UserManager {
 			if (user.getId().substring(user.getId().indexOf("=") + 1, user.getId().indexOf(",")).equals(uid)) {
 				Attributes attrs = LdapUserManager.unmarshal(user, "update");
 				String dn = user.getId();
-				logger.debug("the value of the dn is =  {}  ", dn);
 
 				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
-			} else {
-				logger.debug("******************error perform******************");
-				String dn = user.getId();
-				parentCtx = (LdapContext) ctx.lookup(user.getId().substring(
-						user.getId().indexOf(","), user.getId().length()));
-				Attributes attrs = LdapUserManager.unmarshal(user, "create");
-				parentCtx.createSubcontext(dn, attrs);
-				ctx.destroySubcontext(user.getId());
-				
 			}
 
 			UserVo userVo = new UserVo();
