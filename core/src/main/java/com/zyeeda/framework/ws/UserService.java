@@ -122,7 +122,7 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		User user = new User();
 		user.setId("china");
-		user.setPhoto(bytes);
+//		user.setPhoto(bytes);
 		
 		userMgr.update(user);
 	}

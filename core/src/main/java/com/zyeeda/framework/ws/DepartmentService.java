@@ -38,13 +38,16 @@ public class DepartmentService extends ResourceService {
 	@POST
 	@Path("/{parent}")
 	@Produces("application/json")
-	public DepartmentVo createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws NamingException {
+	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws NamingException {
 		// 传入类似参数ou=dada,o=广州局,在ou=datda,o=广州局下创建部门
 		logger.debug("=====================create method==========================" + parent);
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		dept.setParent(parent);
-		return deptMgr.persist(dept);
+		deptMgr.persist(dept);
+		return deptMgr.findById(dept.getId());
+		
+		
 	}
 	
 	@DELETE
@@ -61,13 +64,15 @@ public class DepartmentService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public DepartmentVo editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
+	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
 		// 传入类似参数ou=dada,o=广州局
 		logger.debug("=====================edit method==========================" + id);
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		dept.setId(id);
-		return deptMgr.update(dept);
+//		dept.setId(id);
+		deptMgr.update(dept);
+		return deptMgr.findById(id);
+//		return deptMgr.update(dept);
 	}
 	
 	@GET

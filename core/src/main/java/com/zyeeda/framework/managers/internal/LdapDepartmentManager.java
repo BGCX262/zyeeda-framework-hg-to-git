@@ -118,6 +118,32 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 	}
 	
+//	@Override
+//	public Department update(Department dept) throws NamingException {
+//		LdapContext ctx = null;
+//		try {
+////			String name = this.findById(dept.getId()).getLabel().replaceAll("<a>", "");
+//			String name = this.findById(dept.getId()).getName();
+//			logger.debug("the value of the name and dept.getName() is = {} {} ", name, dept.getName());
+//			
+//			ctx = this.ldapSvc.getLdapContext();
+//			// 如果名称相同，则可以修改
+//			if (dept.getName().equals(name)) {
+//				Attributes attrs = unmarshal(dept);
+//				String dn = dept.getId();
+//				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+//			} else {
+//				// 修改名称会出现异常
+//				logger.debug("===================error perform==================");
+//			}
+//			
+//			
+//			return dept;
+//		} finally {
+//			LdapUtils.closeContext(ctx);
+//		}
+//	}
+	
 	public Department findById(String id) throws NamingException {
 		LdapContext ctx = null;
 		Attributes attrs = null;
@@ -183,7 +209,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 			ctx = this.ldapSvc.getLdapContext();
 			ne = ctx.search("o=广州局", "(ou=*" + name + ")", this.getThreeLevelScopeSearchControls());
 			
-			SearchResult entry = null; 
+			SearchResult entry = null;
 			deptList = new ArrayList<DepartmentVo>();
 			for (; ne.hasMore(); ) {
 				entry = ne.next();
@@ -223,7 +249,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		
 		for (UserVo userVo: userList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
-			orgNodeVo.setId(userVo.getId());
+			orgNodeVo.setId("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
 			orgNodeVo.setCheckName(userVo.getCheckName());
 			orgNodeVo.setIo(userVo.getId());
 			orgNodeVo.setLabel(userVo.getLabel());
@@ -262,7 +288,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		DepartmentVo deptVo = new DepartmentVo();
 		
 		deptVo.setId(dept.getId());
-		deptVo.setType("task");
+		deptVo.setType("io");
 		deptVo.setLabel("<a>" + dept.getName() + "<a>");
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);

@@ -45,6 +45,7 @@ public class LdapUserManager implements UserManager {
 	public UserVo persist(User user) throws NamingException {
 		LdapContext ctx = null;
 		LdapContext parentCtx = null;
+		
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			String department = user.getDepartmentName();
@@ -53,7 +54,7 @@ public class LdapUserManager implements UserManager {
 					dn, department);
 
 			parentCtx = (LdapContext) ctx.lookup(department);
-			Attributes attrs = LdapUserManager.unmarshal(user);
+			Attributes attrs = LdapUserManager.unmarshal(user, "create");
 			parentCtx.createSubcontext(dn, attrs);
 
 			UserVo userVo = this.fillUserPropertiesToVo(user);
@@ -79,21 +80,30 @@ public class LdapUserManager implements UserManager {
 	@Override
 	public UserVo update(User user) throws NamingException, ParseException {
 		LdapContext ctx = null;
+		LdapContext parentCtx = null;
+		
 		try {
 			String uid = this.findById(user.getId()).getId();
 			logger.debug("the value of the uid is = {} ", uid);
 
 			ctx = this.ldapSvc.getLdapContext();
-			// 如果名称相同，则可以修改
-			if (user.getId().equals(uid)) {
-				Attributes attrs = unmarshal(user);
+			System.out.println("-----------" + user.getId().substring(user.getId().indexOf("="), user.getId().indexOf(",")));
+			System.out.println("-----------" + uid);
+			if (user.getId().substring(user.getId().indexOf("=") + 1, user.getId().indexOf(",")).equals(uid)) {
+				Attributes attrs = LdapUserManager.unmarshal(user, "update");
 				String dn = user.getId();
 				logger.debug("the value of the dn is =  {}  ", dn);
 
 				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
 			} else {
-				// 修改名称会出现异常
 				logger.debug("******************error perform******************");
+				String dn = user.getId();
+				parentCtx = (LdapContext) ctx.lookup(user.getId().substring(
+						user.getId().indexOf(","), user.getId().length()));
+				Attributes attrs = LdapUserManager.unmarshal(user, "create");
+				parentCtx.createSubcontext(dn, attrs);
+				ctx.destroySubcontext(user.getId());
+				
 			}
 
 			UserVo userVo = new UserVo();
@@ -101,20 +111,30 @@ public class LdapUserManager implements UserManager {
 
 			return userVo;
 		} finally {
+			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
 		}
 	}
 
 	@Override
 	public User findById(String id) throws NamingException, ParseException {
+		System.out.println("******************id:" + id);
 		LdapContext cxt = null;
+		NamingEnumeration<SearchResult> ne = null;
+		List<User> userList = null;
 		try {
 			cxt = this.ldapSvc.getLdapContext();
-			Attributes attrs = cxt.getAttributes(id);
+			ne = cxt.search(id, "(uid=*)", this.getThreeLevelScopeSearchControls());
+			SearchResult entry = null;
+			userList = new ArrayList<User>();
+			for (; ne.hasMore();) {
+				entry = ne.next();
+				Attributes attr = entry.getAttributes();
+				User user = LdapUserManager.marshal(attr);;
+				userList.add(user);
 
-			User user = marshal(attrs);
-
-			return user;
+			}
+			return userList.get(0);
 		} finally {
 			LdapUtils.closeContext(cxt);
 		}
@@ -130,8 +150,7 @@ public class LdapUserManager implements UserManager {
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search(id, "(uid=*)", this
-					.getOneLevelScopeSearchControls());
+			ne = ctx.search(id, "(uid=*)", this.getOneLevelScopeSearchControls());
 
 			SearchResult entry = null;
 			userList = new ArrayList<UserVo>();
@@ -149,8 +168,9 @@ public class LdapUserManager implements UserManager {
 				// user.setSurname((String) attr.get("sn").get());
 				user.setId((String) attr.get("uid").get());
 				// user.setId(childId);
-				user.setPassword(new String((byte[]) attr.get("userpassword")
+				user.setPassword(new String((byte[]) attr.get("userPassword")
 						.get()));
+				user.setDeptFullPath(id);
 
 				UserVo userVo = this.fillUserPropertiesToVo(user);
 
@@ -208,7 +228,7 @@ public class LdapUserManager implements UserManager {
 		}
 	}
 
-	private static Attributes unmarshal(User user) {
+	private static Attributes unmarshal(User user, String module) {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");
@@ -219,7 +239,9 @@ public class LdapUserManager implements UserManager {
 
 		attrs.put("cn", user.getUsername());
 		attrs.put("sn", user.getUsername());
-		attrs.put("uid", user.getId());
+		if ("create".equals(module)) {
+			attrs.put("uid", user.getId());
+		}
 		if (StringUtils.isNotBlank(user.getPassword())) {
 			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode(user.getPassword()));
 		} else {
@@ -241,10 +263,10 @@ public class LdapUserManager implements UserManager {
 			attrs.put("mobile", user.getMobile());
 		}
 		if (user.getBirthday() != null) {
-			attrs.put("birthday", user.getBirthday().toString());
+			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
 		}
 		if (user.getDateOfWork() != null) {
-			attrs.put("dateOfWork", user.getDateOfWork().toString());
+			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
 		}
 		if (user.getStatus() != null) {
 			attrs.put("status", user.getStatus().toString());
@@ -252,9 +274,9 @@ public class LdapUserManager implements UserManager {
 		if (user.getPostStatus() != null) {
 			attrs.put("postStatus", user.getPostStatus().toString());
 		}
-		if (user.getPhoto() != null) {
-			attrs.put("jpeg-Image", user.getPhoto());
-		}
+//		if (user.getPhoto() != null) {
+//			attrs.put("jpeg-Image", user.getPhoto());
+//		}
 		
 		return attrs;
 	}
@@ -265,19 +287,16 @@ public class LdapUserManager implements UserManager {
 
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
-		user.setPassword(new String((byte[]) attrs.get("userpassword").get()));
+		user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
 		user.setGender((String) attrs.get("gender").get());
 		user.setPosition((String) attrs.get("position").get());
 		user.setDegree((String) attrs.get("degree").get());
-		user.setEmail((String) attrs.get("email").get());
+		user.setEmail((String) attrs.get("mail").get());
 		user.setMobile((String) attrs.get("mobile").get());
-		user.setBirthday(new SimpleDateFormat("yy-MM-dd mm:hh:ss").parse(attrs
-				.get("birthday").get().toString()));
-		user.setDateOfWork(new SimpleDateFormat("yy-MM-dd mm:hh:ss")
-				.parse(attrs.get("dateOfWork").get().toString()));
+		user.setBirthday(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("birthday").get().toString()));
+		user.setDateOfWork(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("dateOfWork").get().toString()));
 		user.setStatus(new Boolean(attrs.get("status").get().toString()));
-		user.setPostStatus(new Boolean(attrs.get("postStatus").get()
-						.toString()));
+		user.setPostStatus(new Boolean(attrs.get("postStatus").get().toString()));
 
 		return user;
 	}
@@ -286,11 +305,12 @@ public class LdapUserManager implements UserManager {
 		UserVo userVo = new UserVo();
 
 		userVo.setId(user.getId());
-		userVo.setType("task");
+		userVo.setType("node");
 		userVo.setLabel("<a>" + user.getId() + "<a>");
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
+		userVo.setDeptFullPath(user.getDeptFullPath());
 
 		return userVo;
 	}
@@ -334,6 +354,11 @@ public class LdapUserManager implements UserManager {
         }
         is.close();
         return bytes;
+	}
+	
+	public static void main(String[] args) throws ParseException {
+		
+		System.out.println(new SimpleDateFormat("yy-MM-dd").parse("1989-03-22"));
 	}
 
 }

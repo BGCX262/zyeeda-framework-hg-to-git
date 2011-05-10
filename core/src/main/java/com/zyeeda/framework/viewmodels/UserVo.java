@@ -21,6 +21,8 @@ public class UserVo implements Serializable{
 	
 	private boolean leaf;
 	
+	private String deptFullPath;
+	
 	public String getUid() {
 		return uid;
 	}
@@ -67,6 +69,14 @@ public class UserVo implements Serializable{
 
 	public void setLeaf(boolean leaf) {
 		this.leaf = leaf;
+	}
+
+	public String getDeptFullPath() {
+		return deptFullPath;
+	}
+
+	public void setDeptFullPath(String deptFullPath) {
+		this.deptFullPath = deptFullPath;
 	}
 
 }

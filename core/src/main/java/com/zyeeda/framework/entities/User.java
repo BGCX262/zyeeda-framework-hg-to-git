@@ -22,7 +22,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 	private Date dateOfWork;
 	private Boolean status;
 	private Boolean postStatus;
-	private byte[] photo;
+//	private byte[] photo;
 	private File file;
 	private String departmentName;
 	private String deptFullPath;
@@ -123,13 +123,13 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.postStatus = postStatus;
 	}
 
-	public byte[] getPhoto() {
-		return photo;
-	}
-
-	public void setPhoto(byte[] photo) {
-		this.photo = photo;
-	}
+//	public byte[] getPhoto() {
+//		return photo;
+//	}
+//
+//	public void setPhoto(byte[] photo) {
+//		this.photo = photo;
+//	}
 
 	public String getDepartmentName() {
 		return departmentName;
