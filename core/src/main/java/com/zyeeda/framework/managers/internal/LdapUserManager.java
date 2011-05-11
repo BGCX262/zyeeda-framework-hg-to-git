@@ -2,14 +2,10 @@ package com.zyeeda.framework.managers.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import javax.naming.NamingEnumeration;
@@ -60,8 +56,6 @@ public class LdapUserManager implements UserManager {
 			Attributes attrs = LdapUserManager.unmarshal(user, "create");
 			parentCtx.createSubcontext(dn, attrs);
 
-			UserVo userVo = this.fillUserPropertiesToVo(user);
-
 			return user;
 		} finally {
 			LdapUtils.closeContext(parentCtx);
@@ -92,8 +86,8 @@ public class LdapUserManager implements UserManager {
 			ctx = this.ldapSvc.getLdapContext();
 			Attributes attrs = LdapUserManager.unmarshal(user, "update");
 			String oldName = user.getDeptFullPath();
-			String newName = "uid=" + user.getId() + oldName.substring(oldName.indexOf(","), oldName.length());
 			if (!uid.equals(user.getId())) {
+				String newName = "uid=" + user.getId() + oldName.substring(oldName.indexOf(","), oldName.length());
 				ctx.rename(oldName, newName);
 				ctx.modifyAttributes(newName, DirContext.REPLACE_ATTRIBUTE, attrs);
 				user = this.findById(newName);
@@ -299,7 +293,6 @@ public class LdapUserManager implements UserManager {
 			user.setBirthday(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("birthday").get().toString()));
 		}
 		if (attrs.get("dateOfWork") != null) {
-			System.out.println("=========" + new SimpleDateFormat("yy-MM-dd").parse(attrs.get("dateOfWork").get().toString()));
 			user.setDateOfWork(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("dateOfWork").get().toString()));
 		}
 		if (attrs.get("status") != null) {

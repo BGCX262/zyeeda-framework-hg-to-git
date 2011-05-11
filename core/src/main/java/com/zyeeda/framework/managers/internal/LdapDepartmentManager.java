@@ -46,7 +46,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 			String dn = String.format("ou=%s", dept.getName());
 			logger.debug("the value of the dn and parent is = {}   {}  ", dn, parent);
 			
-			Attributes attrs = LdapDepartmentManager.unmarshal(dept);
+			Attributes attrs = LdapDepartmentManager.unmarshal(dept, "create");
 			parentCtx = (LdapContext) ctx.lookup(parent);
 			parentCtx.createSubcontext(dn, attrs);
 		
@@ -94,21 +94,21 @@ public class LdapDepartmentManager implements DepartmentManager {
 	@Override
 	public DepartmentVo update(Department dept) throws NamingException {
 		LdapContext ctx = null;
+		
 		try {
 			String name = this.findById(dept.getId()).getName();
-			logger.debug("the value of the name and dept.getName() is = {} {} ", name, dept.getName());
-			
 			ctx = this.ldapSvc.getLdapContext();
-			// 如果名称相同，则可以修改
+			String oldName = dept.getId();
+			Attributes attrs = unmarshal(dept, "update");
 			if (dept.getName().equals(name)) {
-				Attributes attrs = unmarshal(dept);
-				String dn = dept.getId();
-				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+				ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
+				dept = this.findById(oldName);
 			} else {
-				// 修改名称会出现异常
-				logger.debug("===================error perform==================");
+				String newName = "ou=" + dept.getName() + oldName.substring(oldName.indexOf(","), oldName.length());
+				ctx.rename(oldName, newName);
+				ctx.modifyAttributes(newName, DirContext.REPLACE_ATTRIBUTE, attrs);
+				dept = this.findById(newName);
 			}
-			
 			DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
 			
 			return deptVo;
@@ -117,33 +117,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 	}
 	
-//	@Override
-//	public Department update(Department dept) throws NamingException {
-//		LdapContext ctx = null;
-//		try {
-////			String name = this.findById(dept.getId()).getLabel().replaceAll("<a>", "");
-//			String name = this.findById(dept.getId()).getName();
-//			logger.debug("the value of the name and dept.getName() is = {} {} ", name, dept.getName());
-//			
-//			ctx = this.ldapSvc.getLdapContext();
-//			// 如果名称相同，则可以修改
-//			if (dept.getName().equals(name)) {
-//				Attributes attrs = unmarshal(dept);
-//				String dn = dept.getId();
-//				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
-//			} else {
-//				// 修改名称会出现异常
-//				logger.debug("===================error perform==================");
-//			}
-//			
-//			
-//			return dept;
-//		} finally {
-//			LdapUtils.closeContext(ctx);
-//		}
-//	}
-	
 	public Department findById(String id) throws NamingException {
+		System.out.println("************" + id);
 		LdapContext ctx = null;
 		Attributes attrs = null;
 		try {
@@ -152,12 +127,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 			Department dept = marshal(attrs);
 			dept.setId(id);
 			
-//			DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
-			
-//			return deptVo;
 			return dept;
 		} finally {
-				LdapUtils.closeContext(ctx);
+			LdapUtils.closeContext(ctx);
 		}
 	}
 	
@@ -263,12 +235,14 @@ public class LdapDepartmentManager implements DepartmentManager {
 	
 
 
-	private static Attributes unmarshal(Department dept) {
+	private static Attributes unmarshal(Department dept, String module) {
 		Attributes attrs = new BasicAttributes();
 		
 		attrs.put("objectClass", "top");
 		attrs.put("objectClass", "organizationalUnit");
-		attrs.put("ou", dept.getName());
+		if ("create".equals(module)) {
+			attrs.put("ou", dept.getName());
+		}
 		attrs.put("description", dept.getDescription());
 		
 		return attrs;

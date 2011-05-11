@@ -39,8 +39,6 @@ public class DepartmentService extends ResourceService {
 	@Path("/{parent}")
 	@Produces("application/json")
 	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws NamingException {
-		// 传入类似参数ou=dada,o=广州局,在ou=datda,o=广州局下创建部门
-		logger.debug("=====================create method==========================" + parent);
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		dept.setParent(parent);
@@ -54,8 +52,6 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}")
 	@Produces("application/json")
 	public void removeDepartment(@PathParam("id") String id) throws NamingException {
-		// 传入类似参数ou=dada,o=广州局
-		logger.debug("=====================remove method==========================" + id);
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptMgr.remove(id);
@@ -64,23 +60,16 @@ public class DepartmentService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
-		// 传入类似参数ou=dada,o=广州局
-		logger.debug("=====================edit method==========================" + id);
+	public DepartmentVo editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-//		dept.setId(id);
-		deptMgr.update(dept);
-		return deptMgr.findById(id);
-//		return deptMgr.update(dept);
+		return deptMgr.update(dept);
 	}
 	
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
 	public Department getDepartmentById(@PathParam("id") String id) throws NamingException {
-		// 传入类似参数ou=dada,o=广州局
-		logger.debug("=====================getDeptMent by id method==========================" + id);
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return deptMgr.findById(id);
@@ -90,8 +79,6 @@ public class DepartmentService extends ResourceService {
 	@Path("/search/{name}")
 	@Produces("application/json")
 	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name) throws NamingException {
-		// 传入类似参数dada(单纯名称就可以)
-		logger.debug("=====================getDepartmentListByName method==========================" + name);
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return deptMgr.getDepartmentListByName(name);
@@ -101,7 +88,6 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentId(@PathParam("id") String id) throws NamingException {
-		logger.debug("=====================getDepartmentList method==========================id = {} ", id);
 		LdapService ldapSvc = this.getLdapService();
 		
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
