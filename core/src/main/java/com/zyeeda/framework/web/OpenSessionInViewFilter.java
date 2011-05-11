@@ -64,13 +64,11 @@ public class OpenSessionInViewFilter implements Filter {
     	Registry reg = (Registry) this.config.getServletContext().getAttribute(FrameworkConstants.SERVICE_REGISTRY);
     	
     	PersistenceService defaultPersistenceSvc = null;
-    	PersistenceService attachmentPersistenceSvc = null;
         UserTransaction utx = null;
         
         try {
         	TransactionService txSvc = reg.getService(IocUtils.getServiceId(DefaultTransactionServiceProvider.class), TransactionService.class);
         	defaultPersistenceSvc = reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
-        	attachmentPersistenceSvc = reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
         	
         	utx = txSvc.getTransaction();
         	
@@ -79,7 +77,6 @@ public class OpenSessionInViewFilter implements Filter {
         	logger.debug("tx status after begin = {}", utx.getStatus());
         	
         	defaultPersistenceSvc.openSession();
-        	attachmentPersistenceSvc.openSession();
         	
             chain.doFilter(request, response);
             
@@ -98,9 +95,6 @@ public class OpenSessionInViewFilter implements Filter {
 			}
         	throw new ServletException(t);
 		} finally {
-			if (attachmentPersistenceSvc != null) {
-				attachmentPersistenceSvc.closeSession();
-			}
             if (defaultPersistenceSvc != null) {
             	defaultPersistenceSvc.closeSession();
             }

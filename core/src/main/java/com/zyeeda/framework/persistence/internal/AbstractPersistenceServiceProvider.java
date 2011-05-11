@@ -5,14 +5,11 @@ import javax.persistence.EntityManagerFactory;
 
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.service.AbstractService;
 
-public class AbstractPersistenceServiceProvider extends AbstractService implements PersistenceService {
-	
-	private static final Logger logger = LoggerFactory.getLogger(AbstractPersistenceServiceProvider.class);
+public abstract class AbstractPersistenceServiceProvider extends AbstractService implements PersistenceService {
 	
 	private EntityManagerFactory sessionFactory;
 	private final ThreadLocal<EntityManager> sessionThreadLocal = new ThreadLocal<EntityManager>();
@@ -60,6 +57,8 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 		}
 	}*/
 	
+	protected abstract Logger getLogger();
+	
 	@Override
 	public void stop() throws Exception {
         this.sessionFactory.close();
@@ -71,7 +70,7 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
             session = this.getSessionFactory().createEntityManager();
-            logger.info("Open session on thread [{}].", Thread.currentThread().getName());
+            this.getLogger().info("Open session on thread [{}].", Thread.currentThread().getName());
             this.sessionThreadLocal.set(session);
         }
 
@@ -82,13 +81,13 @@ public class AbstractPersistenceServiceProvider extends AbstractService implemen
     public void closeSession() {
 		EntityManager session = this.sessionThreadLocal.get();
         if (session == null) {
-        	logger.warn("No session opened on thread [{}].", Thread.currentThread().getName());
+        	this.getLogger().warn("No session opened on thread [{}].", Thread.currentThread().getName());
         	return;
         }
         
         session.close();
         this.sessionThreadLocal.remove();
-        logger.info("Close session on thread [{}].", Thread.currentThread().getName());
+        this.getLogger().info("Close session on thread [{}].", Thread.currentThread().getName());
     }
 	
 	@Override

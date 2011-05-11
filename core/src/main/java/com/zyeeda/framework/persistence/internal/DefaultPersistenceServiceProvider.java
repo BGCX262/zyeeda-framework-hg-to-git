@@ -26,6 +26,8 @@ import org.hibernate.ejb.Ejb3Configuration;
 import org.hibernate.event.PreDeleteEventListener;
 import org.hibernate.event.PreInsertEventListener;
 import org.hibernate.event.PreUpdateEventListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 //import com.zyeeda.framework.persistence.AutoRevisionEventListener;
 import com.zyeeda.framework.persistence.AutoRevisionEventListener;
@@ -43,6 +45,8 @@ import com.zyeeda.framework.validation.ValidationService;
 @ServiceId("default-persistence-service")
 @Marker(Primary.class)
 public class DefaultPersistenceServiceProvider extends AbstractPersistenceServiceProvider implements PersistenceService {
+	
+	private final static Logger logger = LoggerFactory.getLogger(DefaultPersistenceServiceProvider.class);
 	
 	private final static String PERSISTENCE_UNIT_NAME = "default";
 	//private final static String ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME = "Zyeeda-Framework-Entity-Classes";
@@ -81,6 +85,11 @@ public class DefaultPersistenceServiceProvider extends AbstractPersistenceServic
     	//this.addMappingClasses(config, ZYEEDA_FRAMEWORK_ENTITY_CLASSES_MANIFEST_ENTRY_NAME);
     	
     	this.setSessionFactory(config.buildEntityManagerFactory());
+	}
+	
+	@Override
+	protected Logger getLogger() {
+		return logger;
 	}
 
 }
