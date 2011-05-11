@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.naming.NamingEnumeration;
@@ -42,7 +45,7 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public UserVo persist(User user) throws NamingException {
+	public User persist(User user) throws NamingException {
 		LdapContext ctx = null;
 		LdapContext parentCtx = null;
 		
@@ -59,7 +62,7 @@ public class LdapUserManager implements UserManager {
 
 			UserVo userVo = this.fillUserPropertiesToVo(user);
 
-			return userVo;
+			return user;
 		} finally {
 			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
@@ -78,28 +81,28 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public UserVo update(User user) throws NamingException, ParseException {
+	public User update(User user) throws NamingException, ParseException {
 		LdapContext ctx = null;
 		LdapContext parentCtx = null;
 		
 		try {
-			String uid = this.findById(user.getId()).getId();
+			String uid = this.findById(user.getDeptFullPath()).getId();
 			logger.debug("the value of the uid is = {} ", uid);
 
 			ctx = this.ldapSvc.getLdapContext();
-			System.out.println("-----------" + user.getId().substring(user.getId().indexOf("="), user.getId().indexOf(",")));
-			System.out.println("-----------" + uid);
-			if (user.getId().substring(user.getId().indexOf("=") + 1, user.getId().indexOf(",")).equals(uid)) {
-				Attributes attrs = LdapUserManager.unmarshal(user, "update");
-				String dn = user.getId();
-
-				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+			Attributes attrs = LdapUserManager.unmarshal(user, "update");
+			String oldName = user.getDeptFullPath();
+			String newName = "uid=" + user.getId() + oldName.substring(oldName.indexOf(","), oldName.length());
+			if (!uid.equals(user.getId())) {
+				ctx.rename(oldName, newName);
+				ctx.modifyAttributes(newName, DirContext.REPLACE_ATTRIBUTE, attrs);
+				user = this.findById(newName);
+			} else {
+				ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
+				user = this.findById(oldName);
 			}
 
-			UserVo userVo = new UserVo();
-			userVo = this.fillUserPropertiesToVo(user);
-
-			return userVo;
+			return user;
 		} finally {
 			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
@@ -193,8 +196,7 @@ public class LdapUserManager implements UserManager {
 				entry = ne.next();
 				User user = new User();
 				String dn = entry.getName();
-				logger
-						.debug("**********the value of the childId is = {}  ",
+				logger.debug("**********the value of the childId is = {}  ",
 								dn);
 
 				Attributes attr = entry.getAttributes();
@@ -274,19 +276,38 @@ public class LdapUserManager implements UserManager {
 	private static User marshal(Attributes attrs) throws NamingException,
 			ParseException {
 		User user = new User();
-
+		
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
 		user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
-		user.setGender((String) attrs.get("gender").get());
-		user.setPosition((String) attrs.get("position").get());
-		user.setDegree((String) attrs.get("degree").get());
-		user.setEmail((String) attrs.get("mail").get());
-		user.setMobile((String) attrs.get("mobile").get());
-		user.setBirthday(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("birthday").get().toString()));
-		user.setDateOfWork(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("dateOfWork").get().toString()));
-		user.setStatus(new Boolean(attrs.get("status").get().toString()));
-		user.setPostStatus(new Boolean(attrs.get("postStatus").get().toString()));
+		if (attrs.get("gender") != null) {
+			user.setGender((String) attrs.get("gender").get());
+		}
+		if (attrs.get("degree") != null) {
+			user.setDegree((String) attrs.get("degree").get());
+		}
+		if (attrs.get("position") != null) {
+			user.setPosition((String) attrs.get("position").get());
+		}
+		if (attrs.get("mail") != null) {
+			user.setEmail((String) attrs.get("mail").get());
+		}
+		if (attrs.get("mobile") != null) {
+			user.setMobile((String) attrs.get("mobile").get());
+		}
+		if (attrs.get("birthday") != null) {
+			user.setBirthday(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("birthday").get().toString()));
+		}
+		if (attrs.get("dateOfWork") != null) {
+			System.out.println("=========" + new SimpleDateFormat("yy-MM-dd").parse(attrs.get("dateOfWork").get().toString()));
+			user.setDateOfWork(new SimpleDateFormat("yy-MM-dd").parse(attrs.get("dateOfWork").get().toString()));
+		}
+		if (attrs.get("status") != null) {
+			user.setStatus(new Boolean(attrs.get("status").get().toString()));
+		}
+		if (attrs.get("postStatus") != null) {
+			user.setStatus(new Boolean(attrs.get("postStatus").get().toString()));
+		}
 
 		return user;
 	}
@@ -346,9 +367,132 @@ public class LdapUserManager implements UserManager {
         return bytes;
 	}
 	
-	public static void main(String[] args) throws ParseException {
+	public void updatePassword(String id, String password) throws NamingException, ParseException {
+		LdapContext ctx = null;
 		
-		System.out.println(new SimpleDateFormat("yy-MM-dd").parse("1989-03-22"));
+		try {
+			ctx = this.ldapSvc.getLdapContext();
+			User user = this.findById(id);
+			Attributes attrs = LdapUserManager.unmarshalForUpdatePassword(user, password);
+			
+			ctx.modifyAttributes(id, DirContext.REPLACE_ATTRIBUTE, attrs);
+		} finally {
+			LdapUtils.closeContext(ctx);
+		}
+	}
+	
+	private static Attributes unmarshalForSetVisible(User user, Boolean visible) {
+		Attributes attrs = new BasicAttributes();
+
+		attrs.put("objectClass", "top");
+		attrs.put("objectClass", "person");
+		attrs.put("objectClass", "organizationalPerson");
+		attrs.put("objectClass", "inetOrgPerson");
+		attrs.put("objectClass", "zy-custom-user-object");
+
+		attrs.put("cn", user.getUsername());
+		attrs.put("sn", user.getUsername());
+		
+		if (StringUtils.isNotBlank(user.getPassword())) {
+			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode(user.getPassword()));
+		} else {
+			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode("123456"));
+		}
+		if (StringUtils.isNotBlank(user.getGender())) {
+			attrs.put("gender", user.getGender());
+		} 
+		if (StringUtils.isNotBlank(user.getPosition())) {
+			attrs.put("position", user.getPosition());
+		}
+		if (StringUtils.isNotBlank(user.getDegree())) {
+			attrs.put("degree", user.getDegree());
+		}
+		if (StringUtils.isNotBlank(user.getEmail())) {
+			attrs.put("mail", user.getEmail());
+		}
+		if (StringUtils.isNotBlank(user.getMobile())) {
+			attrs.put("mobile", user.getMobile());
+		}
+		if (user.getBirthday() != null) {
+			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
+		}
+		if (user.getDateOfWork() != null) {
+			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
+		}
+		attrs.put("status", visible.toString());
+		if (user.getPostStatus() != null) {
+			attrs.put("postStatus", user.getPostStatus().toString());
+		}
+		
+		return attrs;
 	}
 
+	private static Attributes unmarshalForUpdatePassword(User user, String password) {
+		Attributes attrs = new BasicAttributes();
+
+		attrs.put("objectClass", "top");
+		attrs.put("objectClass", "person");
+		attrs.put("objectClass", "organizationalPerson");
+		attrs.put("objectClass", "inetOrgPerson");
+		attrs.put("objectClass", "zy-custom-user-object");
+
+		attrs.put("cn", user.getUsername());
+		attrs.put("sn", user.getUsername());
+		
+		if (StringUtils.isNotBlank(user.getPassword())) {
+			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode(password));
+		} else {
+			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode("123456"));
+		}
+		if (StringUtils.isNotBlank(user.getGender())) {
+			attrs.put("gender", user.getGender());
+		} 
+		if (StringUtils.isNotBlank(user.getPosition())) {
+			attrs.put("position", user.getPosition());
+		}
+		if (StringUtils.isNotBlank(user.getDegree())) {
+			attrs.put("degree", user.getDegree());
+		}
+		if (StringUtils.isNotBlank(user.getEmail())) {
+			attrs.put("mail", user.getEmail());
+		}
+		if (StringUtils.isNotBlank(user.getMobile())) {
+			attrs.put("mobile", user.getMobile());
+		}
+		if (user.getBirthday() != null) {
+			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
+		}
+		if (user.getDateOfWork() != null) {
+			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
+		}
+		if (user.getStatus() != null) {
+			attrs.put("status", user.getStatus().toString());
+		}
+		if (user.getPostStatus() != null) {
+			attrs.put("postStatus", user.getPostStatus().toString());
+		}
+		
+		return attrs;
+	}
+	
+	@Override
+	public void setVisible(Boolean visible, String... ids)
+			throws NamingException, ParseException {
+		LdapContext ctx = null;
+		
+		try {
+			ctx = this.ldapSvc.getLdapContext();
+			User user = null;
+			Attributes attrs = null;
+			for (String dn : ids) {
+				user = this.findById(dn);
+				attrs = LdapUserManager.unmarshalForSetVisible(user, visible);
+				
+				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+			}
+		} finally {
+			LdapUtils.closeContext(ctx);
+		}
+	}
+	
 }

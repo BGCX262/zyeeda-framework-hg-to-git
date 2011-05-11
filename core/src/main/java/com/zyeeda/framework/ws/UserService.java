@@ -1,14 +1,11 @@
 package com.zyeeda.framework.ws;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.util.List;
 
 import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -28,6 +25,7 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
+import com.zyeeda.framework.utils.MD5;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -41,10 +39,9 @@ public class UserService extends ResourceService {
 	}
 	
 	@POST
-	@Path("/{parent}")
+	@Path("/{parent:.*}")
 	@Produces("application/json")
-	public UserVo createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException {
-		logger.debug("=====================create method==========================");
+	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		user.setDepartmentName(parent);
@@ -54,7 +51,6 @@ public class UserService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	public void removeUser(@PathParam("id") String id) throws NamingException {
-		logger.debug("==================== remove the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		userMgr.remove(id);
@@ -63,29 +59,17 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public UserVo editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
-		// 传入参数类似uid=XXX,ou=YYY,o=广州局
-		logger.debug("==================== edit the mothod =======================");
+	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		UserVo userVo = null;
-		if (id.substring(id.indexOf("=") + 1, id.indexOf(",")).equals(user.getId())) {
-			user.setId(id);
-			userVo = userMgr.update(user);
-		} else {
-			user.setId("uid=" + user.getId() + id.substring(id.indexOf(","), id.length()));
-			userVo = userMgr.persist(user);
-			userMgr.remove(id);
-		}
-		return userVo;
+		user.setDeptFullPath(id);
+		return userMgr.update(user);
 	}
 	
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
 	public User getUserById(@PathParam("id") String id) throws NamingException, ParseException {
-		// 传入参数类似uid=XXX,ou=YYY,o=广州局
-		logger.debug("==================== getUserById the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.findById(id);
@@ -95,8 +79,6 @@ public class UserService extends ResourceService {
 	@Path("/search/{name}")
 	@Produces("application/json")
 	public List<UserVo> getUserListByName(@PathParam("name") String name) throws NamingException {
-		// 传入参数：名称
-		logger.debug("==================== getUserListByName the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.getUserListByName(name);
@@ -106,11 +88,50 @@ public class UserService extends ResourceService {
 	@Path("/userList/{deptId}")
 	@Produces("application/json")
 	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws NamingException {
-		// 传入参数类似ou=YYY,o=广州局
-		logger.debug("==================== getUserListByDepartmentId the mothod =======================");
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		return userMgr.getUserListByDepartmentId(deptId);
+	}
+	
+	@PUT
+	@Path("/{id}/update_password")
+	@Produces("application/json")
+	public void updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
+			@FormParam("newPassword") String newPassword) throws NamingException, ParseException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		
+		User u = userMgr.findById(id);
+		if (("{MD5}" + MD5.MD5Encode(oldPassword)).equals(u.getPassword())) {
+			if (!newPassword.equals(oldPassword)) {
+				userMgr.updatePassword(id, newPassword);
+			}
+		} else {
+			throw new RuntimeException("旧密码输入错误");
+		}
+	}
+	
+	@PUT
+	@Path("/{id}/enable")
+	@Produces("application/json")
+	public void enable(@PathParam("id") String id, @FormParam("status") Boolean visible)
+			throws NamingException, ParseException {
+		this.setVisible(id, true);
+	}
+	
+	@PUT
+	@Path("/{id}/unenable")
+	@Produces("application/json")
+	public void unenable(@PathParam("id") String id, @FormParam("status") Boolean visible)
+			throws NamingException, ParseException {
+		this.setVisible(id, false);
+	}
+	
+	private void setVisible(String id, Boolean visible) throws NamingException, ParseException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		
+		userMgr.setVisible(visible, id);
 	}
 	
 	@POST

@@ -95,7 +95,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 	public DepartmentVo update(Department dept) throws NamingException {
 		LdapContext ctx = null;
 		try {
-//			String name = this.findById(dept.getId()).getLabel().replaceAll("<a>", "");
 			String name = this.findById(dept.getId()).getName();
 			logger.debug("the value of the name and dept.getName() is = {} {} ", name, dept.getName());
 			
