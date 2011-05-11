@@ -15,7 +15,7 @@ public interface DepartmentManager {
 	
 	public void remove(String id) throws NamingException;
 	
-	public DepartmentVo update(Department dept) throws NamingException;
+	public Department update(Department dept) throws NamingException;
 	
 	public List<DepartmentVo> getDepartmentListById(String id) throws NamingException;
 	

@@ -92,7 +92,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 	}
 
 	@Override
-	public DepartmentVo update(Department dept) throws NamingException {
+	public Department update(Department dept) throws NamingException {
 		LdapContext ctx = null;
 		
 		try {
@@ -109,9 +109,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 				ctx.modifyAttributes(newName, DirContext.REPLACE_ATTRIBUTE, attrs);
 				dept = this.findById(newName);
 			}
-			DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
+//			DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
 			
-			return deptVo;
+			return dept;
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}

@@ -60,7 +60,7 @@ public class DepartmentService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public DepartmentVo editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
+	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return deptMgr.update(dept);
