@@ -20,6 +20,8 @@ public class OrganizationNodeVo implements Serializable{
 	private boolean leaf;
 	
 	private String io;
+	
+	private String fullPath;
 
 	public String getId() {
 		return id;
@@ -67,6 +69,14 @@ public class OrganizationNodeVo implements Serializable{
 
 	public void setIo(String io) {
 		this.io = io;
+	}
+
+	public String getFullPath() {
+		return fullPath;
+	}
+
+	public void setFullPath(String fullPath) {
+		this.fullPath = fullPath;
 	}
 	
 }

@@ -214,6 +214,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 			orgNodeVo.setIo(deptVo.getIo());
 			orgNodeVo.setLabel(deptVo.getLabel());
 			orgNodeVo.setType(deptVo.getType());
+			orgNodeVo.setFullPath(deptVo.getId());
 			
 			orgNodeVoList.add(orgNodeVo);
 		}
@@ -226,6 +227,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 			orgNodeVo.setLabel(userVo.getLabel());
 			orgNodeVo.setType(userVo.getType());
 			orgNodeVo.setLeaf(userVo.isLeaf());
+			orgNodeVo.setFullPath("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
 			
 			orgNodeVoList.add(orgNodeVo);
 		}

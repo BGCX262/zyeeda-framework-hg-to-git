@@ -102,7 +102,7 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		if (("{MD5}" + MD5.MD5Encode(oldPassword)).equals(u.getPassword())) {
+		if (("{MD5}" + oldPassword).equals(u.getPassword())) {
 			if (!newPassword.equals(oldPassword)) {
 				userMgr.updatePassword(id, newPassword);
 			}

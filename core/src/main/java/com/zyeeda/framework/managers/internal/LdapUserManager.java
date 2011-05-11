@@ -119,7 +119,6 @@ public class LdapUserManager implements UserManager {
 				Attributes attr = entry.getAttributes();
 				User user = LdapUserManager.marshal(attr);;
 				userList.add(user);
-
 			}
 			return userList.get(0);
 		} finally {
@@ -297,9 +296,10 @@ public class LdapUserManager implements UserManager {
 		}
 		if (attrs.get("status") != null) {
 			user.setStatus(new Boolean(attrs.get("status").get().toString()));
+			System.out.println("-----------" + user.getStatus());
 		}
 		if (attrs.get("postStatus") != null) {
-			user.setStatus(new Boolean(attrs.get("postStatus").get().toString()));
+			user.setPostStatus(new Boolean(attrs.get("postStatus").get().toString()));
 		}
 
 		return user;
@@ -433,7 +433,7 @@ public class LdapUserManager implements UserManager {
 		attrs.put("sn", user.getUsername());
 		
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode(password));
+			attrs.put("userPassword", "{MD5}" + password);
 		} else {
 			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode("123456"));
 		}
