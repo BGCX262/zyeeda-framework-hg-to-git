@@ -24,13 +24,13 @@ public class OpenIdProviderEndpointFilter extends PathMatchingFilter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(OpenIdProviderEndpointFilter.class);
 	
+	private static final String OP_LOCAL_IDENTIFIER_TEMPLATE = "%s://%s:%s%s/provider/user.jsp?id=%s";
+	private static final String FULL_ENDPOINT_URL_TEMPLATE = "%s://%s:%s%s/provider/endpoint";
+	
 	@Override
 	protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		HttpServletResponse httpRes = (HttpServletResponse) response;
-		
-		logger.debug("request url = {}", httpReq.getRequestURL().toString());
-		logger.debug("request uri = {}", httpReq.getRequestURI());
 		
 		Registry registry = IocUtils.getRegistry(this.getServletContext());
 		OpenIdProviderService opSvc = registry.getService(OpenIdProviderService.class);
@@ -65,11 +65,15 @@ public class OpenIdProviderEndpointFilter extends PathMatchingFilter {
         	Subject s = SecurityUtils.getSubject();
         	if (s.isAuthenticated()) {
                 String userSelectedId = (s.getPrincipals().iterator().next()).toString();
+                userSelectedId = String.format(OP_LOCAL_IDENTIFIER_TEMPLATE, httpReq.getScheme(), httpReq.getServerName(), 
+                		httpReq.getServerPort(), httpReq.getContextPath(), userSelectedId);
                 String userSelectedClaimedId = userSelectedId;
+                
                 logger.debug("user selected id = {}", userSelectedId);
                 logger.debug("user selected claimed id = {}", userSelectedClaimedId);
                 
-                String fullEndpointUrl = httpReq.getScheme() + "://" + httpReq.getServerName() + ":" + httpReq.getServerPort() + httpReq.getContextPath() + opSvc.getEndpointCompleteUrl();
+                String fullEndpointUrl = String.format(FULL_ENDPOINT_URL_TEMPLATE, httpReq.getScheme(), httpReq.getServerName(),
+                		httpReq.getServerPort(), httpReq.getContextPath());
                 logger.debug("full endpoint url = {}", fullEndpointUrl);
                 Message message = opSvc.authResponse(params, userSelectedId, userSelectedClaimedId, s.isAuthenticated(), fullEndpointUrl);
                 
