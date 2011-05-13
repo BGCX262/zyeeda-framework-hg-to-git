@@ -13,7 +13,6 @@ public class SimpleDomainEntity extends DomainEntity {
     
     @javax.persistence.Basic
     @javax.persistence.Column(name = "F_NAME")
-    @NotNull
     public String getName() {
         return this.name;
     }
