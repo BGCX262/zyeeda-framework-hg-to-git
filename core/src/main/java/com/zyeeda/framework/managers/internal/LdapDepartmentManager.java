@@ -33,6 +33,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 	
 	private LdapService ldapSvc;
 	
+	private static final String ROOT_DEPARTMENT_NAME = "广州局";
+	
 	public LdapDepartmentManager(LdapService ldapSvc) {
 		this.ldapSvc = ldapSvc;
 	}
@@ -104,7 +106,12 @@ public class LdapDepartmentManager implements DepartmentManager {
 				ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
 				dept = this.findById(oldName);
 			} else {
-				String newName = "ou=" + dept.getName() + oldName.substring(oldName.indexOf(","), oldName.length());
+				String newName = null;
+				if (ROOT_DEPARTMENT_NAME.equals(dept.getName())) {
+					newName = "o=" + dept.getName() + oldName.substring(oldName.indexOf(","), oldName.length());
+				} else {
+					newName = "ou=" + dept.getName() + oldName.substring(oldName.indexOf(","), oldName.length());
+				}
 				ctx.rename(oldName, newName);
 				ctx.modifyAttributes(newName, DirContext.REPLACE_ATTRIBUTE, attrs);
 				dept = this.findById(newName);
@@ -124,7 +131,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			attrs = ctx.getAttributes(id);
-			Department dept = marshal(attrs);
+			Department dept = LdapDepartmentManager.marshal(attrs);
 			dept.setId(id);
 			
 			return dept;
@@ -253,9 +260,14 @@ public class LdapDepartmentManager implements DepartmentManager {
 	private static Department marshal(Attributes attrs) throws NamingException {
 		Department dept = new Department();
 		
-		dept.setName((String) attrs.get("ou").get());
-		dept.setDescription((String) attrs.get("description").get());
-		
+		if (attrs.get("ou") != null) {
+			dept.setName((String) attrs.get("ou").get());
+		} else if (attrs.get("o") != null) {
+			dept.setName((String) attrs.get("o").get());
+		}
+		if (attrs.get("description") != null) {
+			dept.setDescription((String) attrs.get("description").get());
+		}
 		return dept;
 	}
 	

@@ -2,7 +2,6 @@ package com.zyeeda.framework.ws;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.SQLException;
 
 import javax.servlet.ServletContext;
@@ -14,12 +13,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import com.zyeeda.framework.entities.Document;
-import com.zyeeda.framework.managers.DocumentManager;
-import com.zyeeda.framework.managers.internal.RdbmsDocumentManager;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/docs")

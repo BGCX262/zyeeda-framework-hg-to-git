@@ -49,9 +49,6 @@ public class LdapUserManager implements UserManager {
 			ctx = this.ldapSvc.getLdapContext();
 			String department = user.getDepartmentName();
 			String dn = String.format("uid=%s", user.getId());
-			logger.debug("the value of the dn and department is = {}  {}  ",
-					dn, department);
-
 			parentCtx = (LdapContext) ctx.lookup(department);
 			Attributes attrs = LdapUserManager.unmarshal(user, "create");
 			parentCtx.createSubcontext(dn, attrs);
@@ -81,11 +78,10 @@ public class LdapUserManager implements UserManager {
 		
 		try {
 			String uid = this.findById(user.getDeptFullPath()).getId();
-			logger.debug("the value of the uid is = {} ", uid);
-
 			ctx = this.ldapSvc.getLdapContext();
 			Attributes attrs = LdapUserManager.unmarshal(user, "update");
 			String oldName = user.getDeptFullPath();
+			
 			if (!uid.equals(user.getId())) {
 				String newName = "uid=" + user.getId() + oldName.substring(oldName.indexOf(","), oldName.length());
 				ctx.rename(oldName, newName);
@@ -105,7 +101,6 @@ public class LdapUserManager implements UserManager {
 
 	@Override
 	public User findById(String id) throws NamingException, ParseException {
-		System.out.println("******************id:" + id);
 		LdapContext cxt = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
@@ -145,26 +140,16 @@ public class LdapUserManager implements UserManager {
 				User user = new User();
 				Attributes attr = entry.getAttributes();
 
-				String uid = (String) attr.get("uid").get();
-				String childId = String.format("uid=%s,%s", uid, id);
-				logger.debug("the value of the uid and childId = {}  {}", uid,
-						childId);
-
+//				String uid = (String) attr.get("uid").get();
+//				String childId = String.format("uid=%s,%s", uid, id);
 				user.setUsername((String) attr.get("cn").get());
-				// user.setSurname((String) attr.get("sn").get());
 				user.setId((String) attr.get("uid").get());
-				// user.setId(childId);
-				user.setPassword(new String((byte[]) attr.get("userPassword")
-						.get()));
+				user.setPassword(new String((byte[]) attr.get("userPassword").get()));
 				user.setDeptFullPath(id);
 
 				UserVo userVo = this.fillUserPropertiesToVo(user);
-
 				userList.add(userVo);
 			}
-			logger.debug("**********the userList's size is = {}"
-					+ userList.size());
-
 			return userList;
 		} finally {
 			LdapUtils.closeEnumeration(ne);
@@ -189,12 +174,9 @@ public class LdapUserManager implements UserManager {
 				entry = ne.next();
 				User user = new User();
 				String dn = entry.getName();
-				logger.debug("**********the value of the childId is = {}  ",
-								dn);
 
 				Attributes attr = entry.getAttributes();
 				user.setUsername((String) attr.get("cn").get());
-				// user.setSurname((String) attr.get("sn").get());
 				user.setId(dn);
 				user.setPassword(new String((byte[]) attr.get("userpassword")
 						.get()));
@@ -203,9 +185,6 @@ public class LdapUserManager implements UserManager {
 
 				userList.add(userVo);
 			}
-			logger.debug("**********the userList's size is = {}  ", userList
-					.size());
-
 			return userList;
 		} finally {
 			LdapUtils.closeEnumeration(ne);
@@ -296,7 +275,6 @@ public class LdapUserManager implements UserManager {
 		}
 		if (attrs.get("status") != null) {
 			user.setStatus(new Boolean(attrs.get("status").get().toString()));
-			System.out.println("-----------" + user.getStatus());
 		}
 		if (attrs.get("postStatus") != null) {
 			user.setPostStatus(new Boolean(attrs.get("postStatus").get().toString()));

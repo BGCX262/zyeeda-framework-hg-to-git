@@ -25,7 +25,6 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
-import com.zyeeda.framework.utils.MD5;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
