@@ -24,8 +24,7 @@ public class OpenIdProviderEndpointFilter extends PathMatchingFilter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(OpenIdProviderEndpointFilter.class);
 	
-	private static final String OP_LOCAL_IDENTIFIER_TEMPLATE = "%s://%s:%s%s/provider/user.jsp?id=%s";
-	private static final String FULL_ENDPOINT_URL_TEMPLATE = "%s://%s:%s%s/provider/endpoint";
+	private final static String OPENID_NAMESPACE = "http://specs.openid.net/auth/2.0";
 	
 	@Override
 	protected boolean onPreHandle(ServletRequest request, ServletResponse response, Object mappedValue) throws Exception {
@@ -37,13 +36,29 @@ public class OpenIdProviderEndpointFilter extends PathMatchingFilter {
 		
 		ParameterList params = null;
 		if (this.pathsMatch(opSvc.getEndpointCompleteUrl(), httpReq)) {
-			logger.debug("Endpoint complete request detected!");
+			logger.debug("OpenID provider endpoint complete request detected!");
 			params = (ParameterList) SecurityUtils.getSubject().getSession().getAttribute("params");
+			if (params == null) {
+				this.outputInvalidAuthRequestMessage(httpRes);
+				return false;
+			}
 		} else {
+			logger.debug("OpenID provider endpoint direct request detected!");
 			params = new ParameterList(httpReq.getParameterMap());
 		}
 		
-        String mode = params.hasParameter("openid.mode") ? params.getParameterValue("openid.mode") : null;
+		if (!params.hasParameter("openid.ns") || !params.hasParameter("openid.mode")) {
+			this.outputInvalidAuthRequestMessage(httpRes);
+			return false;
+		}
+		
+		String ns = params.getParameterValue("openid.ns");
+		if (!OPENID_NAMESPACE.equals(ns)) {
+			this.outputInvalidAuthRequestMessage(httpRes);
+			return false;
+		}
+		
+        String mode = params.getParameterValue("openid.mode");
         logger.debug("OpenID mode = {}", mode);
         
         if ("associate".equals(mode)) {
@@ -62,112 +77,56 @@ public class OpenIdProviderEndpointFilter extends PathMatchingFilter {
         
         if ("checkid_setup".equals(mode) || "checkid_immediate".equals(mode)) {
         	logger.debug("OpenID request mode [checkid_immediate] or [checkid_setup] detected!");
-        	Subject s = SecurityUtils.getSubject();
-        	if (s.isAuthenticated()) {
-                String userSelectedId = (s.getPrincipals().iterator().next()).toString();
-                userSelectedId = String.format(OP_LOCAL_IDENTIFIER_TEMPLATE, httpReq.getScheme(), httpReq.getServerName(), 
-                		httpReq.getServerPort(), httpReq.getContextPath(), userSelectedId);
+        	Subject subject = SecurityUtils.getSubject();
+        	if (subject.isAuthenticated()) {
+        		logger.debug("User is authenticated.");
+        		SecurityUtils.getSubject().getSession().removeAttribute("params");
+        		
+        		String urlPrefix = httpReq.getScheme() + "://" + httpReq.getServerName() + ":" + httpReq.getServerPort() + httpReq.getContextPath();
+        		
+        		String userSelectedId = (subject.getPrincipals().iterator().next()).toString();
+                userSelectedId = urlPrefix + "/provider/user.jsp?id=" + userSelectedId;
                 String userSelectedClaimedId = userSelectedId;
+                String fullEndpointUrl = urlPrefix + opSvc.getEndpointUrl();
+                if (logger.isDebugEnabled()) {
+                	logger.debug("user selected id = {}", userSelectedId);
+                	logger.debug("user selected claimed id = {}", userSelectedClaimedId);
+                	logger.debug("full endpoint url = {}", fullEndpointUrl);
+                }
                 
-                logger.debug("user selected id = {}", userSelectedId);
-                logger.debug("user selected claimed id = {}", userSelectedClaimedId);
-                
-                String fullEndpointUrl = String.format(FULL_ENDPOINT_URL_TEMPLATE, httpReq.getScheme(), httpReq.getServerName(),
-                		httpReq.getServerPort(), httpReq.getContextPath());
-                logger.debug("full endpoint url = {}", fullEndpointUrl);
-                Message message = opSvc.authResponse(params, userSelectedId, userSelectedClaimedId, s.isAuthenticated(), fullEndpointUrl);
-                
+                Message message = opSvc.authResponse(params, userSelectedId, userSelectedClaimedId, subject.isAuthenticated(), fullEndpointUrl);
                 if (message instanceof AuthSuccess) {
-                    httpRes.sendRedirect(((AuthSuccess) message).getDestinationUrl(true));
+                    httpRes.sendRedirect(message.getDestinationUrl(true));
                     return false;
                 }
+                
                 // TODO
-                httpRes.getWriter().print("<pre>" + message.keyValueFormEncoding() + "</pre>");
+                httpRes.sendRedirect(message.getDestinationUrl(true));
                 return false;
         	}
         	
-        	httpReq.getSession().setAttribute("params", params);
         	SecurityUtils.getSubject().getSession().setAttribute("params", params);
         	return true;
         }
         
         logger.debug("Unknown OpenID request mode [{}]", mode);
-        Message message = DirectError.createDirectError("Invalid OpenID request!");
-        this.outputMessage(message, httpRes);
+        this.outputInvalidAuthRequestMessage(httpRes);
         return false;
 	}
 	
-	private void outputMessage(Message message, ServletResponse response) throws IOException {
+	private void outputMessage(Message message, HttpServletResponse httpRes) throws IOException {
 		String messageText = message.keyValueFormEncoding();
-    	response.getWriter().print(messageText);
+    	httpRes.getWriter().print(messageText);
 	}
-
-
-/*
-	@Override
-	protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-		logger.debug("on access denied");
-		
-		HttpServletRequest httpReq = (HttpServletRequest) request;
-		HttpServletResponse httpRes = (HttpServletResponse) response;
-		
-		// 访问登录页面
-		if (this.isLoginRequest(httpReq, httpRes)) {
-			logger.debug("this is sign in request");
-			// POST 数据到登录界面
-			if (this.isLoginSubmission(httpReq, httpRes)) {
-				logger.debug("Sign in page submission request detected!");
-				return this.executeLogin(httpReq, httpRes);
-			}
-			
-			// 直接访问登录界面，允许
-			logger.debug("Sign in page view request detected!");
-			
-			SecurityUtils.getSubject().getSession().setAttribute("params", params);
-			return true;
-		}
-		
-		// 访问其它页面，转发到登录页面
-		logger.debug("Redirect to sign in page {}", this.getLoginUrl());
-		httpRes.sendRedirect(this.getLoginUrl());
-		return false;
-	}
-	*/
 	
-	/*
-	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject,
-			ServletRequest request, ServletResponse response) throws Exception {
-		HttpServletRequest httpReq = (HttpServletRequest) request;
-		HttpServletResponse httpRes = (HttpServletResponse) response;
-		
-		Registry registry = IocUtils.getRegistry(this.getServletContext());
-		OpenIdProviderService opSvc = registry.getService(OpenIdProviderService.class);
-		
-		Message message = opSvc.authResponse(httpReq, httpRes);
-		if (message instanceof AuthSuccess) {
-			AuthSuccess authSuccess = (AuthSuccess) message;
-			httpRes.sendRedirect(authSuccess.getDestinationUrl(true));
-		} else {
-			// TODO
-		}
-		return false;
+	private void output400Message(Message message, HttpServletResponse httpRes) throws IOException {
+		httpRes.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+		this.outputMessage(message, httpRes);
 	}
-	*/
-	/*
-	protected boolean onLoginFailure(AuthenticationToken token,	AuthenticationException e,
-			ServletRequest request,	ServletResponse response) {
-		HttpServletRequest httpReq = (HttpServletRequest) request;
-		HttpServletResponse httpRes = (HttpServletResponse) response;
-		try {
-			httpReq.getRequestDispatcher(this.getLoginUrl()).forward(httpReq, httpRes);
-		} catch (ServletException exception) {
-			throw new RuntimeException(exception);
-		} catch (IOException exception) {
-			throw new RuntimeException(exception);
-		}
-		return false;
-	}
-*/
 	
+	private void outputInvalidAuthRequestMessage(HttpServletResponse httpRes) throws IOException {
+		Message message = DirectError.createDirectError("Invalid OpenID auth request!");
+		this.output400Message(message, httpRes);
+	}
 
 }

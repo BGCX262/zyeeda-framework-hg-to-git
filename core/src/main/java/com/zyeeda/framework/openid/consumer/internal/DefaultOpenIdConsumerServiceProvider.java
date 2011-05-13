@@ -13,8 +13,9 @@ import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthRequest;
 
 import com.zyeeda.framework.config.ConfigurationService;
-import com.zyeeda.framework.openid.consumer.OpenIdConsumer;
+import com.zyeeda.framework.openid.consumer.HttpSessionOpenIdConsumer;
 import com.zyeeda.framework.openid.consumer.OpenIdConsumerService;
+import com.zyeeda.framework.openid.consumer.ShiroSessionOpenIdConsumer;
 import com.zyeeda.framework.service.AbstractService;
 
 @ServiceId("default-openid-consumer-service")
@@ -30,7 +31,7 @@ public class DefaultOpenIdConsumerServiceProvider extends AbstractService
 	private String openIdProvider;
 	private String realm;
 	
-	private OpenIdConsumer consumer;
+	private HttpSessionOpenIdConsumer consumer;
 	
 	public DefaultOpenIdConsumerServiceProvider(
 			@Primary ConfigurationService configSvc,
@@ -50,7 +51,7 @@ public class DefaultOpenIdConsumerServiceProvider extends AbstractService
 	
 	@Override
 	public void start() throws Exception {
-		this.consumer = new OpenIdConsumer();
+		this.consumer = new ShiroSessionOpenIdConsumer();
 		this.consumer.setReturnToUrl(this.returnToUrl);
 		this.consumer.setRealm(this.realm);
 	}
