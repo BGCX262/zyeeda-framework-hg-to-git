@@ -19,6 +19,8 @@ public interface DepartmentManager {
 	
 	public List<DepartmentVo> getDepartmentListById(String id) throws NamingException;
 	
+	public List<DepartmentVo> getDepartmentListById(String id, String type) throws NamingException;
+	
 	public List<DepartmentVo> getDepartmentListByName(String name) throws NamingException;
 	
 }

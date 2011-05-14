@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -14,6 +15,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,17 +89,24 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("/{id}/children")
 	@Produces("application/json")
-	public List<OrganizationNodeVo> getChildrenNodesByDepartmentId(@PathParam("id") String id) throws NamingException {
+	public List<OrganizationNodeVo> getChildrenNodesByDepartmentId(@Context HttpServletRequest request, 
+			@PathParam("id") String id) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		List<DepartmentVo> deptList = deptMgr.getDepartmentListById(id);
-		
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<UserVo> userList = userMgr.getUserListByDepartmentId(id);
+		List<DepartmentVo> deptList = null;
+		List<UserVo> userList = null;
 		
+		String type = request.getParameter("type");
+		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
+			deptList = deptMgr.getDepartmentListById(id, type);
+			userList = userMgr.getUserListByDepartmentId(id, type);
+		} else {
+			deptList = deptMgr.getDepartmentListById(id);
+			userList = userMgr.getUserListByDepartmentId(id);
+		}
 		List<OrganizationNodeVo> orgList = deptMgr.mergeDepartmentVoAndUserVo(deptList, userList);
-		logger.debug("the size of the orgList  = {} ", orgList.size());
 		
 		return orgList;
 	}

@@ -20,6 +20,8 @@ public interface UserManager {
 	
 	public List<UserVo> getUserListByDepartmentId(String id) throws NamingException;
 	
+	public List<UserVo> getUserListByDepartmentId(String id, String type) throws NamingException;
+	
 	public List<UserVo> getUserListByName(String name) throws NamingException;
 	
 	public void updatePassword(String id, String password) throws NamingException, ParseException;

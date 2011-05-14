@@ -11,8 +11,10 @@ import java.util.List;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
@@ -140,8 +142,6 @@ public class LdapUserManager implements UserManager {
 				User user = new User();
 				Attributes attr = entry.getAttributes();
 
-//				String uid = (String) attr.get("uid").get();
-//				String childId = String.format("uid=%s,%s", uid, id);
 				user.setUsername((String) attr.get("cn").get());
 				user.setId((String) attr.get("uid").get());
 				user.setPassword(new String((byte[]) attr.get("userPassword").get()));
@@ -287,7 +287,7 @@ public class LdapUserManager implements UserManager {
 		UserVo userVo = new UserVo();
 
 		userVo.setId(user.getId());
-		userVo.setType("node");
+		userVo.setType("io");
 		userVo.setLabel("<a>" + user.getId() + "<a>");
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
@@ -317,6 +317,74 @@ public class LdapUserManager implements UserManager {
 		return sc;
 	}
 	
+	public void updatePassword(String id, String password) throws NamingException, ParseException {
+		LdapContext ctx = null;
+		
+		try {
+			ctx = this.ldapSvc.getLdapContext();
+			ModificationItem[] mods = new ModificationItem[1];
+			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", password));
+			
+			ctx.modifyAttributes(id, mods);
+		} finally {
+			LdapUtils.closeContext(ctx);
+		}
+	}
+	
+	@Override
+	public void setVisible(Boolean visible, String... ids)
+			throws NamingException, ParseException {
+		LdapContext ctx = null;
+		
+		try {
+			ctx = this.ldapSvc.getLdapContext();
+			ModificationItem[] mods = new ModificationItem[1];
+			
+			for (String dn : ids) {
+				mods = new ModificationItem[1];
+				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("status", visible.toString()));
+				ctx.modifyAttributes(dn, mods);
+			}
+		} finally {
+			LdapUtils.closeContext(ctx);
+		}
+	}
+	
+	@Override
+	public List<UserVo> getUserListByDepartmentId(String id, String type)
+			throws NamingException {
+		LdapContext ctx = null;
+		NamingEnumeration<SearchResult> ne = null;
+		List<UserVo> userList = null;
+		logger.debug("the value of the id is = {}  ", id);
+
+		try {
+			ctx = this.ldapSvc.getLdapContext();
+			ne = ctx.search(id, "(uid=*)", this.getOneLevelScopeSearchControls());
+
+			SearchResult entry = null;
+			userList = new ArrayList<UserVo>();
+			for (; ne.hasMore();) {
+				entry = ne.next();
+				User user = new User();
+				Attributes attr = entry.getAttributes();
+
+				user.setUsername((String) attr.get("cn").get());
+				user.setId((String) attr.get("uid").get());
+				user.setPassword(new String((byte[]) attr.get("userPassword").get()));
+				user.setDeptFullPath(id);
+
+				UserVo userVo = this.fillUserPropertiesToVo(user);
+				userVo.setType(type);
+				userList.add(userVo);
+			}
+			return userList;
+		} finally {
+			LdapUtils.closeEnumeration(ne);
+			LdapUtils.closeContext(ctx);
+		}
+	}
+	
 	private static byte[] getBytesFromFile(File file) throws IOException {
 		InputStream is = new FileInputStream(file);
         long length = file.length();
@@ -336,134 +404,6 @@ public class LdapUserManager implements UserManager {
         }
         is.close();
         return bytes;
-	}
-	
-	public void updatePassword(String id, String password) throws NamingException, ParseException {
-		LdapContext ctx = null;
-		
-		try {
-			ctx = this.ldapSvc.getLdapContext();
-			User user = this.findById(id);
-			Attributes attrs = LdapUserManager.unmarshalForUpdatePassword(user, password);
-			
-			ctx.modifyAttributes(id, DirContext.REPLACE_ATTRIBUTE, attrs);
-		} finally {
-			LdapUtils.closeContext(ctx);
-		}
-	}
-	
-	private static Attributes unmarshalForSetVisible(User user, Boolean visible) {
-		Attributes attrs = new BasicAttributes();
-
-		attrs.put("objectClass", "top");
-		attrs.put("objectClass", "person");
-		attrs.put("objectClass", "organizationalPerson");
-		attrs.put("objectClass", "inetOrgPerson");
-		attrs.put("objectClass", "zy-custom-user-object");
-
-		attrs.put("cn", user.getUsername());
-		attrs.put("sn", user.getUsername());
-		
-		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode(user.getPassword()));
-		} else {
-			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode("123456"));
-		}
-		if (StringUtils.isNotBlank(user.getGender())) {
-			attrs.put("gender", user.getGender());
-		} 
-		if (StringUtils.isNotBlank(user.getPosition())) {
-			attrs.put("position", user.getPosition());
-		}
-		if (StringUtils.isNotBlank(user.getDegree())) {
-			attrs.put("degree", user.getDegree());
-		}
-		if (StringUtils.isNotBlank(user.getEmail())) {
-			attrs.put("mail", user.getEmail());
-		}
-		if (StringUtils.isNotBlank(user.getMobile())) {
-			attrs.put("mobile", user.getMobile());
-		}
-		if (user.getBirthday() != null) {
-			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
-		}
-		if (user.getDateOfWork() != null) {
-			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
-		}
-		attrs.put("status", visible.toString());
-		if (user.getPostStatus() != null) {
-			attrs.put("postStatus", user.getPostStatus().toString());
-		}
-		
-		return attrs;
-	}
-
-	private static Attributes unmarshalForUpdatePassword(User user, String password) {
-		Attributes attrs = new BasicAttributes();
-
-		attrs.put("objectClass", "top");
-		attrs.put("objectClass", "person");
-		attrs.put("objectClass", "organizationalPerson");
-		attrs.put("objectClass", "inetOrgPerson");
-		attrs.put("objectClass", "zy-custom-user-object");
-
-		attrs.put("cn", user.getUsername());
-		attrs.put("sn", user.getUsername());
-		
-		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + password);
-		} else {
-			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode("123456"));
-		}
-		if (StringUtils.isNotBlank(user.getGender())) {
-			attrs.put("gender", user.getGender());
-		} 
-		if (StringUtils.isNotBlank(user.getPosition())) {
-			attrs.put("position", user.getPosition());
-		}
-		if (StringUtils.isNotBlank(user.getDegree())) {
-			attrs.put("degree", user.getDegree());
-		}
-		if (StringUtils.isNotBlank(user.getEmail())) {
-			attrs.put("mail", user.getEmail());
-		}
-		if (StringUtils.isNotBlank(user.getMobile())) {
-			attrs.put("mobile", user.getMobile());
-		}
-		if (user.getBirthday() != null) {
-			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
-		}
-		if (user.getDateOfWork() != null) {
-			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
-		}
-		if (user.getStatus() != null) {
-			attrs.put("status", user.getStatus().toString());
-		}
-		if (user.getPostStatus() != null) {
-			attrs.put("postStatus", user.getPostStatus().toString());
-		}
-		
-		return attrs;
-	}
-	
-	@Override
-	public void setVisible(Boolean visible, String... ids)
-			throws NamingException, ParseException {
-		LdapContext ctx = null;
-		
-		try {
-			ctx = this.ldapSvc.getLdapContext();
-			User user = null;
-			Attributes attrs = null;
-			for (String dn : ids) {
-				user = this.findById(dn);
-				attrs = LdapUserManager.unmarshalForSetVisible(user, visible);
-				
-				ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
-			}
-		} finally {
-			LdapUtils.closeContext(ctx);
-		}
 	}
 	
 }

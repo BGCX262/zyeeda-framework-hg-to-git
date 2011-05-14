@@ -15,6 +15,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -128,6 +129,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		System.out.println("************" + id);
 		LdapContext ctx = null;
 		Attributes attrs = null;
+		
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			attrs = ctx.getAttributes(id);
@@ -159,14 +161,12 @@ public class LdapDepartmentManager implements DepartmentManager {
 				Department dept = new Department();
 				Attributes attr = entry.getAttributes();
 				String childId = String.format("%s,%s", entry.getName(), id);
-				logger.debug("the value of the childId is = {}  ", childId);
 				
 				dept.setName((String)attr.get("ou").get());
 				dept.setDescription((String)attr.get("description").get());
 				dept.setId(childId);
 				
 				DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
-				
 				deptList.add(deptVo);
 			}
 			
@@ -252,8 +252,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 		if ("create".equals(module)) {
 			attrs.put("ou", dept.getName());
 		}
-		attrs.put("description", dept.getDescription());
-		
+		if (StringUtils.isNotBlank(dept.getDescription())) {
+			attrs.put("description", dept.getDescription());
+		}
 		return attrs;
 	}
 	
@@ -280,7 +281,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
 		deptVo.setIo("/rest/depts/" + dept.getId() + "/children");
-		logger.debug("******the value of the io is = {} ", deptVo.getIo());
 		
 		return deptVo;
 	}
@@ -303,6 +303,42 @@ public class LdapDepartmentManager implements DepartmentManager {
 		SearchControls sc = new SearchControls();
 
 		return sc;
+	}
+
+	@Override
+	public List<DepartmentVo> getDepartmentListById(String id, String type)
+			throws NamingException {
+		logger.debug("******************the method is getDepartmentListById*******************");
+		LdapContext ctx = null;
+		NamingEnumeration<SearchResult> ne = null;
+		List<DepartmentVo> deptList = null;
+		
+		try {
+			ctx = this.ldapSvc.getLdapContext();
+			SearchResult entry = null;
+			ne = ctx.search(id, "(ou=*)", this.getOneLevelScopeSearchControls());
+			
+			deptList = new ArrayList<DepartmentVo>();
+			for (; ne.hasMore(); ) {
+				entry = ne.next();
+				Department dept = new Department();
+				Attributes attr = entry.getAttributes();
+				String childId = String.format("%s,%s", entry.getName(), id);
+				
+				dept.setName((String)attr.get("ou").get());
+				dept.setDescription((String)attr.get("description").get());
+				dept.setId(childId);
+				
+				DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
+				deptVo.setType(type);
+				deptVo.setIo(deptVo.getIo() + "?type=task");
+				deptList.add(deptVo);
+			}
+			return deptList;
+		} finally {
+			LdapUtils.closeEnumeration(ne);
+			LdapUtils.closeContext(ctx);
+		}
 	}
 	
 }

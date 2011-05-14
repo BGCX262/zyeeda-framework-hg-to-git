@@ -95,7 +95,8 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}/update_password")
 	@Produces("application/json")
-	public void updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
+	//TODO: why send too many data
+	public User updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
 			@FormParam("newPassword") String newPassword) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -108,29 +109,33 @@ public class UserService extends ResourceService {
 		} else {
 			throw new RuntimeException("旧密码输入错误");
 		}
+		return userMgr.findById(id);
 	}
 	
 	@PUT
 	@Path("/{id}/enable")
 	@Produces("application/json")
-	public void enable(@PathParam("id") String id, @FormParam("status") Boolean visible)
+	//TODO: why send too many data
+	public User enable(@PathParam("id") String id, @FormParam("status") Boolean visible)
 			throws NamingException, ParseException {
-		this.setVisible(id, true);
+		return this.setVisible(id, true);
 	}
 	
 	@PUT
 	@Path("/{id}/unenable")
 	@Produces("application/json")
-	public void unenable(@PathParam("id") String id, @FormParam("status") Boolean visible)
+	//TODO: why send too many data
+	public User unenable(@PathParam("id") String id, @FormParam("status") Boolean visible)
 			throws NamingException, ParseException {
-		this.setVisible(id, false);
+		return this.setVisible(id, false);
 	}
 	
-	private void setVisible(String id, Boolean visible) throws NamingException, ParseException {
+	private User setVisible(String id, Boolean visible) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		userMgr.setVisible(visible, id);
+		return userMgr.findById(id);
 	}
 	
 	@POST
