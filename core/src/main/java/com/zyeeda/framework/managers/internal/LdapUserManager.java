@@ -323,7 +323,7 @@ public class LdapUserManager implements UserManager {
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			ModificationItem[] mods = new ModificationItem[1];
-			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", password));
+			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", "{MD5}" + password));
 			
 			ctx.modifyAttributes(id, mods);
 		} finally {
