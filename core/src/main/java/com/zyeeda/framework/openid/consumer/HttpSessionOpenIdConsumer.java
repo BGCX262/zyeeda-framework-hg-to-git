@@ -18,19 +18,18 @@ import org.openid4java.message.ParameterList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OpenIdConsumer {
+public class HttpSessionOpenIdConsumer {
 	
-	private final static Logger logger = LoggerFactory.getLogger(OpenIdConsumer.class);
+	private final static Logger logger = LoggerFactory.getLogger(HttpSessionOpenIdConsumer.class);
 
-	private final static String OPENID_DISCOVERED_KEY = "openid.discovered";
+	protected final static String OPENID_DISCOVERED_KEY = "openid.discovered";
 	
-	//private String redirectUrl;
 	private String returnToUrl;
 	private String realm;
 	
 	private ConsumerManager manager;
 	
-	public OpenIdConsumer() throws ConsumerException {
+	public HttpSessionOpenIdConsumer() throws ConsumerException {
 		this.manager = new ConsumerManager();
 		this.manager.setConnectTimeout(300000);
 		this.manager.setSocketTimeout(300000);
@@ -40,38 +39,29 @@ public class OpenIdConsumer {
 	}
 	
 	public AuthRequest authRequest(String userSuppliedId,
-            HttpServletRequest request,
-            HttpServletResponse response) throws OpenIDException {
+            HttpServletRequest httpReq,
+            HttpServletResponse httpRes) throws OpenIDException {
 		
 		logger.info("user supplied id = {}", userSuppliedId);
 		
 		List<?> discos = this.manager.discover(userSuppliedId);
 		DiscoveryInformation discovered = this.manager.associate(discos);
-		request.getSession().setAttribute(OPENID_DISCOVERED_KEY, discovered);
+		this.storeDiscoveryInfo(httpReq, discovered);
 		AuthRequest authReq = this.manager.authenticate(discovered, this.returnToUrl);
 		authReq.setRealm(this.realm);
 		
 		return authReq;
-		/*
-		logger.debug("discovery info version = {}", discovered.getVersion());
-		if (discovered.isVersion2()) {
-			request.setAttribute("message", authReq);
-			request.getRequestDispatcher(this.redirectUrl).forward(request, response);
-			return;
-		}
-		response.sendRedirect(authReq.getDestinationUrl(true));*/
 	}
 	
-	public Identifier verifyResponse(HttpServletRequest request) throws OpenIDException {
-		ParameterList response = new ParameterList(request.getParameterMap());
+	public Identifier verifyResponse(HttpServletRequest httpReq) throws OpenIDException {
+		ParameterList response = new ParameterList(httpReq.getParameterMap());
 
-		DiscoveryInformation discovered = (DiscoveryInformation) request
-				.getSession().getAttribute(OPENID_DISCOVERED_KEY);
+		DiscoveryInformation discovered = this.retrieveDiscoveryInfo(httpReq);
 
-		StringBuffer receivingURL = request.getRequestURL();
-		String queryString = request.getQueryString();
+		StringBuffer receivingURL = httpReq.getRequestURL();
+		String queryString = httpReq.getQueryString();
 		if (queryString != null && queryString.length() > 0) {
-			receivingURL.append("?").append(request.getQueryString());
+			receivingURL.append("?").append(httpReq.getQueryString());
 		}
 
 		VerificationResult verification = this.manager.verify(receivingURL.toString(), response, discovered);
@@ -79,10 +69,6 @@ public class OpenIdConsumer {
 		Identifier verified = verification.getVerifiedId();
 		return verified;
 	}
-
-	/*public void setRedirectUrl(String redirectUrl) {
-		this.redirectUrl = redirectUrl;
-	}*/
 	
 	public void setReturnToUrl(String returnToUrl) {
 		this.returnToUrl = returnToUrl;
@@ -98,6 +84,14 @@ public class OpenIdConsumer {
 
 	public void setRealm(String realm) {
 		this.realm = realm;
+	}
+	
+	protected void storeDiscoveryInfo(HttpServletRequest httpReq, DiscoveryInformation discovered) {
+		httpReq.getSession().setAttribute(OPENID_DISCOVERED_KEY, discovered);
+	}
+	
+	protected DiscoveryInformation retrieveDiscoveryInfo(HttpServletRequest httpReq) {
+		return (DiscoveryInformation) httpReq.getSession().getAttribute(OPENID_DISCOVERED_KEY);
 	}
 	
 }

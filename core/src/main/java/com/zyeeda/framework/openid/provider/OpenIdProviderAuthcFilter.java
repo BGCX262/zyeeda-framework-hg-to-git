@@ -5,6 +5,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.Subject;
@@ -35,11 +36,13 @@ public class OpenIdProviderAuthcFilter extends FormAuthenticationFilter {
 			// 提交数据到登录页面
 			if (this.isLoginSubmission(httpReq, httpRes)) {
 				logger.debug("Sign in submission request detected!");
-				boolean success = this.executeLogin(httpReq, httpRes);
-				logger.debug("sign in result = {}", success);
-				if (success) {
+				this.executeLogin(httpReq, httpRes);
+				
+				if (this.isOpenIdRequest(httpReq)) {
 					httpRes.sendRedirect(this.getServletContext().getContextPath() + opSvc.getEndpointCompleteUrl());
+					return false;
 				}
+				return true;
 			}
 			
 			// 直接访问登录页面
@@ -74,4 +77,8 @@ public class OpenIdProviderAuthcFilter extends FormAuthenticationFilter {
         logger.debug("is access allowed = {}", result);
         return result;
     }
+	
+	private boolean isOpenIdRequest(HttpServletRequest httpReq) {
+		return SecurityUtils.getSubject().getSession().getAttribute("params") != null;
+	}
 }

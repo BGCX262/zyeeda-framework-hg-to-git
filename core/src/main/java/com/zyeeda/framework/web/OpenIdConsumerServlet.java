@@ -15,7 +15,7 @@ import org.openid4java.message.AuthRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.openid.consumer.OpenIdConsumer;
+import com.zyeeda.framework.openid.consumer.HttpSessionOpenIdConsumer;
 
 public abstract class OpenIdConsumerServlet extends HttpServlet {
 
@@ -31,7 +31,7 @@ public abstract class OpenIdConsumerServlet extends HttpServlet {
 	
 	private String publicIdentifier;
 	private String returnToUrl;
-	private OpenIdConsumer consumer;
+	private HttpSessionOpenIdConsumer consumer;
 	
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -39,10 +39,10 @@ public abstract class OpenIdConsumerServlet extends HttpServlet {
 		this.publicIdentifier = config.getInitParameter(PUBLIC_IDENTIFIER_KEY);
 		this.returnToUrl = config.getInitParameter(REDIRECT_TO_URL_KEY);
 		
-		this.consumer = (OpenIdConsumer) this.getServletContext().getAttribute(OPENID_CONSUMER_KEY);
+		this.consumer = (HttpSessionOpenIdConsumer) this.getServletContext().getAttribute(OPENID_CONSUMER_KEY);
 		if (this.consumer == null) {
 			try {
-				this.consumer = new OpenIdConsumer();
+				this.consumer = new HttpSessionOpenIdConsumer();
 				this.consumer.setReturnToUrl(config.getInitParameter(RETURN_TO_URL_KEY));
 				this.getServletContext().setAttribute(OPENID_CONSUMER_KEY, this.consumer);
 			} catch (ConsumerException e) {
