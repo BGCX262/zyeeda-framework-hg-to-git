@@ -2,9 +2,6 @@ package com.zyeeda.framework.entities.base;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.StringUtils;
-
-
 @javax.persistence.MappedSuperclass
 public class DomainEntity implements Serializable {
 
