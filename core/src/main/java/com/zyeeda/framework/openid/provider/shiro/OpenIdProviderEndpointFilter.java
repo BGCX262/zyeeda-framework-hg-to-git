@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid.provider;
+package com.zyeeda.framework.openid.provider.shiro;
 
 import java.io.IOException;
 
@@ -18,6 +18,7 @@ import org.openid4java.message.ParameterList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.openid.provider.OpenIdProviderService;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class OpenIdProviderEndpointFilter extends PathMatchingFilter {

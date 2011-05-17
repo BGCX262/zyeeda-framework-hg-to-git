@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid.consumer;
+package com.zyeeda.framework.openid.consumer.shiro;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -9,6 +9,7 @@ import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 
 
 public class OpenIdConsumerRealm extends AuthorizingRealm {
@@ -34,7 +35,7 @@ public class OpenIdConsumerRealm extends AuthorizingRealm {
 		
 		Object principal = token.getPrincipal();
 		if (principal == null) {
-			throw new AuthenticationException("OpenID authenticate failed.");
+			throw new AuthenticationException("Cannot authenticate with null principal.");
 		}
 		
 		return new SimpleAuthenticationInfo(principal, null, this.getName());

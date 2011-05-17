@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid.consumer;
+package com.zyeeda.framework.openid.consumer.internal;
 
 import java.util.List;
 
@@ -18,7 +18,9 @@ import org.openid4java.message.ParameterList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HttpSessionOpenIdConsumer {
+import com.zyeeda.framework.openid.consumer.OpenIdConsumer;
+
+public class HttpSessionOpenIdConsumer implements OpenIdConsumer {
 	
 	private final static Logger logger = LoggerFactory.getLogger(HttpSessionOpenIdConsumer.class);
 
@@ -38,6 +40,7 @@ public class HttpSessionOpenIdConsumer {
         this.manager.getRealmVerifier().setEnforceRpId(false);
 	}
 	
+	@Override
 	public AuthRequest authRequest(String userSuppliedId,
             HttpServletRequest httpReq,
             HttpServletResponse httpRes) throws OpenIDException {
@@ -53,6 +56,7 @@ public class HttpSessionOpenIdConsumer {
 		return authReq;
 	}
 	
+	@Override
 	public Identifier verifyResponse(HttpServletRequest httpReq) throws OpenIDException {
 		ParameterList response = new ParameterList(httpReq.getParameterMap());
 
@@ -67,31 +71,60 @@ public class HttpSessionOpenIdConsumer {
 		VerificationResult verification = this.manager.verify(receivingURL.toString(), response, discovered);
 
 		Identifier verified = verification.getVerifiedId();
+		if (verified == null) {
+			throw new OpenIDException("Cannot verify OpenID auth response.");
+		}
+		
+		/*AuthSuccess authSuccess = (AuthSuccess) verification.getAuthResponse();
+		if (authSuccess.hasExtension(AxMessage.OPENID_NS_AX) && this.axExtConsumer != null) {
+			MessageExtension ext = authSuccess.getExtension(AxMessage.OPENID_NS_AX);
+			if (ext instanceof FetchResponse) {
+				FetchResponse fetchResp = (FetchResponse) ext;
+				this.axExtConsumer.processFetchResponse(fetchResp);
+			}
+		}*/
+		// TODO some more extension
 		return verified;
 	}
 	
+	@Override
 	public void setReturnToUrl(String returnToUrl) {
 		this.returnToUrl = returnToUrl;
 	}
 	
+	@Override
 	public String getReturnToUrl() {
 		return this.returnToUrl;
 	}
 
+	@Override
 	public String getRealm() {
 		return realm;
 	}
 
+	@Override
 	public void setRealm(String realm) {
 		this.realm = realm;
 	}
 	
-	protected void storeDiscoveryInfo(HttpServletRequest httpReq, DiscoveryInformation discovered) {
+	@Override
+	public void storeDiscoveryInfo(HttpServletRequest httpReq, DiscoveryInformation discovered) {
 		httpReq.getSession().setAttribute(OPENID_DISCOVERED_KEY, discovered);
 	}
 	
-	protected DiscoveryInformation retrieveDiscoveryInfo(HttpServletRequest httpReq) {
+	@Override
+	public DiscoveryInformation retrieveDiscoveryInfo(HttpServletRequest httpReq) {
 		return (DiscoveryInformation) httpReq.getSession().getAttribute(OPENID_DISCOVERED_KEY);
 	}
+	
+	/*@Override
+	public AxExtensionConsumer getAxExtensionConsumer() {
+		return this.axExtConsumer;
+	}
+	
+	@Override
+	public void setAxExtensionConsumer(AxExtensionConsumer axExtConsumer) {
+		this.axExtConsumer = axExtConsumer;
+	}*/
 	
 }
