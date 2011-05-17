@@ -6,7 +6,13 @@ public class Permission {
 	private String name;
 	private String value;
 	private String isHaveIO;
-	private String path;
+	private int path = 0;
+	public int getPath() {
+		return path;
+	}
+	public void setPath(int path) {
+		this.path = path;
+	}
 	private Boolean checked;
 	public Boolean getChecked() {
 		return checked;
@@ -14,12 +20,7 @@ public class Permission {
 	public void setChecked(Boolean checked) {
 		this.checked = checked;
 	}
-	public String getPath() {
-		return path;
-	}
-	public void setPath(String path) {
-		this.path = path;
-	}
+	
 	public String getIsHaveIO() {
 		return isHaveIO;
 	}

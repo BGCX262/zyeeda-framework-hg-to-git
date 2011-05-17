@@ -26,30 +26,29 @@ public class RoleManagerImpl extends DomainEntityManager<Role, String> implement
 		super(persistenceSvc);
 	}
 	
-	public  List<Permission> getListIdNameById(String id, String level) throws XPathExpressionException, IOException {
-		List<Permission> authList=null;
+	public  List<Permission> getListIdNameById(String id, String levelPath) throws XPathExpressionException, IOException {
+		List<Permission> authList = null;
 		InputStream is = null;
-		InputSource src =null;
+		InputSource src = null;
 		XPathExpression exp = null;
 		try {
 			XPathFactory fac = XPathFactory.newInstance();
 			XPath xpath = fac.newXPath();
-			if(level !=null){
-				if("a".equals(id) && Integer.parseInt(level) == 0){
-					 exp = xpath.compile("/permissions/p[@id='"+id+"']");
-				}else{
-					int levelPath=0;
-					String path="/p";
-					levelPath=Integer.parseInt(level);
-					for(int j=0;j<levelPath-1;j++){
-						path+="/p";
-						System.out.print("*********************************"+path);
+			//if( level == 0){
+				//	 exp = xpath.compile("/permissions/p[@id='"+id+"']");
+				//}else{
+					//int levelPath = 0;
+					String path = "/p";
+					int level = Integer.parseInt(levelPath);
+					for(int j = 0; j<level; j++){
+						path += "/p";
 					}
-					 exp = xpath.compile("/permissions/"+path+"[@id='"+id+"']");
-				}
-			}
+					 exp = xpath.compile("/permissions"+path+"[@id='"+id+"']");
+				//}
+			//}
+			level++;
 			//File file = new File(path);
-			is= this.getClass().getClassLoader().getResourceAsStream(PERMISSION_FILE);
+			is = this.getClass().getClassLoader().getResourceAsStream(PERMISSION_FILE);
 			//InputStream is = new FileInputStream(file);
 			src= new InputSource(is);
 			NodeList list = (NodeList) exp.evaluate(src, XPathConstants.NODESET);
@@ -67,15 +66,15 @@ public class RoleManagerImpl extends DomainEntityManager<Role, String> implement
 						permission.setName(el.getAttribute("name"));
 						permission.setValue(el.getAttribute("value"));
 						permission.setIsHaveIO(el.getAttribute("isIO"));
-						permission.setPath(el.getAttribute("level"));
+						permission.setPath(level);
 						authList.add(permission);
 					}
 				}
 			}
 		} finally {
-			//is.close();
+			is.close();
 		}
-		return authList;
+			return authList;
 		}
 //	public static final void main(String[] args) throws XPathExpressionException, IOException {
 //		List<Permission> list=getListIdNameById("permissions/p[@id='a']","src/aa.xml");
