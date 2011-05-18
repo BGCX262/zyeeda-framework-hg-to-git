@@ -34,18 +34,12 @@ public class RoleManagerImpl extends DomainEntityManager<Role, String> implement
 		try {
 			XPathFactory fac = XPathFactory.newInstance();
 			XPath xpath = fac.newXPath();
-			//if( level == 0){
-				//	 exp = xpath.compile("/permissions/p[@id='"+id+"']");
-				//}else{
-					//int levelPath = 0;
 					String path = "/p";
 					int level = Integer.parseInt(levelPath);
 					for(int j = 0; j<level; j++){
 						path += "/p";
 					}
 					 exp = xpath.compile("/permissions"+path+"[@id='"+id+"']");
-				//}
-			//}
 			level++;
 			//File file = new File(path);
 			is = this.getClass().getClassLoader().getResourceAsStream(PERMISSION_FILE);
