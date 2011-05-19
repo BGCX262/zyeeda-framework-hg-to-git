@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.LdapServiceException;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.service.AbstractService;
 
 @ServiceId("sun-ldap-service")
@@ -92,8 +94,7 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		LdapContext ctx = null;
 		try {
 			ctx = this.getLdapContext();
-			SearchControls sc = new SearchControls();
-			sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+			SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
 			NamingEnumeration<SearchResult> ne = ctx.search(this.baseDn, String.format(this.securityPrincipalTemplate, username), sc);
 			SearchResult result = ne.hasMore() ? ne.next() : null;
 			if (result == null) {

@@ -4,7 +4,7 @@ import javax.naming.directory.SearchControls;
 
 public class SearchControlsFactory {
 	
-	public static SearchControls getgetSearchControls(int scope) {
+	public static SearchControls getSearchControls(int scope) {
 		SearchControls sc = SearchControlsFactory.getDefaultSearchControls();
 		sc.setSearchScope(scope);
 		
