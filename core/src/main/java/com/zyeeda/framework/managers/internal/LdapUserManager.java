@@ -91,7 +91,7 @@ public class LdapUserManager implements UserManager {
 		List<User> userList = null;
 		try {
 			cxt = this.ldapSvc.getLdapContext();
-			ne = cxt.search("", "uid=" + id, SearchControlsFactory.getgetSearchControls(
+			ne = cxt.search("", "uid=" + id, SearchControlsFactory.getSearchControls(
 					SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
@@ -116,7 +116,7 @@ public class LdapUserManager implements UserManager {
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search(id, "(uid=*)", SearchControlsFactory.getgetSearchControls(
+			ne = ctx.search(id, "(uid=*)", SearchControlsFactory.getSearchControls(
 					SearchControls.ONELEVEL_SCOPE));
 
 			SearchResult entry = null;
@@ -149,7 +149,7 @@ public class LdapUserManager implements UserManager {
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			ne = ctx.search("o=广州局", "(uid=*" + name + ")", SearchControlsFactory.
-					getgetSearchControls(SearchControls.SUBTREE_SCOPE));
+					getSearchControls(SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
 			
