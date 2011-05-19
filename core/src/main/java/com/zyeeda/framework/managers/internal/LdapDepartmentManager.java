@@ -10,6 +10,7 @@ import javax.naming.OperationNotSupportedException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.LdapContext;
@@ -21,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.DepartmentManager;
 import com.zyeeda.framework.utils.TreeDeleteControlUtils;
 
@@ -105,7 +106,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 	}
 	
 	@Override
-	public List<Department> getDepartmentListById(String id) throws NamingException {
+	public List<Department> getChildrenById(String id) throws NamingException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<Department> deptList = null;
@@ -113,7 +114,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			SearchResult entry = null;
-			ne = ctx.search(id, "(ou=*)", SunLdapServiceProvider.getOneLevelScopeSearchControls());
+			ne = ctx.search(id, "(ou=*)", SearchControlsFactory.getgetSearchControls(SearchControls.ONELEVEL_SCOPE));
 			
 			deptList = new ArrayList<Department>();
 			for (; ne.hasMore(); ) {
@@ -137,14 +138,13 @@ public class LdapDepartmentManager implements DepartmentManager {
 	}
 	
 	@Override
-	public List<Department> getDepartmentListByName(String name)
-			throws NamingException {
+	public List<Department> findByName(String name) throws NamingException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<Department> deptList = null;
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search("o=广州局", "(ou=*" + name + ")", SunLdapServiceProvider.getThreeLevelScopeSearchControls());
+			ne = ctx.search("o=广州局", "(ou=*" + name + ")", SearchControlsFactory.getgetSearchControls(SearchControls.SUBTREE_SCOPE));
 			
 			SearchResult entry = null;
 			deptList = new ArrayList<Department>();
@@ -205,40 +205,5 @@ public class LdapDepartmentManager implements DepartmentManager {
 		 ctx.unbind("");
 		 logger.debug("Entry " + ctx.getNameInNamespace() + " deleted");
 	}
-//	@Override
-//	public List<Department> getDepartmentListById(String id, String type)
-//			throws NamingException {
-//		logger.debug("******************the method is getDepartmentListById*******************");
-//		LdapContext ctx = null;
-//		NamingEnumeration<SearchResult> ne = null;
-//		List<DepartmentVo> deptList = null;
-//		
-//		try {
-//			ctx = this.ldapSvc.getLdapContext();
-//			SearchResult entry = null;
-//			ne = ctx.search(id, "(ou=*)", this.getOneLevelScopeSearchControls());
-//			
-//			deptList = new ArrayList<DepartmentVo>();
-//			for (; ne.hasMore(); ) {
-//				entry = ne.next();
-//				Department dept = new Department();
-//				Attributes attr = entry.getAttributes();
-//				String childId = String.format("%s,%s", entry.getName(), id);
-//				
-//				dept.setName((String)attr.get("ou").get());
-//				dept.setDescription((String)attr.get("description").get());
-//				dept.setId(childId);
-//				
-//				DepartmentVo deptVo = this.fillDepartmentPropertiesToVo(dept);
-//				deptVo.setType(type);
-//				deptVo.setIo(deptVo.getIo() + "?type=task");
-//				deptList.add(dept);
-//			}
-//			return deptList;
-//		} finally {
-//			LdapUtils.closeEnumeration(ne);
-//			LdapUtils.closeContext(ctx);
-//		}
-//	}
 	
 }

@@ -16,7 +16,7 @@ public interface DepartmentManager {
 	
 	public void update(Department dept) throws NamingException;
 	
-	public List<Department> getDepartmentListById(String id) throws NamingException;
+	public List<Department> getChildrenById(String id) throws NamingException;
 	
-	public List<Department> getDepartmentListByName(String name) throws NamingException;
+	public List<Department> findByName(String name) throws NamingException;
 }

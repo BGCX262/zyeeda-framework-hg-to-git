@@ -98,7 +98,7 @@ public class DepartmentService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
-		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getDepartmentListByName(name));
+		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.findByName(name));
 	}
 	
 	@GET
@@ -115,11 +115,11 @@ public class DepartmentService extends ResourceService {
 		String type = request.getParameter("type");
 		
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getDepartmentListById(id), type);
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
 		} else {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getDepartmentListById(id));
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
 		}
-		userVoList = UserService.fillUserListPropertiesToVo(userMgr.getUserListByDepartmentId(id));
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
 		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
 		
 		return orgList;

@@ -17,9 +17,9 @@ public interface UserManager {
 	
 	public User findById(String id) throws NamingException, ParseException;
 	
-	public List<User> getUserListByDepartmentId(String id) throws NamingException;
+	public List<User> findByDepartmentId(String id) throws NamingException;
 	
-	public List<User> getUserListByName(String name) throws NamingException;
+	public List<User> findByName(String name) throws NamingException;
 	
 	public void updatePassword(String id, String password) throws NamingException, ParseException;
 	
