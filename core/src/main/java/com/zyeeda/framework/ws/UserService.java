@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -46,7 +44,7 @@ public class UserService extends ResourceService {
 	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		if (userMgr.findById(user.getId()) != null) {
+		if (userMgr.findById(user.getId()) != null ) {
 			throw new RuntimeException("账号不能重复");
 		} else {
 			user.setDepartmentName(parent);
@@ -98,7 +96,7 @@ public class UserService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
-		return UserService.fillUserListPropertiesToVo(userMgr.getUserListByName(name));
+		return UserService.fillUserListPropertiesToVo(userMgr.findByName(name));
 	}
 	
 	@GET
@@ -108,7 +106,7 @@ public class UserService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
-		return UserService.fillUserListPropertiesToVo(userMgr.getUserListByDepartmentId(deptId));
+		return UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(deptId));
 	}
 	
 	@PUT

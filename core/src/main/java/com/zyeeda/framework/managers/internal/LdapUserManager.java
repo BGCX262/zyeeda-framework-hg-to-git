@@ -1,9 +1,5 @@
 package com.zyeeda.framework.managers.internal;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,9 +11,11 @@ import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.slf4j.Logger;
@@ -26,9 +24,9 @@ import org.slf4j.LoggerFactory;
 import com.ibm.icu.text.SimpleDateFormat;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.UserManager;
-import com.zyeeda.framework.utils.MD5;
+import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
 
@@ -93,7 +91,8 @@ public class LdapUserManager implements UserManager {
 		List<User> userList = null;
 		try {
 			cxt = this.ldapSvc.getLdapContext();
-			ne = cxt.search("", "uid=" + id, SunLdapServiceProvider.getThreeLevelScopeSearchControls());
+			ne = cxt.search("", "uid=" + id, SearchControlsFactory.getgetSearchControls(
+					SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
 			for (; ne.hasMore();) {
@@ -109,16 +108,16 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public List<User> getUserListByDepartmentId(String id)
+	public List<User> findByDepartmentId(String id)
 			throws NamingException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
-		logger.debug("the value of the id is = {}  ", id);
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search(id, "(uid=*)", SunLdapServiceProvider.getOneLevelScopeSearchControls());
+			ne = ctx.search(id, "(uid=*)", SearchControlsFactory.getgetSearchControls(
+					SearchControls.ONELEVEL_SCOPE));
 
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
@@ -142,18 +141,18 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public List<User> getUserListByName(String name) throws NamingException {
+	public List<User> findByName(String name) throws NamingException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search("o=广州局", "(uid=*" + name + ")", SunLdapServiceProvider
-					.getThreeLevelScopeSearchControls());
-
+			ne = ctx.search("o=广州局", "(uid=*" + name + ")", SearchControlsFactory.
+					getgetSearchControls(SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
+			
 			for (; ne.hasMore();) {
 				entry = ne.next();
 				User user = new User();
@@ -243,26 +242,27 @@ public class LdapUserManager implements UserManager {
 //		}
 //	}
 	
-	private static byte[] getBytesFromFile(File file) throws IOException {
-		InputStream is = new FileInputStream(file);
-        long length = file.length();
-        if (length > Integer.MAX_VALUE) {
-        	throw new IOException("File is to large "+file.getName());
-        }
-        byte[] bytes = new byte[(int)length];
-        int offset = 0;
-        int numRead = 0;
-
-        while (offset < bytes.length
-        		&& (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-            offset += numRead;
-        }
-        if (offset < bytes.length) {
-            throw new IOException("Could not completely read file "+file.getName());
-        }
-        is.close();
-        return bytes;
-	}
+	//add for upload photo
+//	private static byte[] getBytesFromFile(File file) throws IOException {
+//		InputStream is = new FileInputStream(file);
+//        long length = file.length();
+//        if (length > Integer.MAX_VALUE) {
+//        	throw new IOException("File is to large "+file.getName());
+//        }
+//        byte[] bytes = new byte[(int)length];
+//        int offset = 0;
+//        int numRead = 0;
+//
+//        while (offset < bytes.length
+//        		&& (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+//            offset += numRead;
+//        }
+//        if (offset < bytes.length) {
+//            throw new IOException("Could not completely read file "+file.getName());
+//        }
+//        is.close();
+//        return bytes;
+//	}
 	
 	private static Attributes unmarshal(User user/*, String module*/) {
 		Attributes attrs = new BasicAttributes();
@@ -271,16 +271,16 @@ public class LdapUserManager implements UserManager {
 		attrs.put("objectClass", "person");
 		attrs.put("objectClass", "organizationalPerson");
 		attrs.put("objectClass", "inetOrgPerson");
-		attrs.put("objectClass", "zy-custom-user-object");
+		attrs.put("objectClass", "employee");
 
 		attrs.put("cn", user.getUsername());
 		attrs.put("sn", user.getUsername());
 		attrs.put("uid", user.getId());
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode(user.getPassword()));
+			attrs.put("userPassword", "{MD5}" + DigestUtils.md5Hex(user.getPassword()));
 		} else {
-			attrs.put("userPassword", "{MD5}" + MD5.MD5Encode("123456"));
+			attrs.put("userPassword", "{MD5}" + DigestUtils.md5Hex("123456"));
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -298,16 +298,22 @@ public class LdapUserManager implements UserManager {
 			attrs.put("mobile", user.getMobile());
 		}
 		if (user.getBirthday() != null) {
-			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
+			attrs.put("birthday", DatetimeUtils.formatDate(user.getBirthday()));
 		}
 		if (user.getDateOfWork() != null) {
-			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
+			attrs.put("dateOfWork", DatetimeUtils.formatDate(user.getDateOfWork()));
 		}
 		if (user.getStatus() != null) {
 			attrs.put("status", user.getStatus().toString());
 		}
 		if (user.getPostStatus() != null) {
 			attrs.put("postStatus", user.getPostStatus().toString());
+		}
+		if (user.getDepartmentName() != null) {
+			attrs.put("deptName", user.getDepartmentName());
+		}
+		if (user.getDeptFullPath() != null) {
+			attrs.put("deptFullPath", user.getDeptFullPath());
 		}
 		
 		return attrs;
@@ -346,6 +352,12 @@ public class LdapUserManager implements UserManager {
 		}
 		if (attrs.get("postStatus") != null) {
 			user.setPostStatus(new Boolean(attrs.get("postStatus").get().toString()));
+		}
+		if (attrs.get("deptName") != null) {
+			user.setDepartmentName(attrs.get("deptName").get().toString());
+		}
+		if (attrs.get("deptFullPath") != null) {
+			user.setDeptFullPath(attrs.get("deptFullPath").get().toString());
 		}
 		
 		return user;

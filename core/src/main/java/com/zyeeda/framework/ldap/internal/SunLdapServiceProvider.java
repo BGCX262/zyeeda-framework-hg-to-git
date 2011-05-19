@@ -6,7 +6,6 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
@@ -127,26 +126,6 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		
 		env.put(Context.SECURITY_AUTHENTICATION, this.securityAuthentication);
 		return env;
-	}
-	
-	public static SearchControls getOneLevelScopeSearchControls() {
-		SearchControls sc = SunLdapServiceProvider.getSearchControls();
-		sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-
-		return sc;
-	}
-	
-	public static SearchControls getThreeLevelScopeSearchControls() {
-		SearchControls sc = SunLdapServiceProvider.getSearchControls();
-		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-		return sc;
-	}
-
-	public static SearchControls getSearchControls() {
-		SearchControls sc = new SearchControls();
-
-		return sc;
 	}
 
 }

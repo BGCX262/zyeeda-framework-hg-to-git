@@ -23,6 +23,7 @@ public class OrganizationNodeVo implements Serializable{
 	
 	private String fullPath;
 
+	/*标识是用户还是部门*/
 	private String kind;
 
 	public String getId() {
