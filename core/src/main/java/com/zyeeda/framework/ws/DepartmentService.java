@@ -1,8 +1,11 @@
 package com.zyeeda.framework.ws;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -43,11 +46,14 @@ public class DepartmentService extends ResourceService {
 	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		dept.setParent(parent);
-		deptMgr.persist(dept);
-		return deptMgr.findById(dept.getId());
-		
-		
+		if (deptMgr.findById(dept.getName()) != null) {
+			throw new RuntimeException("部门名称不能重复");
+		} else {
+			dept.setParent(parent);
+			deptMgr.persist(dept);
+			
+			return deptMgr.findById(dept.getId());
+		}
 	}
 	
 	@DELETE
@@ -65,7 +71,14 @@ public class DepartmentService extends ResourceService {
 	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		return deptMgr.update(dept);
+		
+		String name = deptMgr.findById(dept.getId()).getName();
+		if (dept.getName().equals(name)) {
+			deptMgr.update(dept);
+			return deptMgr.findById(id);
+		} else {
+			throw new RuntimeException("不能修改部门名称");
+		}
 	}
 	
 	@GET
@@ -74,6 +87,7 @@ public class DepartmentService extends ResourceService {
 	public Department getDepartmentById(@PathParam("id") String id) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		
 		return deptMgr.findById(id);
 	}
 	
@@ -83,7 +97,8 @@ public class DepartmentService extends ResourceService {
 	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		return deptMgr.getDepartmentListByName(name);
+		
+		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getDepartmentListByName(name));
 	}
 	
 	@GET
@@ -95,19 +110,86 @@ public class DepartmentService extends ResourceService {
 		
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<DepartmentVo> deptList = null;
-		List<UserVo> userList = null;
-		
+		List<DepartmentVo> deptVoList = null;
+		List<UserVo> userVoList = null;
 		String type = request.getParameter("type");
+		
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
-			deptList = deptMgr.getDepartmentListById(id, type);
-			userList = userMgr.getUserListByDepartmentId(id, type);
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getDepartmentListById(id), type);
 		} else {
-			deptList = deptMgr.getDepartmentListById(id);
-			userList = userMgr.getUserListByDepartmentId(id);
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getDepartmentListById(id));
 		}
-		List<OrganizationNodeVo> orgList = deptMgr.mergeDepartmentVoAndUserVo(deptList, userList);
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.getUserListByDepartmentId(id));
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
 		
 		return orgList;
+	}
+	
+	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVo(List<DepartmentVo> deptVoList, List<UserVo> userVoList) {
+		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
+		for (DepartmentVo deptVo: deptVoList) {
+			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
+			orgNodeVo.setId(deptVo.getId());
+			orgNodeVo.setCheckName(deptVo.getCheckName());
+			orgNodeVo.setIo(deptVo.getIo());
+			orgNodeVo.setLabel(deptVo.getLabel());
+			orgNodeVo.setType(deptVo.getType());
+			orgNodeVo.setFullPath(deptVo.getId());
+			orgNodeVo.setKind(deptVo.getKind());
+			
+			orgNodeVoList.add(orgNodeVo);
+		}
+		
+		for (UserVo userVo: userVoList) {
+			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
+			orgNodeVo.setId("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
+			orgNodeVo.setCheckName(userVo.getCheckName());
+			orgNodeVo.setIo(userVo.getId());
+			orgNodeVo.setLabel(userVo.getLabel());
+			orgNodeVo.setType(userVo.getType());
+			orgNodeVo.setLeaf(userVo.isLeaf());
+			orgNodeVo.setFullPath("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
+			orgNodeVo.setKind(userVo.getKind());
+			
+			orgNodeVoList.add(orgNodeVo);
+		}
+		
+		return orgNodeVoList;
+	}
+	
+	public static DepartmentVo fillDepartmentPropertiesToVo(Department dept) {
+		DepartmentVo deptVo = new DepartmentVo();
+		
+		deptVo.setId(dept.getId());
+		deptVo.setType("io");
+		deptVo.setLabel("<a>" + dept.getName() + "<a>");
+		deptVo.setCheckName(dept.getId());
+		deptVo.setLeaf(false);
+		deptVo.setIo("/rest/depts/" + dept.getId() + "/children");
+		deptVo.setKind("dept");
+		
+		return deptVo;
+	}
+	
+	public static List<DepartmentVo> fillDepartmentListPropertiesToVo(List<Department> deptList) {
+		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
+		DepartmentVo deptVo = null;
+		for (Department dept : deptList) {
+			deptVo = DepartmentService.fillDepartmentPropertiesToVo(dept);
+			deptVoList.add(deptVo);
+		}
+		return deptVoList;
+	}
+	
+	public static List<DepartmentVo> fillDepartmentListPropertiesToVo(List<Department> deptList, String type) {
+		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
+		DepartmentVo deptVo = null;
+		for (Department dept : deptList) {
+			deptVo = DepartmentService.fillDepartmentPropertiesToVo(dept);
+			deptVo.setIo(deptVo.getIo() + "?type=task");
+			deptVo.setType(type);
+			deptVoList.add(deptVo);
+		}
+		return deptVoList;
 	}
 }

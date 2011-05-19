@@ -3,9 +3,12 @@ package com.zyeeda.framework.ws;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -40,11 +43,16 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/{parent:.*}")
 	@Produces("application/json")
-	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException {
+	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		user.setDepartmentName(parent);
-		return userMgr.persist(user);
+		if (userMgr.findById(user.getId()) != null) {
+			throw new RuntimeException("账号不能重复");
+		} else {
+			user.setDepartmentName(parent);
+			userMgr.persist(user);
+			return userMgr.findById(user.getId());
+		}
 	}
 	
 	@DELETE
@@ -61,8 +69,16 @@ public class UserService extends ResourceService {
 	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		
 		user.setDeptFullPath(id);
-		return userMgr.update(user);
+		String uid = user.getDeptFullPath().substring(user.getDeptFullPath().indexOf("=") + 1, 
+				user.getDeptFullPath().indexOf(","));
+		if (!uid.equals(user.getId())) {
+			throw new RuntimeException("不能修改账号");
+		} else {
+			userMgr.update(user);
+			return userMgr.findById(user.getId());
+		}
 	}
 	
 	@GET
@@ -71,7 +87,8 @@ public class UserService extends ResourceService {
 	public User getUserById(@PathParam("id") String id) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		return userMgr.findById(id);
+		
+		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 	}
 	
 	@GET
@@ -80,7 +97,8 @@ public class UserService extends ResourceService {
 	public List<UserVo> getUserListByName(@PathParam("name") String name) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		return userMgr.getUserListByName(name);
+		
+		return UserService.fillUserListPropertiesToVo(userMgr.getUserListByName(name));
 	}
 	
 	@GET
@@ -89,19 +107,19 @@ public class UserService extends ResourceService {
 	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		return userMgr.getUserListByDepartmentId(deptId);
+		
+		return UserService.fillUserListPropertiesToVo(userMgr.getUserListByDepartmentId(deptId));
 	}
 	
 	@PUT
 	@Path("/{id}/update_password")
 	@Produces("application/json")
-	//TODO: why send too many data
 	public User updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
 			@FormParam("newPassword") String newPassword) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
-		User u = userMgr.findById(id);
+		User u = userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 		if (("{MD5}" + oldPassword).equals(u.getPassword())) {
 			if (!newPassword.equals(oldPassword)) {
 				userMgr.updatePassword(id, newPassword);
@@ -109,13 +127,12 @@ public class UserService extends ResourceService {
 		} else {
 			throw new RuntimeException("旧密码输入错误");
 		}
-		return userMgr.findById(id);
+		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 	}
 	
 	@PUT
 	@Path("/{id}/enable")
 	@Produces("application/json")
-	//TODO: why send too many data
 	public User enable(@PathParam("id") String id, @FormParam("status") Boolean visible)
 			throws NamingException, ParseException {
 		return this.setVisible(id, true);
@@ -124,18 +141,9 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}/unenable")
 	@Produces("application/json")
-	//TODO: why send too many data
-	public User unenable(@PathParam("id") String id, @FormParam("status") Boolean visible)
+	public User unEnable(@PathParam("id") String id, @FormParam("status") Boolean visible)
 			throws NamingException, ParseException {
 		return this.setVisible(id, false);
-	}
-	
-	private User setVisible(String id, Boolean visible) throws NamingException, ParseException {
-		LdapService ldapSvc = this.getLdapService();
-		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		
-		userMgr.setVisible(visible, id);
-		return userMgr.findById(id);
 	}
 	
 	@POST
@@ -150,9 +158,9 @@ public class UserService extends ResourceService {
 	    while ((len = in.read(b, 0, 1024)) != -1) {  
 	        baos.write(b, 0, len);  
 	    }  
-	    baos.flush();  
+	    baos.flush();
 	  
-	    byte[] bytes = baos.toByteArray();
+//	    byte[] bytes = baos.toByteArray();
 	    LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		User user = new User();
@@ -162,5 +170,37 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
+	private User setVisible(String id, Boolean visible) throws NamingException, ParseException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		
+		userMgr.setVisible(visible, id);
+		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
+	}
+	
+	public static UserVo fillUserPropertiesToVo(User user) {
+		UserVo userVo = new UserVo();
+
+		userVo.setId(user.getId());
+		userVo.setType("io");
+		userVo.setLabel("<a>" + user.getId() + "<a>");
+		userVo.setCheckName(user.getId());
+		userVo.setLeaf(true);
+		userVo.setUid(user.getId());
+		userVo.setDeptFullPath(user.getDeptFullPath());
+		userVo.setKind("user");
+
+		return userVo;
+	}
+	
+	public static List<UserVo> fillUserListPropertiesToVo(List<User> userList) {
+		List<UserVo> userVoList = new ArrayList<UserVo>(userList.size());
+		UserVo userVo = null;
+		for (User user : userList) {
+			userVo = UserService.fillUserPropertiesToVo(user);
+			userVoList.add(userVo);
+		}
+		return userVoList;
+	}
 	
 }

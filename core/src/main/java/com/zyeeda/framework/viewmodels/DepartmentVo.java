@@ -21,6 +21,8 @@ public class DepartmentVo implements Serializable {
 
 	private String io;
 
+	private String kind;
+
 	public String getId() {
 		return id;
 	}
@@ -67,6 +69,14 @@ public class DepartmentVo implements Serializable {
 
 	public void setIo(String io) {
 		this.io = io;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 
 }
