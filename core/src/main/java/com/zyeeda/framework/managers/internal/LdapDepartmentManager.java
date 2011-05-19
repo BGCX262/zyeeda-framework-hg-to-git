@@ -114,9 +114,10 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			SearchResult entry = null;
-			ne = ctx.search(id, "(ou=*)", SearchControlsFactory.getgetSearchControls(SearchControls.ONELEVEL_SCOPE));
-			
+			ne = ctx.search(id, "(ou=*)", SearchControlsFactory.getgetSearchControls(
+					SearchControls.ONELEVEL_SCOPE));
 			deptList = new ArrayList<Department>();
+			
 			for (; ne.hasMore(); ) {
 				entry = ne.next();
 				Department dept = new Department();
@@ -144,7 +145,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 		List<Department> deptList = null;
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search("o=广州局", "(ou=*" + name + ")", SearchControlsFactory.getgetSearchControls(SearchControls.SUBTREE_SCOPE));
+			ne = ctx.search("o=广州局", "(ou=*" + name + ")", SearchControlsFactory.getgetSearchControls(
+					SearchControls.SUBTREE_SCOPE));
 			
 			SearchResult entry = null;
 			deptList = new ArrayList<Department>();

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
-import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -46,7 +44,8 @@ public class DepartmentService extends ResourceService {
 	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		if (deptMgr.findById(dept.getName()) != null) {
+		if (deptMgr.findByName(dept.getName()) != null && 
+				deptMgr.findByName(dept.getName()).size() > 0) {
 			throw new RuntimeException("部门名称不能重复");
 		} else {
 			dept.setParent(parent);

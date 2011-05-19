@@ -44,7 +44,7 @@ public class UserService extends ResourceService {
 	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		if (userMgr.findById(user.getId()) != null) {
+		if (userMgr.findById(user.getId()) != null ) {
 			throw new RuntimeException("账号不能重复");
 		} else {
 			user.setDepartmentName(parent);

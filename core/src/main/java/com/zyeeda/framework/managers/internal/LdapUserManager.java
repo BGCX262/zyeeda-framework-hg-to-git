@@ -26,6 +26,7 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.UserManager;
+import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
 
@@ -90,7 +91,8 @@ public class LdapUserManager implements UserManager {
 		List<User> userList = null;
 		try {
 			cxt = this.ldapSvc.getLdapContext();
-			ne = cxt.search("", "uid=" + id, SearchControlsFactory.getgetSearchControls(SearchControls.SUBTREE_SCOPE));
+			ne = cxt.search("", "uid=" + id, SearchControlsFactory.getgetSearchControls(
+					SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
 			for (; ne.hasMore();) {
@@ -114,7 +116,8 @@ public class LdapUserManager implements UserManager {
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search(id, "(uid=*)", SearchControlsFactory.getgetSearchControls(SearchControls.ONELEVEL_SCOPE));
+			ne = ctx.search(id, "(uid=*)", SearchControlsFactory.getgetSearchControls(
+					SearchControls.ONELEVEL_SCOPE));
 
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
@@ -145,11 +148,11 @@ public class LdapUserManager implements UserManager {
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search("o=广州局", "(uid=*" + name + ")", SearchControlsFactory.getgetSearchControls(
-					SearchControls.SUBTREE_SCOPE));
-
+			ne = ctx.search("o=广州局", "(uid=*" + name + ")", SearchControlsFactory.
+					getgetSearchControls(SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
+			
 			for (; ne.hasMore();) {
 				entry = ne.next();
 				User user = new User();
@@ -268,7 +271,7 @@ public class LdapUserManager implements UserManager {
 		attrs.put("objectClass", "person");
 		attrs.put("objectClass", "organizationalPerson");
 		attrs.put("objectClass", "inetOrgPerson");
-		attrs.put("objectClass", "zy-custom-user-object");
+		attrs.put("objectClass", "employee");
 
 		attrs.put("cn", user.getUsername());
 		attrs.put("sn", user.getUsername());
@@ -295,10 +298,10 @@ public class LdapUserManager implements UserManager {
 			attrs.put("mobile", user.getMobile());
 		}
 		if (user.getBirthday() != null) {
-			attrs.put("birthday", new SimpleDateFormat("yyyy-MM-hh").format(user.getBirthday()).toString());
+			attrs.put("birthday", DatetimeUtils.formatDate(user.getBirthday()));
 		}
 		if (user.getDateOfWork() != null) {
-			attrs.put("dateOfWork", new SimpleDateFormat("yyyy-MM-hh").format(user.getDateOfWork()).toString());
+			attrs.put("dateOfWork", DatetimeUtils.formatDate(user.getDateOfWork()));
 		}
 		if (user.getStatus() != null) {
 			attrs.put("status", user.getStatus().toString());
