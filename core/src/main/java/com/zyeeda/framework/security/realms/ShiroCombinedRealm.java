@@ -2,9 +2,6 @@ package com.zyeeda.framework.security.realms;
 
 import java.io.IOException;
 
-import java.util.Iterator;
-import java.util.List;
-
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapContext;
 
@@ -14,7 +11,6 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.shiro.subject.PrincipalCollection;
@@ -64,10 +60,10 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-		String username = (String) this.getAvailablePrincipal(principals);
+		//String username = (String) this.getAvailablePrincipal(principals);
 		//List<?> roles = this.roleMgr.getRolesBySubject(username);
 		
-		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		//SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 //		for (Iterator<?> it = roles.iterator(); it.hasNext(); ) {
 //			Role role = (Role) it.next();
 //			logger.debug("role name = {}", role.getName());
@@ -76,7 +72,8 @@ public class ShiroCombinedRealm extends AuthorizingRealm {
 //			info.addStringPermissions(role.getPermissionSet());
 //		}
 //		
-		return info;
+		//return info;
+		return null;
 	}
 
 }
