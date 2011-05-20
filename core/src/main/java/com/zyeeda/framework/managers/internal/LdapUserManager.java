@@ -18,8 +18,6 @@ import javax.naming.ldap.LdapContext;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.realm.ldap.LdapUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.ibm.icu.text.SimpleDateFormat;
 import com.zyeeda.framework.entities.User;
@@ -30,7 +28,7 @@ import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
 
-	private static final Logger logger = LoggerFactory.getLogger(LdapUserManager.class);
+//	private static final Logger logger = LoggerFactory.getLogger(LdapUserManager.class);
 
 	private LdapService ldapSvc;
 

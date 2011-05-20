@@ -17,8 +17,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.ldap.LdapService;
@@ -32,7 +30,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/depts")
 public class DepartmentService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
+//	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public DepartmentService(@Context ServletContext ctx) {
 		super(ctx);

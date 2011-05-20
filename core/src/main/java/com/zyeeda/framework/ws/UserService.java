@@ -19,12 +19,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
@@ -32,7 +28,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/users")
 public class UserService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
+//	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
