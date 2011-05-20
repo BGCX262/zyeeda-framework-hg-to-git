@@ -114,10 +114,7 @@
                 com.zyeeda.framework.ws.DictionaryService 
                 com.zyeeda.framework.ws.DocumentService 
                 com.zyeeda.framework.ws.DepartmentService 
-<<<<<<< local
-=======
                 com.zyeeda.framework.ws.UserService 
->>>>>>> other
             </param-value>
         </init-param>
         <init-param>
