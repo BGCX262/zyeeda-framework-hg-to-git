@@ -11,6 +11,8 @@ import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.OpenIdProviderSecurityServiceProvider;
+import com.zyeeda.framework.synch.UserSynchService;
+import com.zyeeda.framework.synch.internal.UserSynchServiceProvider;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class ResourceService {
@@ -41,6 +43,10 @@ public class ResourceService {
 	
 	protected LdapService getLdapService() {
 		return this.reg.getService(IocUtils.getServiceId(SunLdapServiceProvider.class), LdapService.class);
+	}
+	
+	protected UserSynchService getUserSynchService() {
+		return this.reg.getService(IocUtils.getServiceId(UserSynchServiceProvider.class), UserSynchService.class);
 	}
 	
 }
