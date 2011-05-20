@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid.consumer;
+package com.zyeeda.framework.openid.consumer.shiro;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -14,6 +14,7 @@ import org.openid4java.message.AuthRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.openid.consumer.OpenIdConsumerService;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
@@ -65,7 +66,6 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 			logger.debug("OpenID login request detected, redirect to OP endpoint.");
 			AuthRequest authReq = openidConsumer.authRequest(httpReq, httpRes);
 			httpReq.setAttribute("message", authReq);
-			//httpReq.getRequestDispatcher(this.redirectToUrl).forward(httpReq, httpRes);
 			return true;
 		}
 		

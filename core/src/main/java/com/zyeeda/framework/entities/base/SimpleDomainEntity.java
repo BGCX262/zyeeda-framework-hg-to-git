@@ -1,8 +1,5 @@
 package com.zyeeda.framework.entities.base;
 
-import javax.validation.constraints.NotNull;
-
-
 @javax.persistence.MappedSuperclass
 public class SimpleDomainEntity extends DomainEntity {
 

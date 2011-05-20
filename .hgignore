@@ -19,3 +19,7 @@ WEB-INF/lib
 private
 work
 drools_audit.log
+syntax: regexp
+^core/src/main/java/com/zyeeda/framework/managers/internal/DefaultUserManager\.java$
+syntax: regexp
+^core/src/main/java/com/zyeeda/framework/managers/internal/DefaultDepartmentManager\.java$
