@@ -41,6 +41,8 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -48,6 +50,7 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>true</filtering>
             </resource>
             <resource>
                 <directory>src/main/rules</directory>
@@ -60,6 +63,28 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
             </plugin>
             -->
+            <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.1.1</version>
+                <configuration>
+                    <archive>
+                        <compress>true</compress>
+                        <index>true</index>
+                        <manifestEntries>
+                            <Tapestry-Module-Classes>
+                                com.zyeeda.drivebox.ioc.DriveboxkModule
+                            </Tapestry-Module-Classes>
+                            <Implementation-Version>
+                                ${project.version}
+                            </Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            -->
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-eclipse-plugin</artifactId>
@@ -72,6 +97,7 @@
                     <manifest>${basedir}/src/main/resources/META-INF/MANIFEST.MF</manifest>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 </project>

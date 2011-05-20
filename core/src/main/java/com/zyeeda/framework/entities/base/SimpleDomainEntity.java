@@ -1,8 +1,5 @@
 package com.zyeeda.framework.entities.base;
 
-import javax.validation.constraints.NotNull;
-
-
 @javax.persistence.MappedSuperclass
 public class SimpleDomainEntity extends DomainEntity {
 
@@ -13,7 +10,6 @@ public class SimpleDomainEntity extends DomainEntity {
     
     @javax.persistence.Basic
     @javax.persistence.Column(name = "F_NAME")
-    @NotNull
     public String getName() {
         return this.name;
     }

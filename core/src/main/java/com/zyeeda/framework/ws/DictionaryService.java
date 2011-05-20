@@ -29,7 +29,6 @@ public class DictionaryService extends ResourceService {
 	@Produces("application/json")
 	public List<Dictionary> getDictionary(@PathParam("type") String type) {
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
-		
 		Search search = new Search();
 		search.addFilterEqual("type", type);
 		List<Dictionary> dicts = dictMgr.search(search);

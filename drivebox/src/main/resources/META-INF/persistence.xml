@@ -7,6 +7,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <jta-data-source>java:comp/env/jdbc/defaultDS</jta-data-source>
 
+        <mapping-file>/META-INF/persistence-unit-metadata.orm.xml</mapping-file>
         <mapping-file>org/drools/persistence/session/SessionInfo.orm.xml</mapping-file>
         <mapping-file>org/drools/persistence/processinstance/ProcessInstanceInfo.orm.xml</mapping-file>
         <mapping-file>org/drools/persistence/processinstance/ProcessInstanceEventInfo.orm.xml</mapping-file>
@@ -44,6 +45,7 @@
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
         <non-jta-data-source>java:comp/env/jdbc/droolsTaskDS</non-jta-data-source>
 
+        <mapping-file>/META-INF/persistence-unit-metadata.orm.xml</mapping-file>
         <mapping-file>org/drools/task/Attachment.orm.xml</mapping-file>
         <mapping-file>org/drools/task/Content.orm.xml</mapping-file>
         <mapping-file>org/drools/task/BooleanExpression.orm.xml</mapping-file>
@@ -85,28 +87,4 @@
         </properties>
     </persistence-unit>
     
-    <persistence-unit name="attachment" transaction-type="JTA">
-        <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <jta-data-source>java:comp/env/jdbc/attachmentDS</jta-data-source>
-
-        <class>com.zyeeda.framework.entities.Document</class>
-        <exclude-unlisted-classes>true</exclude-unlisted-classes>
-
-        <properties>
-            <!--
-            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLInnoDBDialect" />
-            -->
-            <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect" />
-            <property name="hibernate.hbm2ddl.auto" value="update" />
-            <property name="hibernate.show_sql" value="false" />
-            <property name="hibernate.format_sql" value="false" />
-            <property name="hibernate.use_sql_comments" value="false" />
-            <property name="hibernate.id.new_generator_mappings" value="true" />
-            <property name="hibernate.validator.apply_to_ddl" value="false" />
-            <property name="hibernate.current_session_context_class" value="jta" />
-            <property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.BTMTransactionManagerLookup" />
-            <property name="hibernate.transaction.factory_class" value="org.hibernate.ejb.transaction.JoinableCMTTransactionFactory" />
-        </properties>
-    </persistence-unit>
-
 </persistence>

@@ -7,11 +7,6 @@
 
     <display-name>Zyeeda Framework Web Application</display-name>
 
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>WEB-INF/spring-beans.xml</param-value>
-    </context-param>
-
     <resource-ref>
         <description>Default Data Source</description>
         <res-ref-name>jdbc/defaultDS</res-ref-name>
@@ -21,12 +16,6 @@
     <resource-ref>
         <description>Drools Task Data Source</description>
         <res-ref-name>jdbc/droolsTaskDS</res-ref-name>
-        <res-type>javax.sql.DataSource</res-type>
-        <res-auth>Container</res-auth>
-    </resource-ref>
-    <resource-ref>
-        <description>Attachment Data Source</description>
-        <res-ref-name>jdbc/attachmentDS</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
@@ -54,24 +43,6 @@
             com.zyeeda.framework.web.ContextListener
         </listener-class>
     </listener>
-    <!--
-    <listener>
-        <listener-class>
-            org.springframework.web.context.ContextLoaderListener
-        </listener-class>
-    </listener>
-    -->
-
-    <!--
-    <filter>
-        <filter-name>Remote User Mock Filter</filter-name>
-        <filter-class>com.zyeeda.framework.web.mock.RemoteUserMockFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>Remote User Mock Filter</filter-name>
-        <url-pattern>*.jsp</url-pattern>
-    </filter-mapping>
-    -->
 
     <!-- 
     <filter>
@@ -85,6 +56,7 @@
     </filter-mapping>
     -->
 
+    <!--
     <filter>
         <filter-name>OSiVFilter</filter-name>
         <filter-class>com.zyeeda.framework.web.OpenSessionInViewFilter</filter-class>
@@ -93,24 +65,22 @@
         <filter-name>OSiVFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+    -->
 
-    <!--
     <filter>
         <filter-name>SecurityFilter</filter-name>
-        <display-name>Security Filter</display-name>
-        <filter-class>com.zyeeda.framework.web.SecurityFilter</filter-class>
+        <filter-class>org.apache.shiro.web.servlet.IniShiroFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>SecurityFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-    -->
     
     <!--
     <servlet>
         <servlet-name>OpenIdConsumer</servlet-name>
         <servlet-class>
-            com.zyeeda.framework.web.OpenIdConsumerServlet
+            com.zyeeda.framework.web.demo.DemoOpenIdConsumerServlet
         </servlet-class>
         <init-param>
             <param-name>redirect.to.url</param-name>
@@ -144,12 +114,17 @@
                 com.zyeeda.framework.ws.DictionaryService 
                 com.zyeeda.framework.ws.DocumentService 
                 com.zyeeda.framework.ws.DepartmentService 
+<<<<<<< local
+=======
+                com.zyeeda.framework.ws.UserService 
+>>>>>>> other
             </param-value>
         </init-param>
         <init-param>
             <param-name>jaxrs.providers</param-name>
             <param-value>
-                com.zyeeda.framework.cxf.DedicatedJsonProvider
+                com.zyeeda.framework.cxf.JacksonJsonProvider 
+                com.zyeeda.framework.cxf.DateParameterHandler
             </param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
@@ -181,10 +156,5 @@
         </user-data-constraint>
     </security-constraint>
     -->
-
-    <mime-mapping>
-        <extension>manifest</extension>
-        <mime-type>test/manifest</mime-type>
-    </mime-mapping>
 
 </web-app>
