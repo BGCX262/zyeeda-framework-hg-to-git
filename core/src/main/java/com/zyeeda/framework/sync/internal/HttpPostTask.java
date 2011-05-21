@@ -1,4 +1,4 @@
-package com.zyeeda.framework.synch.internal;
+package com.zyeeda.framework.sync.internal;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ public class HttpPostTask implements Runnable {
 	@Override
 	public void run() {
 		try {
-			HttpClientFactory.sendPostRequest(this.post);
+			HttpClientHelper.sendPostRequest(this.post);
 		} catch (ClientProtocolException e) {
 			throw new RuntimeException(e);
 		} catch (IOException e) {

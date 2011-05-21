@@ -1,4 +1,4 @@
-package com.zyeeda.framework.synch.internal;
+package com.zyeeda.framework.sync.internal;
 
 import java.io.Serializable;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -7,13 +7,13 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 
-import com.zyeeda.framework.synch.UserSynchService;
+import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.ws.base.ResourceService;
 
-public class UserSynchThreadPool extends ResourceService {
+public class UserSyncThreadPool extends ResourceService {
 
-	private UserSynchService userSynchService = null;
-	public UserSynchThreadPool(ServletContext ctx) {
+	private UserSyncService userSynchService = null;
+	public UserSyncThreadPool(ServletContext ctx) {
 		super(ctx);
 		
 		userSynchService = this.getUserSynchService();
@@ -56,11 +56,11 @@ public class UserSynchThreadPool extends ResourceService {
 		}
 
 		public void run() {
-			if (UserSynchThreadPool.USER_SYNCH_ADD_TASK.equals(this.taskType)) {
+			if (UserSyncThreadPool.USER_SYNCH_ADD_TASK.equals(this.taskType)) {
 				
-			} else if (UserSynchThreadPool.USER_SYNCH_UPDATE_TASK.equals(this.taskType)) {
+			} else if (UserSyncThreadPool.USER_SYNCH_UPDATE_TASK.equals(this.taskType)) {
 				
-			} else if (UserSynchThreadPool.USER_SYNCH_SET_VISIBLE_TASK.equals(this.taskType)) {
+			} else if (UserSyncThreadPool.USER_SYNCH_SET_VISIBLE_TASK.equals(this.taskType)) {
 				
 			}
 		}

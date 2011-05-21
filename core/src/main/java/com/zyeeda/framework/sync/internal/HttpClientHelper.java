@@ -1,4 +1,4 @@
-package com.zyeeda.framework.synch.internal;
+package com.zyeeda.framework.sync.internal;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-public class HttpClientFactory {
+public class HttpClientHelper {
 	
 	public static void sendPostRequest(HttpPost post) throws ClientProtocolException, IOException {
 		HttpClient client = new DefaultHttpClient();
