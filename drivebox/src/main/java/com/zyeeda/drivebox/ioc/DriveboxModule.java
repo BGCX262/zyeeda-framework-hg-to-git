@@ -43,6 +43,7 @@ public class DriveboxModule {
 		binder.bind(UserSyncService.class, HttpClientUserSyncServiceProvider.class);
 	}
 	
+	@Startup
 	public static void startServices(
 			@Primary final ConfigurationService configSvc,
 			@Primary final TemplateService tplSvc,
@@ -69,6 +70,5 @@ public class DriveboxModule {
 		userSyncService.start();
 		
 	}
-
 
 }
