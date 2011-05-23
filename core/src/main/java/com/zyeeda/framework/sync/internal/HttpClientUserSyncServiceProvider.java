@@ -52,10 +52,10 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 	public void init(Configuration config) throws Exception {
 		this.syncUrls = config.getString(HttpClientUserSyncServiceProvider.SYNC_URLS);
 		this.urls = StringUtils.split(this.syncUrls, ",");
-		this.poolExecutor = this.getThreadPool();
 		this.corePoolSize = Integer.parseInt(config.getString(CORE_POOL_SIZE));
 		this.keepAliveTime = Integer.parseInt(config.getString(KEEP_ALIVE_TIME));
 		this.maximumPoolSize = Integer.parseInt(config.getString(MAXIMUM_POOL_SIZE));
+		this.poolExecutor = this.getThreadPool();
 	}
 
 	@Override
