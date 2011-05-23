@@ -23,6 +23,9 @@ public class OrganizationNodeVo implements Serializable{
 	
 	private String fullPath;
 
+	/*标识是用户还是部门*/
+	private String kind;
+
 	public String getId() {
 		return id;
 	}
@@ -77,6 +80,14 @@ public class OrganizationNodeVo implements Serializable{
 
 	public void setFullPath(String fullPath) {
 		this.fullPath = fullPath;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
 	}
 	
 }

@@ -6,23 +6,20 @@ import java.util.List;
 import javax.naming.NamingException;
 
 import com.zyeeda.framework.entities.User;
-import com.zyeeda.framework.viewmodels.UserVo;
 
 public interface UserManager {
 
-	public User persist(User user) throws NamingException;
-	
-	public User findById(String id) throws NamingException, ParseException;
+	public void persist(User user) throws NamingException;
 	
 	public void remove(String id) throws NamingException;
 	
-	public User update(User user) throws NamingException, ParseException;
+	public void update(User user) throws NamingException, ParseException;
 	
-	public List<UserVo> getUserListByDepartmentId(String id) throws NamingException;
+	public User findById(String id) throws NamingException, ParseException;
 	
-	public List<UserVo> getUserListByDepartmentId(String id, String type) throws NamingException;
+	public List<User> findByDepartmentId(String id) throws NamingException;
 	
-	public List<UserVo> getUserListByName(String name) throws NamingException;
+	public List<User> findByName(String name) throws NamingException;
 	
 	public void updatePassword(String id, String password) throws NamingException, ParseException;
 	
