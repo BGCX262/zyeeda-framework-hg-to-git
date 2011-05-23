@@ -107,6 +107,7 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		if (this.urls.length <= 0) {
 			return;
 		}
+		
 		HttpPut put = null;
 		try {
 			HttpParams params = this.buildHttpParams(this.buildMap(user));
