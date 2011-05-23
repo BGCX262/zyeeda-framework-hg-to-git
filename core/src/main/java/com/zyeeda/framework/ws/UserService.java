@@ -22,6 +22,7 @@ import javax.ws.rs.core.Context;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
+import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -62,6 +63,7 @@ public class UserService extends ResourceService {
 	@Produces("application/json")
 	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
+		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		user.setDeptFullPath(id);
@@ -71,6 +73,7 @@ public class UserService extends ResourceService {
 			throw new RuntimeException("不能修改账号");
 		} else {
 			userMgr.update(user);
+			userSyncService.update(user);
 			return userMgr.findById(user.getId());
 		}
 	}

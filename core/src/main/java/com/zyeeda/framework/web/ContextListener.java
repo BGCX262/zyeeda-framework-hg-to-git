@@ -15,6 +15,9 @@
  */
 package com.zyeeda.framework.web;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -26,6 +29,8 @@ import org.apache.tapestry5.ioc.IOCUtilities;
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.RegistryBuilder;
 import org.apache.tapestry5.ioc.def.ContributionDef;
+import org.apache.tapestry5.ioc.def.ContributionDef2;
+import org.apache.tapestry5.ioc.internal.util.InternalUtils;
 
 import com.zyeeda.framework.config.internal.ConfigurationServiceContributionDef;
 import com.zyeeda.framework.FrameworkConstants;
@@ -55,6 +60,14 @@ public class ContextListener implements ServletContextListener {
             IOCUtilities.addDefaultModules(builder);
             ContributionDef contributionDef = new ConfigurationServiceContributionDef(context);
             builder.add(new CustomModuleDef(contributionDef));
+System.out.println("===============" + new CustomModuleDef(contributionDef).getServiceIds().size());
+Set<ContributionDef> cSet = new CustomModuleDef(contributionDef).getContributionDefs();
+for (Iterator<ContributionDef> iterator = cSet.iterator(); iterator.hasNext();) {
+	ContributionDef c = iterator.next();
+	ContributionDef2 cd2 = InternalUtils.toContributionDef2(c);
+	System.out.println("----" + cd2.getServiceId());
+	System.out.println("----" + c.getServiceId());
+}
             builder.add(this.provideExtraModules());
             Registry registry = builder.build();
             

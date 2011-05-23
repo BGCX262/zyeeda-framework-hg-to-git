@@ -15,10 +15,12 @@ import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.openid.consumer.OpenIdConsumerService;
 import com.zyeeda.framework.openid.consumer.internal.DefaultOpenIdConsumerServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
+import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.OpenIdProviderSecurityServiceProvider;
+import com.zyeeda.framework.sync.UserSyncService;
+import com.zyeeda.framework.sync.internal.HttpClientUserSyncServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
 import com.zyeeda.framework.template.internal.FreemarkerTemplateServiceProvider;
 import com.zyeeda.framework.transaction.TransactionService;
@@ -41,6 +43,7 @@ public class FrameworkModule {
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
+		binder.bind(UserSyncService.class, HttpClientUserSyncServiceProvider.class);
 	}
 	
 	@Startup
@@ -54,7 +57,8 @@ public class FrameworkModule {
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc,
 			@Primary final KnowledgeService knowledgeSvc,
-			@Primary final OpenIdConsumerService consumerSvc) throws Exception {
+			@Primary final OpenIdConsumerService consumerSvc,
+			@Primary final UserSyncService userSyncService) throws Exception {
 		
 		configSvc.start();
 		tplSvc.start();
@@ -66,6 +70,7 @@ public class FrameworkModule {
 		securitySvc.start();
 		knowledgeSvc.start();
 		consumerSvc.start();
+		userSyncService.start();
 		
 	}
 	

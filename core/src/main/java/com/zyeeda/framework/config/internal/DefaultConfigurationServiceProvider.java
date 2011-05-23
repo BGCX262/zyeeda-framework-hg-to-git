@@ -29,7 +29,6 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 			Collection<ServletContext> contexts, RegistryShutdownHub shutdownHub) {
 		
 		super(shutdownHub);
-		
 		if (contexts.size() != 1) {
 			throw new IllegalStateException("There should be one and only one context.");
 		}
