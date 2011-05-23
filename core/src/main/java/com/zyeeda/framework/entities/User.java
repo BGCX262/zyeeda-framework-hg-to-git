@@ -3,9 +3,11 @@ package com.zyeeda.framework.entities;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Entity;
 
 import com.zyeeda.framework.entities.base.SimpleDomainEntity;
 
+//@Entity
 public class User extends SimpleDomainEntity implements Serializable {
 
 	private static final long serialVersionUID = -411862891641683217L;

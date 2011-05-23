@@ -252,6 +252,7 @@ public class DocumentService extends ResourceService {
 
 	// TODO
 	// 修改出错 给出提示
+	// 现在还没有不为空约束，而在底层写入的则为：当传来的参数不为空的时候则去修改，如果为空就不去修改
 	@PUT
 	@Path("/")
 	@Produces("application/json")
