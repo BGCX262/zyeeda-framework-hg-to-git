@@ -21,6 +21,7 @@
         <class>com.zyeeda.framework.entities.Dictionary</class>
         <class>com.zyeeda.framework.entities.ProcessHistory</class>
         <class>com.zyeeda.framework.entities.ActionHistory</class>
+         <class>com.zyeeda.framework.entities.User</class>
 
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
 
