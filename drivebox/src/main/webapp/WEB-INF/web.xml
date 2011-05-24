@@ -64,7 +64,7 @@
         <filter-name>OSiVFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
-   <!-- -->
+   
 
     <filter>
         <filter-name>SecurityFilter</filter-name>
@@ -113,7 +113,8 @@
                 com.zyeeda.framework.ws.DictionaryService 
                 com.zyeeda.framework.ws.DocumentService 
                 com.zyeeda.framework.ws.DepartmentService 
-                com.zyeeda.framework.ws.UserService 
+                com.zyeeda.framework.ws.UserService
+                com.zyeeda.framework.ws.DefaultUserService
             </param-value>
         </init-param>
         <init-param>
@@ -137,6 +138,7 @@
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
+        <!-- <url-pattern>/sync/*</url-pattern> -->
     </servlet-mapping>
 
     <!-- 

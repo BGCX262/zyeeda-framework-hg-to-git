@@ -1,6 +1,6 @@
-<!DOCTYPE HTML>
-<html manifest="test.manifest">
+<html>
     <head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
         <script type="text/javascript">
             function store() {
                 console.log(navigator.onLine);
@@ -11,15 +11,20 @@
                 console.log(navigator.onLine);
                 console.log(localStorage.getItem('name'));
                 console.log(localStorage);
+                
             }
         </script>
     </head>
     <body>
-        <form method="POST" action="/rest/docs"
+        <form method="POST" action="/rest/docs/"
             enctype="multipart/form-data" name="files">
             <label>Name:</label><input type="text" name="name" /><br />
             <label>Desc:</label><input type="text" name="description" /><br />
-            <label>Attach:</label><input type="file" name="file1" id="file1" />
+            <label>Creator:</label><input type="text" name="creator" /><br />
+            <label>Owner:</label><input type="text" name="owner" /><br />
+            <label>Keywor:</label><input type="text" name="keyword" /><br />
+            <label>foreignId</label><input type="text" name="foreignId" /><br />
+            <label>Attach:</label><input type="file" name="content" id="content" />
             <input type="submit" value="submit"/>
         </form>
         <button type="button" onclick="store();">Store</button>
