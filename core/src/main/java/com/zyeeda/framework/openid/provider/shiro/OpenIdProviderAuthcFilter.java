@@ -1,4 +1,4 @@
-package com.zyeeda.framework.openid.provider;
+package com.zyeeda.framework.openid.provider.shiro;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -14,6 +14,7 @@ import org.apache.tapestry5.ioc.Registry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.openid.provider.OpenIdProviderService;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class OpenIdProviderAuthcFilter extends FormAuthenticationFilter {

@@ -1,6 +1,8 @@
 package com.zyeeda.framework.security.internal;
 
+import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
@@ -40,9 +42,8 @@ public class OpenIdProviderSecurityServiceProvider extends AbstractService imple
 	 */
 	@Override
 	public String getCurrentUser() {
-		return "admin";
-		//Subject current = SecurityUtils.getSubject();
-		//return current.getPrincipal().toString();
+		Subject current = SecurityUtils.getSubject();
+		return current.getPrincipal().toString();
 	}
 	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {
