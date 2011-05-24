@@ -1,8 +1,12 @@
 package com.zyeeda.framework.sync.internal;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -10,10 +14,12 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpParams;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
@@ -23,6 +29,7 @@ import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.sync.UserSyncService;
+import com.zyeeda.framework.utils.DatetimeUtils;
 
 @ServiceId("httpclient-user-sync-service")
 @Marker(Primary.class)
@@ -32,6 +39,10 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 	private static final String CORE_POOL_SIZE = "corePoolSize";
 	private static final String KEEP_ALIVE_TIME = "keepAliveTime";
 	private static final String MAXIMUM_POOL_SIZE = "maximumPoolSize";
+	private static final String SYNC_ADD_PATH = "/rest/sync/persist";
+	private static final String SYNC_UPDATE_PATH = "/rest/sync/update";
+	private static final String SYNC_SET_VISIBLE_PATH = "/rest/sync/setVisible";
+	
 	
 	private String syncUrls = null;
 	private String[] urls = null;
@@ -66,10 +77,10 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		
 		HttpPost post = null;
 		try {
-			HttpParams params = this.buildHttpParams(this.buildMap(user));
+			HttpEntity entity = this.getUrlEncodedFormEntity(this.buildMap(user));
 			for (String url : this.urls) {
-				post = new HttpPost(url);
-				post.setParams(params);
+				post = new HttpPost(url + SYNC_ADD_PATH);
+				post.setEntity(entity);
 				this.poolExecutor.execute(new HttpPostTask(post));
 			}
 		} catch (IllegalArgumentException e) {
@@ -88,16 +99,22 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		}
 		
 		HttpPut put = null;
-		HttpParams params = null;
-		for (String id : ids) {
-			params = new BasicHttpParams();
-			params.setParameter("id", id);
-			params.setParameter("visible", visible);
-			for (String url : this.urls) {
-				put = new HttpPut(url);
-				put.setParams(params);
-				this.poolExecutor.execute(new HttpPutTask(put));
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		HttpEntity entity = null;
+		
+		try {
+			for (String id : ids) {
+				formParams.add(new BasicNameValuePair("id", id.substring(id.indexOf("=") + 1, id.indexOf(","))));
+				formParams.add(new BasicNameValuePair("status", visible.toString()));
+				entity = new UrlEncodedFormEntity(formParams, "utf-8");
+				for (String url : this.urls) {
+					put = new HttpPut(url + SYNC_SET_VISIBLE_PATH);
+					put.setEntity(entity);
+					this.poolExecutor.execute(new HttpPutTask(put));
+				}
 			}
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -109,10 +126,10 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		
 		HttpPut put = null;
 		try {
-			HttpParams params = this.buildHttpParams(this.buildMap(user));
+			HttpEntity entity = this.getUrlEncodedFormEntity(this.buildMap(user));
 			for (String url : this.urls) {
-				put = new HttpPut(url);
-				put.setParams(params);
+				put = new HttpPut(url + SYNC_UPDATE_PATH);
+				put.setEntity(entity);
 				this.poolExecutor.execute(new HttpPutTask(put));
 			}
 		} catch (IllegalArgumentException e) {
@@ -132,18 +149,37 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
 		for (int i = 0; i < methods.length; i++) {  
 		   if (methods[i].getName().indexOf("get") == 0) {  
-			   paramsMap.put(methods[i].getName(), methods[i].invoke(obj, new Object[0]));  
+			   paramsMap.put(this.getFunctionNameToFieldName(methods[i].getName()), methods[i].invoke(obj, new Object[0]));
 		   }  
 		}
 		return paramsMap;
 	}
 	
-	private HttpParams buildHttpParams(Map<String, Object> paramsMap) {
-		HttpParams params = new BasicHttpParams();
+	private String getFunctionNameToFieldName(String functionName) {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append(Character.toLowerCase(functionName.charAt(3))).append(functionName.substring(4, functionName.length()));
+		
+		return buffer.toString();
+	}
+	
+	private UrlEncodedFormEntity getUrlEncodedFormEntity(Map<String, Object> paramsMap) {
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
 		for (String key : paramsMap.keySet()) {
-			params.setParameter(key, paramsMap.get(key));
+			if (paramsMap.get(key) instanceof Boolean) {
+				formParams.add(new BasicNameValuePair(key, paramsMap.get(key).toString()));
+			} else if (paramsMap.get(key) instanceof String) {
+				formParams.add(new BasicNameValuePair(key, (String) paramsMap.get(key)));
+			} else if (paramsMap.get(key) instanceof Date) {
+				formParams.add(new BasicNameValuePair(key, DatetimeUtils.formatDate((Date) paramsMap.get(key))));
+			}
 		}
-		return params;
+		UrlEncodedFormEntity uefEntity = null;
+		try {
+			uefEntity = new UrlEncodedFormEntity(formParams, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		return uefEntity;
 	}
 	
 	private ThreadPoolExecutor getThreadPool() {
