@@ -47,24 +47,24 @@ public class MenuManagerImpl implements MenuManager {
 			menuMap.put(parentPermission.getValue(), parentMenu);
 			while (parentPermission != null) {
 				parentMenu = new Menu();
-				    String authKey = parentPermission.getValue();
-					parentPermission = permissionMgr.getParentPermissionByPath(parentPermission.getValue());
-						if(parentPermission != null){
-							parentMenu.setAuth(parentPermission.getValue());
-							parentMenu.setId(parentPermission.getId());
-							parentMenu.setName(parentPermission.getName());
-								if (menuMap.get(parentMenu.getAuth()) == null) {
-									menuMap.put(parentMenu.getAuth(), parentMenu);
-									parentMenu.getPermissionSet().add(menuMap.get(authKey));
-								} else if(menuMap.get(parentMenu.getAuth()) != null) {
-									Menu menuKey = menuMap.get(parentMenu.getAuth());
-									menuKey.getPermissionSet().add(menuMap.get(authKey));
-									break;
-								}
-						} else {
-							root = authKey;
-							listMenu.add(menuMap.get(root));
-						} 
+			    String authKey = parentPermission.getValue();
+				parentPermission = permissionMgr.getParentPermissionByPath(parentPermission.getValue());
+					if(parentPermission != null){
+						parentMenu.setAuth(parentPermission.getValue());
+						parentMenu.setId(parentPermission.getId());
+						parentMenu.setName(parentPermission.getName());
+							if (menuMap.get(parentMenu.getAuth()) == null) {
+								menuMap.put(parentMenu.getAuth(), parentMenu);
+								parentMenu.getPermissionSet().add(menuMap.get(authKey));
+							} else if(menuMap.get(parentMenu.getAuth()) != null) {
+								Menu menuKey = menuMap.get(parentMenu.getAuth());
+								menuKey.getPermissionSet().add(menuMap.get(authKey));
+								break;
+							}
+					} else {
+						root = authKey;
+						listMenu.add(menuMap.get(root));
+					} 
 			}
 		}
 		return listMenu;
