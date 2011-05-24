@@ -1,14 +1,16 @@
 package com.zyeeda.framework.entities;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-import com.zyeeda.framework.entities.base.SimpleDomainEntity;
-
-//@Entity
-public class User extends SimpleDomainEntity implements Serializable {
+@Entity(name = "ZDA_SYS_USER")
+public class User/* extends SimpleDomainEntity*/ implements Serializable {
 
 	private static final long serialVersionUID = -411862891641683217L;
 
@@ -25,10 +27,10 @@ public class User extends SimpleDomainEntity implements Serializable {
 	private Boolean status;
 	private Boolean postStatus;
 //	private byte[] photo;
-	private File file;
 	private String departmentName;
 	private String deptFullPath;
 
+	@Id @Column(name = "F_ID")
 	public String getId() {
 		return id;
 	}
@@ -37,6 +39,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.id = id;
 	}
 
+	@Column(name = "F_USERNAME", nullable = false)
 	public String getUsername() {
 		return username;
 	}
@@ -45,6 +48,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.username = username;
 	}
 
+	@Column(name = "F_PASSWORD", nullable = false, length = 36)
 	public String getPassword() {
 		return password;
 	}
@@ -53,6 +57,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.password = password;
 	}
 
+	@Column(name = "F_GENDER", length = 4)
 	public String getGender() {
 		return gender;
 	}
@@ -61,6 +66,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.gender = gender;
 	}
 
+	@Column(name = "F_POSITION", length = 100)
 	public String getPosition() {
 		return position;
 	}
@@ -69,6 +75,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.position = position;
 	}
 
+	@Column(name = "F_DEGREE", length = 100)
 	public String getDegree() {
 		return degree;
 	}
@@ -77,6 +84,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.degree = degree;
 	}
 
+	@Column(name = "F_EMAIL", length = 50)
 	public String getEmail() {
 		return email;
 	}
@@ -85,6 +93,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.email = email;
 	}
 
+	@Column(name = "F_MOBILE", length = 13)
 	public String getMobile() {
 		return mobile;
 	}
@@ -93,6 +102,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.mobile = mobile;
 	}
 
+	@Temporal(TemporalType.TIME) @Column(name = "F_BIRTHDAY", length = 19)
 	public Date getBirthday() {
 		return birthday;
 	}
@@ -101,6 +111,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.birthday = birthday;
 	}
 
+	@Temporal(TemporalType.TIME) @Column(name = "F_DATEOFWORK", length = 19)
 	public Date getDateOfWork() {
 		return dateOfWork;
 	}
@@ -109,6 +120,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.dateOfWork = dateOfWork;
 	}
 
+	@Column(name = "STATUS")
 	public Boolean getStatus() {
 		return status;
 	}
@@ -117,6 +129,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.status = status;
 	}
 
+	@Column(name = "POSTSTATUS")
 	public Boolean getPostStatus() {
 		return postStatus;
 	}
@@ -133,6 +146,7 @@ public class User extends SimpleDomainEntity implements Serializable {
 //		this.photo = photo;
 //	}
 
+	@Column(name = "F_DEPARTMENTNAME", length = 100)
 	public String getDepartmentName() {
 		return departmentName;
 	}
@@ -141,20 +155,13 @@ public class User extends SimpleDomainEntity implements Serializable {
 		this.departmentName = departmentName;
 	}
 
+	@Column(name = "F_DEPTFULLPATH", length = 100)
 	public String getDeptFullPath() {
 		return deptFullPath;
 	}
 
 	public void setDeptFullPath(String deptFullPath) {
 		this.deptFullPath = deptFullPath;
-	}
-
-	public File getFile() {
-		return file;
-	}
-
-	public void setFile(File file) {
-		this.file = file;
 	}
 
 }
