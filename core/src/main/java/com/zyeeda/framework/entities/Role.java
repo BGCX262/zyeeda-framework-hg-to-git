@@ -45,6 +45,8 @@ public class Role extends SimpleDomainEntity {
 	private String permissions;
 	private String scopeType;
 	private String scopeId;
+//	private String deptepment;
+//	private String deptementId;
 	
 	@ElementCollection
 	@CollectionTable(name="SYS_SUBJECT", joinColumns=@JoinColumn(name="F_ROLE_ID"))
@@ -52,6 +54,7 @@ public class Role extends SimpleDomainEntity {
 	public Set<String> getSubjects() {
 		return this.subjects;
 	}
+	
 	public void setSubjects(Set<String> subjects) {
 		this.subjects = subjects;
 	}
@@ -61,6 +64,7 @@ public class Role extends SimpleDomainEntity {
 	public String getPermissions() {
 		return this.permissions;
 	}
+	
 	public void setPermissions(String permissions) {
 		this.permissions = permissions;
 	}
@@ -77,6 +81,7 @@ public class Role extends SimpleDomainEntity {
 	public String getScopeType() {
 		return this.scopeType;
 	}
+	
 	public void setScopeType(String scopeType) {
 		this.scopeType = scopeType;
 	}
@@ -86,6 +91,7 @@ public class Role extends SimpleDomainEntity {
 	public String getScopeId() {
 		return this.scopeId;
 	}
+	
 	public void setScopeId(String scopeId) {
 		this.scopeId = scopeId;
 	}
