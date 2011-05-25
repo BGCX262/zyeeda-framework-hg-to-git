@@ -29,11 +29,16 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 		search.addFilterEqual("alive", true);
 		return this.searchUnique(search);
 	}
+	
 	public List<ActionHistory> findListByProcessId(Long processInsId){
 		Search search = new Search();
 		search.addFilterEqual("processInstanceId", processInsId);
 		return this.search(search);
 	}
-
-
+	
+	public List<ActionHistory> findListByProcessCreator(String name){
+		Search search = new Search();
+		search.addFilterEqual("creator", name);
+		return this.search(search);
+	}
 }
