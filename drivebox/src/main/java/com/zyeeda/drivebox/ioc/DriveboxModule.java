@@ -16,6 +16,8 @@ import com.zyeeda.framework.openid.consumer.internal.DefaultOpenIdConsumerServic
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
+import com.zyeeda.framework.scheduler.SchedulerService;
+import com.zyeeda.framework.scheduler.internal.QuartzSchedulerServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.OpenIdProviderSecurityServiceProvider;
 import com.zyeeda.framework.sync.UserSyncService;
@@ -41,6 +43,7 @@ public class DriveboxModule {
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
 		binder.bind(UserSyncService.class, HttpClientUserSyncServiceProvider.class);
+		binder.bind(SchedulerService.class, QuartzSchedulerServiceProvider.class);
 	}
 	
 	@Startup
@@ -55,7 +58,8 @@ public class DriveboxModule {
 			@Primary final SecurityService<?> securitySvc,
 			@Primary final KnowledgeService knowledgeSvc,
 			@Primary final OpenIdConsumerService consumerSvc,
-			@Primary final UserSyncService userSyncService) throws Exception {
+			@Primary final UserSyncService userSyncSvc,
+			@Primary final SchedulerService<?> schedulerSvc) throws Exception {
 		
 		configSvc.start();
 		tplSvc.start();
@@ -67,7 +71,8 @@ public class DriveboxModule {
 		securitySvc.start();
 		knowledgeSvc.start();
 		consumerSvc.start();
-		userSyncService.start();
+		userSyncSvc.start();
+		//schedulerSvc.start();
 		
 	}
 
