@@ -10,6 +10,8 @@ import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.utils.IocUtils;
+
 public class TapestryIocJobFactory implements JobFactory {
 	
 	private final static Logger logger = LoggerFactory.getLogger(TapestryIocJobFactory.class);
@@ -25,7 +27,7 @@ public class TapestryIocJobFactory implements JobFactory {
 		JobDetail detail = bundle.getJobDetail();
 		Class<? extends Job> jobClass = detail.getJobClass();
 		logger.debug("Fetch job class {} from Tapestry IoC container", jobClass.getSimpleName());
-		return this.resources.getService(jobClass);
+		return this.resources.getService(IocUtils.getServiceId(jobClass), Job.class);
 	}
 
 }
