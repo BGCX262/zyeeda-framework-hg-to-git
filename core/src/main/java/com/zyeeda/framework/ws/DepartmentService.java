@@ -2,6 +2,7 @@ package com.zyeeda.framework.ws;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletContext;
@@ -19,9 +20,12 @@ import javax.ws.rs.core.Context;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
+import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
+import com.zyeeda.framework.managers.internal.RoleManagerImpl;
 import com.zyeeda.framework.viewmodels.DepartmentVo;
 import com.zyeeda.framework.viewmodels.OrganizationNodeVo;
 import com.zyeeda.framework.viewmodels.UserVo;
@@ -104,13 +108,11 @@ public class DepartmentService extends ResourceService {
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentId(@Context HttpServletRequest request, 
 			@PathParam("id") String id) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
-		
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		List<DepartmentVo> deptVoList = null;
 		List<UserVo> userVoList = null;
 		String type = request.getParameter("type");
-		
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
 		} else {
@@ -122,6 +124,9 @@ public class DepartmentService extends ResourceService {
 		return orgList;
 	}
 	
+	
+	
+	
 	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVo(List<DepartmentVo> deptVoList, List<UserVo> userVoList) {
 		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
 		for (DepartmentVo deptVo: deptVoList) {
@@ -132,8 +137,7 @@ public class DepartmentService extends ResourceService {
 			orgNodeVo.setLabel(deptVo.getLabel());
 			orgNodeVo.setType(deptVo.getType());
 			orgNodeVo.setFullPath(deptVo.getId());
-			orgNodeVo.setKind(deptVo.getKind());
-			
+			orgNodeVo.setKind(deptVo.getKind());		
 			orgNodeVoList.add(orgNodeVo);
 		}
 		
@@ -188,5 +192,66 @@ public class DepartmentService extends ResourceService {
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;
+	}
+	
+	
+	@GET
+	@Path("/{id}/children/{roleId}")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChildrenNodesByDepartmentIdAndRoleId(@Context HttpServletRequest request, 
+			@PathParam("id") String id, @PathParam("roleId") String roleId) throws NamingException {
+		LdapService ldapSvc = this.getLdapService();
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		Role role = roleMgr.find(id);
+		Set<String> roleByUser = role.getSubjects();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<DepartmentVo> deptVoList = null;
+		List<UserVo> userVoList = null;
+		String type = request.getParameter("type");
+		
+		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
+		} else {
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
+		}
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVoCheckUser(deptVoList, userVoList, roleByUser);
+		
+		return orgList;
+	}
+	
+	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVoCheckUser(List<DepartmentVo> deptVoList, List<UserVo> userVoList, Set<String> userId) {
+		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
+		for (DepartmentVo deptVo: deptVoList) {
+			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
+			orgNodeVo.setId(deptVo.getId());
+			orgNodeVo.setCheckName(deptVo.getCheckName());
+			orgNodeVo.setIo(deptVo.getIo());
+			orgNodeVo.setLabel(deptVo.getLabel());
+			orgNodeVo.setType(deptVo.getType());
+			orgNodeVo.setFullPath(deptVo.getId());
+			orgNodeVo.setKind(deptVo.getKind());		
+			orgNodeVoList.add(orgNodeVo);
+		}
+		
+		for (UserVo userVo: userVoList) {
+			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
+			orgNodeVo.setId("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
+			orgNodeVo.setCheckName(userVo.getCheckName());
+			orgNodeVo.setIo(userVo.getId());
+			for(String id:userId){
+				if(id.equals(userVo.getId())){
+					orgNodeVo.setCheckedAuth(true);
+				}
+			}
+			orgNodeVo.setLabel(userVo.getLabel());
+			orgNodeVo.setType(userVo.getType());
+			orgNodeVo.setLeaf(userVo.isLeaf());
+			orgNodeVo.setFullPath("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
+			orgNodeVo.setKind(userVo.getKind());			
+			orgNodeVoList.add(orgNodeVo);
+		}
+		return orgNodeVoList;
 	}
 }

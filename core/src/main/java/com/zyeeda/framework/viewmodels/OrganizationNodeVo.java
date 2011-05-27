@@ -22,6 +22,8 @@ public class OrganizationNodeVo implements Serializable{
 	private String io;
 	
 	private String fullPath;
+	private Boolean checkedAuth;
+	
 
 	/*标识是用户还是部门*/
 	private String kind;
@@ -90,4 +92,11 @@ public class OrganizationNodeVo implements Serializable{
 		this.kind = kind;
 	}
 	
+	public Boolean getCheckedAuth() {
+		return checkedAuth;
+	}
+
+	public void setCheckedAuth(Boolean checkedAuth) {
+		this.checkedAuth = checkedAuth;
+	}
 }
