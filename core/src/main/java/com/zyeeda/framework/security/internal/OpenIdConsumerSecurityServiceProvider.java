@@ -1,6 +1,7 @@
 package com.zyeeda.framework.security.internal;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.subject.Subject;
@@ -35,7 +36,11 @@ public class OpenIdConsumerSecurityServiceProvider extends AbstractService imple
 	@Override
 	public String getCurrentUser() {
 		Subject current = SecurityUtils.getSubject();
-		return current.getPrincipal().toString();
+		Object principal = current.getPrincipal();
+		if (principal == null) {
+			throw new AuthenticationException("Subject not signed in.");
+		}
+		return principal.toString();
 	}
 	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {
