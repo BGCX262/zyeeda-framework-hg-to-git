@@ -186,7 +186,7 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType("io");
-		userVo.setLabel("<a>" + user.getId() + "<a>");
+		userVo.setLabel(user.getId());
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
