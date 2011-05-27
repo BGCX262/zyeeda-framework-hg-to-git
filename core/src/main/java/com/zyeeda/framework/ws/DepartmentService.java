@@ -1,6 +1,7 @@
 package com.zyeeda.framework.ws;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -207,6 +208,7 @@ public class DepartmentService extends ResourceService {
 		if(role != null) {
 			roleByUser = role.getSubjects();
 		}
+		roleByUser = role.getSubjects();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		List<DepartmentVo> deptVoList = null;
