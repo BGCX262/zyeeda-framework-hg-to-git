@@ -19,7 +19,7 @@ import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServicePro
 import com.zyeeda.framework.scheduler.SchedulerService;
 import com.zyeeda.framework.scheduler.internal.QuartzSchedulerServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
-import com.zyeeda.framework.security.internal.OpenIdProviderSecurityServiceProvider;
+import com.zyeeda.framework.security.internal.OpenIdConsumerSecurityServiceProvider;
 import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.sync.internal.HttpClientUserSyncServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
@@ -38,7 +38,7 @@ public class DriveboxModule {
 		binder.bind(PersistenceService.class, DroolsTaskPersistenceServiceProvider.class);
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
-		binder.bind(SecurityService.class, OpenIdProviderSecurityServiceProvider.class);
+		binder.bind(SecurityService.class, OpenIdConsumerSecurityServiceProvider.class);
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);

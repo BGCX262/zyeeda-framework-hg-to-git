@@ -10,6 +10,7 @@ import org.quartz.spi.TriggerFiredBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.AnnotationException;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class TapestryIocJobFactory implements JobFactory {
@@ -26,8 +27,21 @@ public class TapestryIocJobFactory implements JobFactory {
 	public Job newJob(TriggerFiredBundle bundle, Scheduler scheduler) throws SchedulerException {
 		JobDetail detail = bundle.getJobDetail();
 		Class<? extends Job> jobClass = detail.getJobClass();
-		logger.debug("Fetch job class {} from Tapestry IoC container", jobClass.getSimpleName());
-		return this.resources.getService(IocUtils.getServiceId(jobClass), Job.class);
+		try {
+			logger.debug("New job class {} via IoC container", jobClass.getSimpleName());
+			return this.resources.getService(IocUtils.getServiceId(jobClass), Job.class);
+		} catch (AnnotationException e) {
+			logger.trace(e.getMessage(), e);
+		}
+		
+		try {
+			logger.debug("New job class {} via constructor", jobClass.getSimpleName());
+			return jobClass.newInstance();
+		} catch (InstantiationException e) {
+			throw new SchedulerException(e);
+		} catch (IllegalAccessException e) {
+			throw new SchedulerException(e);
+		}
 	}
 
 }

@@ -29,9 +29,6 @@ public class OpenIdConsumerRealm extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		logger.debug("authentication token type = {}", token.getClass().getName());
-		if (!(token instanceof OpenIdAuthenticationToken)) {
-			throw new AuthenticationException("Invalid authentication token.");
-		}
 		
 		Object principal = token.getPrincipal();
 		if (principal == null) {
