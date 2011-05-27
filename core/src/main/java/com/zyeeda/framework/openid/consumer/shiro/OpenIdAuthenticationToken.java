@@ -8,21 +8,19 @@ public class OpenIdAuthenticationToken implements AuthenticationToken {
 
 	private static final long serialVersionUID = 7305997052059544245L;
 	
-	private Identifier id;
 	private String userId;
 	
 	public OpenIdAuthenticationToken(Identifier id) {
-		this.id = id;
-		
-		String url = this.id.getIdentifier();
+		String url = id.getIdentifier();
 		this.userId = StringUtils.substringAfterLast(url, "id=");
+	}
+	
+	public OpenIdAuthenticationToken(String userId) {
+		this.userId = userId;
 	}
 
 	@Override
 	public Object getPrincipal() {
-		if (id == null) {
-			return null;
-		}
 		return this.userId;
 	}
 
