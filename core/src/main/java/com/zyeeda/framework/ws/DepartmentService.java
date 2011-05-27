@@ -208,7 +208,6 @@ public class DepartmentService extends ResourceService {
 		if(role != null) {
 			roleByUser = role.getSubjects();
 		}
-		roleByUser = role.getSubjects();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		List<DepartmentVo> deptVoList = null;
