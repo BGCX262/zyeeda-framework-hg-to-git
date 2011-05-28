@@ -250,7 +250,7 @@ public class DepartmentService extends ResourceService {
 				}
 			}
 			orgNodeVo.setLabel(userVo.getLabel());
-			orgNodeVo.setType(userVo.getType());
+			orgNodeVo.setType("task");
 			orgNodeVo.setLeaf(userVo.isLeaf());
 			orgNodeVo.setFullPath("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
 			orgNodeVo.setKind(userVo.getKind());			
