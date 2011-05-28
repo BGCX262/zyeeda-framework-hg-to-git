@@ -241,7 +241,7 @@ public class DepartmentService extends ResourceService {
 		
 		for (UserVo userVo: userVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
-			orgNodeVo.setId("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
+			orgNodeVo.setId(userVo.getId());
 			orgNodeVo.setCheckName(userVo.getCheckName());
 			orgNodeVo.setIo(userVo.getId());
 			for(String id:userId){
