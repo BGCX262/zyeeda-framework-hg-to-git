@@ -114,6 +114,7 @@ public class DepartmentService extends ResourceService {
 		List<DepartmentVo> deptVoList = null;
 		List<UserVo> userVoList = null;
 		String type = request.getParameter("type");
+		System.out.println("=========================" + type	);
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
 		} else {
@@ -152,10 +153,8 @@ public class DepartmentService extends ResourceService {
 			orgNodeVo.setLeaf(userVo.isLeaf());
 			orgNodeVo.setFullPath("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
 			orgNodeVo.setKind(userVo.getKind());
-			
 			orgNodeVoList.add(orgNodeVo);
 		}
-		
 		return orgNodeVoList;
 	}
 	
@@ -167,6 +166,7 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel("<a>" + dept.getName() + "<a>");
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
+		
 		deptVo.setIo("/rest/depts/" + dept.getId() + "/children");
 		deptVo.setKind("dept");
 		
