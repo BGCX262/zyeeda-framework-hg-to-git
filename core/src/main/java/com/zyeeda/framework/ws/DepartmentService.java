@@ -114,13 +114,14 @@ public class DepartmentService extends ResourceService {
 		List<DepartmentVo> deptVoList = null;
 		List<UserVo> userVoList = null;
 		String type = request.getParameter("type");
-		System.out.println("=========================" + type	);
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
+			//userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), type);
 		} else {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
+			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
 		}
-		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
+		
 		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
 		
 		return orgList;
@@ -215,7 +216,7 @@ public class DepartmentService extends ResourceService {
 		String type = request.getParameter("type");
 		
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVoByRoleId(deptMgr.getChildrenById(id), type, roleId);
 		} else {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
 		}
@@ -225,7 +226,8 @@ public class DepartmentService extends ResourceService {
 		return orgList;
 	}
 	
-	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVoCheckUser(List<DepartmentVo> deptVoList, List<UserVo> userVoList, Set<String> userId) {
+	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVoCheckUser(List<DepartmentVo> deptVoList, 
+			List<UserVo> userVoList, Set<String> userId) {
 		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
 		for (DepartmentVo deptVo: deptVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
@@ -258,4 +260,33 @@ public class DepartmentService extends ResourceService {
 		}
 		return orgNodeVoList;
 	}
+	
+	public static DepartmentVo fillDepartmentPropertiesToVoByRole(Department dept, String roleId) {
+		DepartmentVo deptVo = new DepartmentVo();
+		
+		deptVo.setId(dept.getId());
+		deptVo.setType("io");
+		deptVo.setLabel("<a>" + dept.getName() + "<a>");
+		deptVo.setCheckName(dept.getId());
+		deptVo.setLeaf(false);
+		
+		deptVo.setIo("/rest/depts/" + dept.getId() + "/children/" + roleId );
+		deptVo.setKind("dept");
+		
+		return deptVo;
+	}
+	
+	public static List<DepartmentVo> fillDepartmentListPropertiesToVoByRoleId(List<Department> deptList, String type, String roleId) {
+		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
+		DepartmentVo deptVo = null;
+		for (Department dept : deptList) {
+			deptVo = DepartmentService.fillDepartmentPropertiesToVoByRole(dept, roleId);
+			deptVo.setIo(deptVo.getIo() + "?type=task");
+			deptVo.setType(type);
+			deptVoList.add(deptVo);
+		}
+		return deptVoList;
+	}
+	
+	
 }
