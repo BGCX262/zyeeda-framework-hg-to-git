@@ -3,7 +3,9 @@ package com.zyeeda.drivebox.ioc;
 import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.Startup;
+import org.quartz.Job;
 
+import com.zyeeda.drivebox.jobs.TestJob;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
@@ -29,7 +31,7 @@ import com.zyeeda.framework.transaction.internal.DefaultTransactionServiceProvid
 import com.zyeeda.framework.validation.ValidationService;
 import com.zyeeda.framework.validation.internal.HibernateValidationServiceProvider;
 
-public class DriveboxModule {
+public class Module {
 	
 	public static void bind(ServiceBinder binder) {
 		binder.bind(ConfigurationService.class, DefaultConfigurationServiceProvider.class);
@@ -44,6 +46,8 @@ public class DriveboxModule {
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
 		binder.bind(UserSyncService.class, HttpClientUserSyncServiceProvider.class);
 		binder.bind(SchedulerService.class, QuartzSchedulerServiceProvider.class);
+		
+		binder.bind(Job.class, TestJob.class);
 	}
 	
 	@Startup
@@ -72,7 +76,7 @@ public class DriveboxModule {
 		knowledgeSvc.start();
 		consumerSvc.start();
 		userSyncSvc.start();
-		//schedulerSvc.start();
+		schedulerSvc.start();
 		
 	}
 
