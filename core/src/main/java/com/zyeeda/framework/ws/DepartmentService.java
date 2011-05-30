@@ -99,7 +99,6 @@ public class DepartmentService extends ResourceService {
 	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name) throws NamingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		
 		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.findByName(name));
 	}
 	
