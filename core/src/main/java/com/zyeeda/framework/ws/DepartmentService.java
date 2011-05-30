@@ -116,7 +116,7 @@ public class DepartmentService extends ResourceService {
 		String type = request.getParameter("type");
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
-			//userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), type);
+			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), type);
 		} else {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
 			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));

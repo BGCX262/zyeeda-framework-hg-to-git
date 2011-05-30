@@ -22,7 +22,7 @@ import com.zyeeda.framework.entities.base.SimpleDomainEntity;
 
 @Entity
 @Table(name = "SYS_ROLE")
-@NamedNativeQuery(name = "getRolesBySubject", query = "SELECT r.F_ID, r.F_NAME, r.F_DESCRIPTION, r.F_SCOPE_TYPE, r.F_SCOPE_ID, r.F_PERMISSIONS "
+@NamedNativeQuery(name = "getRolesBySubject", query = "SELECT * "
 		+ "FROM SYS_ROLE r "
 		+ "LEFT JOIN SYS_SUBJECT s ON s.F_ROLE_ID = r.F_ID "
 		+ "WHERE s.F_SUBJECT = :subject", resultClass = Role.class)
