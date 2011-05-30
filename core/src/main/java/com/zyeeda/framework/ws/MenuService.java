@@ -1,6 +1,8 @@
 package com.zyeeda.framework.ws;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -27,19 +29,30 @@ public class MenuService extends ResourceService {
 	}
 
 	@GET
-	@Path("/{roleId}")
+	@Path("/")
 	@Produces("application/json")
-	public List<Menu> getMenu(@PathParam("roleId") String id)
-			throws XPathExpressionException, IOException {
-		List<Menu> listMenu = null;
+	public List<Menu> getMenu()throws XPathExpressionException, IOException {
+		String user = this.getSecurityService().getCurrentUser();
 		MenuManager menuMgr = new MenuManagerImpl();
 		RoleManagerImpl roleMgr = new RoleManagerImpl(this
 				.getPersistenceService());
-		Role role = roleMgr.find(id);
-		Set<String> auth = role.getPermissionSet();
+		Set<String> rolesAuth = new HashSet<String>();
+		List<Role> roles = new ArrayList<Role>();
+		roles = roleMgr.getRoleBySubject(user);
+		for(Role role:roles){
+			for(String permission:role.getPermissionSet()){
+				for(String haveAuth:rolesAuth){
+					if(!(permission.equals(haveAuth))){
+						rolesAuth.add(permission);
+					}
+				}
+			}
+		}
+		//Set<String> permissionSet = role.getPermissionSet();
+		List<Menu> listMenu = new ArrayList<Menu>();
+		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
 
-	
 
 }
