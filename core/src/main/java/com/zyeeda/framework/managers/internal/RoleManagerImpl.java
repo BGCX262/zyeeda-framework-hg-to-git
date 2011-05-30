@@ -33,6 +33,7 @@ public class RoleManagerImpl extends DomainEntityManager<Role, String>
 		TypedQuery<Role> query = this.em().createNamedQuery("getRolesBySubject", Role.class);
 		query.setParameter("subject", subject);
 		List<Role> roleList = query.getResultList();
+		logger.debug("the value of the dept subject size is = {}  ", roleList.size());
 		return roleList;
 	}
 	
