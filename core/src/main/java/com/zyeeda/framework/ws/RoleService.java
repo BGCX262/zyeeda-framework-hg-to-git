@@ -14,15 +14,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.RoleManagerImpl;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/roles")
 public class RoleService extends ResourceService {
+	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public RoleService(ServletContext ctx) {
 		super(ctx);
