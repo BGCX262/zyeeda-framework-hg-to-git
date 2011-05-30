@@ -1,6 +1,5 @@
 package com.zyeeda.framework.security.internal;
 
-import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
@@ -8,7 +7,6 @@ import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 
-import com.zyeeda.framework.openid.consumer.shiro.BypassCredentialsMatcher;
 import com.zyeeda.framework.openid.consumer.shiro.OpenIdConsumerRealm;
 
 @Marker(Primary.class)
@@ -30,11 +28,7 @@ public class OpenIdConsumerSecurityServiceProvider extends AbstractSecurityServi
 	
 	private class ShiroSecurityManager extends DefaultWebSecurityManager {
 		public ShiroSecurityManager() {
-			super();
-			OpenIdConsumerRealm realm = new OpenIdConsumerRealm();
-			CredentialsMatcher matcher = new BypassCredentialsMatcher();
-			realm.setCredentialsMatcher(matcher);
-			this.setRealm(realm);
+			super(new OpenIdConsumerRealm());
 		}
 	}
 

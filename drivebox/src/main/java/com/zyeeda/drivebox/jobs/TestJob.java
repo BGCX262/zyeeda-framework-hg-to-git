@@ -14,7 +14,7 @@ import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.openid.consumer.shiro.OpenIdAuthenticationToken;
+import com.zyeeda.framework.openid.consumer.shiro.PasswordFreeAuthenticationToken;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.annotations.Virtual;
 
@@ -39,7 +39,7 @@ public class TestJob implements Job {
 
 			@Override
 			public Void call() throws Exception {
-				subject.login(new OpenIdAuthenticationToken("system"));
+				subject.login(new PasswordFreeAuthenticationToken("system"));
 				logger.info("current user = {}", securitySvc.getCurrentUser());
 				return null;
 			}
