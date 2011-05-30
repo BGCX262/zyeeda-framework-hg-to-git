@@ -8,7 +8,6 @@ import org.quartz.Job;
 import com.zyeeda.drivebox.jobs.TestJob;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
-import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
 import com.zyeeda.framework.ldap.LdapService;
@@ -16,12 +15,15 @@ import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.openid.consumer.OpenIdConsumerService;
 import com.zyeeda.framework.openid.consumer.internal.DefaultOpenIdConsumerServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.persistence.annotations.DroolsTask;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
 import com.zyeeda.framework.scheduler.SchedulerService;
 import com.zyeeda.framework.scheduler.internal.QuartzSchedulerServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
+import com.zyeeda.framework.security.annotations.Virtual;
 import com.zyeeda.framework.security.internal.OpenIdConsumerSecurityServiceProvider;
+import com.zyeeda.framework.security.internal.VirtualConsumerSecurityServiceProvider;
 import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.sync.internal.HttpClientUserSyncServiceProvider;
 import com.zyeeda.framework.template.TemplateService;
@@ -41,6 +43,7 @@ public class Module {
 		binder.bind(ValidationService.class, HibernateValidationServiceProvider.class);
 		binder.bind(LdapService.class, SunLdapServiceProvider.class);
 		binder.bind(SecurityService.class, OpenIdConsumerSecurityServiceProvider.class);
+		binder.bind(SecurityService.class, VirtualConsumerSecurityServiceProvider.class);
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
@@ -57,9 +60,10 @@ public class Module {
 			@Primary final TransactionService txSvc,
 			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService defaultPersistenceSvc,
-			@DroolsTaskPersistence final PersistenceService droolsTaskPersistenceSvc,
+			@DroolsTask final PersistenceService droolsTaskPersistenceSvc,
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc,
+			@Virtual final SecurityService<?> virtualSecuritySvc,
 			@Primary final KnowledgeService knowledgeSvc,
 			@Primary final OpenIdConsumerService consumerSvc,
 			@Primary final UserSyncService userSyncSvc,
@@ -73,6 +77,7 @@ public class Module {
 		droolsTaskPersistenceSvc.start();
 		ldapSvc.start();
 		securitySvc.start();
+		virtualSecuritySvc.start();
 		knowledgeSvc.start();
 		consumerSvc.start();
 		userSyncSvc.start();

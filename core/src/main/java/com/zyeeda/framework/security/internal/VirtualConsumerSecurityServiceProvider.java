@@ -1,23 +1,23 @@
 package com.zyeeda.framework.security.internal;
 
 import org.apache.shiro.authc.credential.CredentialsMatcher;
+import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.tapestry5.ioc.annotations.Marker;
-import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 
 import com.zyeeda.framework.openid.consumer.shiro.BypassCredentialsMatcher;
 import com.zyeeda.framework.openid.consumer.shiro.OpenIdConsumerRealm;
+import com.zyeeda.framework.security.annotations.Virtual;
 
-@Marker(Primary.class)
-@ServiceId("openid-consumer-security-service")
-public class OpenIdConsumerSecurityServiceProvider extends AbstractSecurityServiceProvider {
+@Marker(Virtual.class)
+@ServiceId("virtual-consumer-security-service")
+public class VirtualConsumerSecurityServiceProvider extends AbstractSecurityServiceProvider {
 	
 	private SecurityManager securityMgr;
 
-	public OpenIdConsumerSecurityServiceProvider(RegistryShutdownHub shutdownHub) {
+	public VirtualConsumerSecurityServiceProvider(RegistryShutdownHub shutdownHub) {
 		super(shutdownHub);
 		
 		this.securityMgr = new ShiroSecurityManager();
@@ -28,7 +28,7 @@ public class OpenIdConsumerSecurityServiceProvider extends AbstractSecurityServi
 		return this.securityMgr;
 	}
 	
-	private class ShiroSecurityManager extends DefaultWebSecurityManager {
+	private class ShiroSecurityManager extends DefaultSecurityManager {
 		public ShiroSecurityManager() {
 			super();
 			OpenIdConsumerRealm realm = new OpenIdConsumerRealm();

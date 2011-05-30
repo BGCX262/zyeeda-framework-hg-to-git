@@ -12,12 +12,12 @@ import org.apache.tapestry5.ioc.Registry;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.utils.IocUtils;
 
-public class SecurityFilter extends IniShiroFilter {
+public abstract class SecurityFilter extends IniShiroFilter {
 	
 	@Override
 	protected Map<String, ?> applySecurityManager(Ini ini) {
 		Registry registry = IocUtils.getRegistry(this.getFilterConfig().getServletContext());
-		SecurityService<?> securitySvc = registry.getService(SecurityService.class);
+		SecurityService<?> securitySvc = this.getSecurityService(registry);
 		SecurityManager securityMgr = (SecurityManager) securitySvc.getSecurityManager();
 		
 		if (!(securityMgr instanceof WebSecurityManager)) {
@@ -29,46 +29,6 @@ public class SecurityFilter extends IniShiroFilter {
 		return null;
 	}
 	
-	/*
-	@Override
-	public void init(FilterConfig config) throws ServletException {
-		this.config = config;
-		this.innerFilter = new IniShiroFilter();
-		
-		Registry registry = IocUtils.getRegistry(this.config.getServletContext());
-		SecurityService<?> securitySvc = registry.getService(SecurityService.class);
-		SecurityManager securityMgr = (SecurityManager) securitySvc.getSecurityManager();
-		if (!(securityMgr instanceof WebSecurityManager)) {
-			throw new ConfigurationException("Incompatible security manager.");
-		}
-		this.innerFilter.setSecurityManager((WebSecurityManager) securitySvc.getSecurityManager());
-	
-		Ini ini = IniFactorySupport.loadDefaultClassPathIni();
-		if (ini == null || ini.isEmpty()) {
-			return;
-		}
-		
-        Ini.Section urls = ini.getSection(IniFilterChainResolverFactory.URLS);
-        Ini.Section filters = ini.getSection(IniFilterChainResolverFactory.FILTERS);
-        if ((urls != null && !urls.isEmpty()) || (filters != null && !filters.isEmpty())) {
-            IniFilterChainResolverFactory filterChainResolverFactory = new IniFilterChainResolverFactory(ini);
-            filterChainResolverFactory.setFilterConfig(this.config);
-            FilterChainResolver resolver = filterChainResolverFactory.getInstance();
-            this.innerFilter.setFilterChainResolver(resolver);
-        }
-	}
-	*/
-	
-	/*
-	@Override
-	public void destroy() {
-		this.innerFilter.destroy();
-	}
-
-	@Override
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-		this.innerFilter.doFilter(request, response, filterChain);
-	}
-	*/
+	protected abstract SecurityService<?> getSecurityService(Registry registry);
 
 }
