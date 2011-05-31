@@ -10,7 +10,6 @@ syntax: glob
 *.bak
 *.orig
 *.tlog
-MANIFEST.MF
 
 target
 bin
@@ -23,3 +22,5 @@ syntax: regexp
 ^core/src/main/java/com/zyeeda/framework/managers/internal/DefaultUserManager\.java$
 syntax: regexp
 ^core/src/main/java/com/zyeeda/framework/managers/internal/DefaultDepartmentManager\.java$
+syntax: regexp
+^core/src/main/java/com/zyeeda/framework/sync/internal/UserSyncThreadPool\.java$

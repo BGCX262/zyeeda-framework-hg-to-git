@@ -19,20 +19,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
+import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/users")
 public class UserService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
+//	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
@@ -43,13 +40,16 @@ public class UserService extends ResourceService {
 	@Produces("application/json")
 	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
+		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		if (userMgr.findById(user.getId()) != null ) {
 			throw new RuntimeException("账号不能重复");
 		} else {
 			user.setDepartmentName(parent);
 			userMgr.persist(user);
-			return userMgr.findById(user.getId());
+			user = userMgr.findById(user.getId());
+			userSyncService.persist(user);
+			return user;
 		}
 	}
 	
@@ -66,6 +66,7 @@ public class UserService extends ResourceService {
 	@Produces("application/json")
 	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
+		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		user.setDeptFullPath(id);
@@ -75,7 +76,9 @@ public class UserService extends ResourceService {
 			throw new RuntimeException("不能修改账号");
 		} else {
 			userMgr.update(user);
-			return userMgr.findById(user.getId());
+			user = userMgr.findById(user.getId());
+			userSyncService.update(user);
+			return user;
 		}
 	}
 	
@@ -170,9 +173,11 @@ public class UserService extends ResourceService {
 	
 	private User setVisible(String id, Boolean visible) throws NamingException, ParseException {
 		LdapService ldapSvc = this.getLdapService();
+		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		userMgr.setVisible(visible, id);
+		userSyncService.setVisible(visible, id);
 		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 	}
 	
@@ -181,7 +186,7 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType("io");
-		userVo.setLabel("<a>" + user.getId() + "<a>");
+		userVo.setLabel(user.getId());
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());

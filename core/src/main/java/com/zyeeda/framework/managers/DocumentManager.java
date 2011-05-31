@@ -7,7 +7,13 @@ import java.util.List;
 import com.zyeeda.framework.entities.Document;
 
 public interface DocumentManager {
-
+	public int findNumber(String owner,String foreignId,String[] keyword) throws DocumentException;
+	
+	public int findNumber(String foreignId, String[] keyword) throws DocumentException;
+	public int findOwnerNumber(String owner,String foreignId) throws DocumentException;
+	
+	public Document findById (String id) throws DocumentException ; 
+	
 	// 创建
 	public void persist(Document doc) throws DocumentException, IOException;
 
@@ -16,13 +22,21 @@ public interface DocumentManager {
 			throws DocumentException;
 
 	// 根据拥有人关键字数据类别去查询
-	public List<Document> findByKeyword(String owner, String keyword,
+	public List<Document> findByKeyword(String owner, String[] keyword,
 			String foreignId, int skip, int limit) throws DocumentException;
 
+	
+	//public List<Document> findByKeyword(String owner,  int skip, int limit) throws DocumentException;
+	
+	public List<Document> findByKeyword(String owner,String foreignId,  int skip, int limit) throws DocumentException;
+	
+	
 	public void updateDocument(Document document) throws UnknownHostException,
 			DocumentException;
 
 	public void removeById(String id) throws UnknownHostException,
 			DocumentException;
+
+	public void allremoveById(String[] id) throws DocumentException;
 
 }

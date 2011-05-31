@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Tapestry-Module-Classes: com.zyeeda.drivebox.ioc.DriveboxModule
+Implementation-Version: ${project.version}

@@ -12,7 +12,7 @@ import org.apache.tapestry5.ioc.Registry;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.utils.IocUtils;
 
-public class OpenIdProviderSecurityFilter extends IniShiroFilter {
+public class SecurityFilter extends IniShiroFilter {
 	
 	@Override
 	protected Map<String, ?> applySecurityManager(Ini ini) {

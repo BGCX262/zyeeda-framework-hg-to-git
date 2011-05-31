@@ -1,23 +1,18 @@
 package com.zyeeda.framework.entities;
 
-import java.sql.Blob;
+import java.io.InputStream;
 import java.util.Date;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import java.io.*;
-
-import com.zyeeda.framework.entities.base.RevisionDomainEntity;
 import com.zyeeda.framework.entities.base.SimpleDomainEntity;
 
 @Entity
 @Table(name = "ZDA_SYS_DOCUMENTS")
+@XmlRootElement(name = "document")
 public class Document extends SimpleDomainEntity {
 
 	private static final long serialVersionUID = -5913731949268189623L;
@@ -32,6 +27,7 @@ public class Document extends SimpleDomainEntity {
     private String lastModifier;
     private Date lastModifiedTime;
     private long fileSize;
+	
     public long getFileSize() {
 		return fileSize;
 	}
@@ -44,7 +40,10 @@ public class Document extends SimpleDomainEntity {
     private String keyword;
     private InputStream content;
     private String contentType;
-    private String subType;
+    
+
+
+	private String subType;
     private String type;
     
     
