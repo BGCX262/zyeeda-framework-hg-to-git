@@ -67,7 +67,7 @@
    
     <filter>
         <filter-name>SecurityFilter</filter-name>
-        <filter-class>com.zyeeda.framework.web.SecurityFilter</filter-class>
+        <filter-class>com.zyeeda.framework.web.OpenIdConsumerSecurityFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>SecurityFilter</filter-name>

@@ -17,7 +17,7 @@ public class OpenIdConsumerRealm extends AuthorizingRealm {
 	private static final Logger logger = LoggerFactory.getLogger(OpenIdConsumerRealm.class);
 	
 	public OpenIdConsumerRealm() {
-		this.setAuthenticationTokenClass(OpenIdAuthenticationToken.class);
+		this.setAuthenticationTokenClass(PasswordFreeAuthenticationToken.class);
 		this.setCredentialsMatcher(new BypassCredentialsMatcher());
 	}
 
