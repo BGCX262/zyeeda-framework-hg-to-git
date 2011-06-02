@@ -6,7 +6,6 @@ import java.util.List;
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.OperationNotSupportedException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
@@ -24,6 +23,7 @@ import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.DepartmentManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.TreeDeleteControlUtils;
 
 public class LdapDepartmentManager implements DepartmentManager {
@@ -36,7 +36,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		this.ldapSvc = ldapSvc;
 	}
 	
-	public void persist(Department dept) throws NamingException {
+	public void persist(Department dept) throws UserPersistException {
 		LdapContext ctx = null;
 		LdapContext parentCtx = null;
 		try {
@@ -51,6 +51,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 		
 			String id = String.format("%s,%s", dn, parent);
 			dept.setId(id);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
@@ -58,7 +60,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 	}
 	
 	@Override
-	public void remove(String id) throws NamingException {
+	public void remove(String id) throws UserPersistException{
 		LdapContext ctx = null;
 		try {
 			ctx = this.ldapSvc.getLdapContext();
@@ -67,16 +69,15 @@ public class LdapDepartmentManager implements DepartmentManager {
 			ctx.unbind("");
 			
 			logger.debug("ctx " + ctx.getNameInNamespace() + " deleted");
-		} catch(OperationNotSupportedException e) {
-			 ctx.setRequestControls(new Control[0]);
-	         deleteRecursively(ctx);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}
 	}
 	
 	@Override
-	public void update(Department dept) throws NamingException {
+	public void update(Department dept) throws UserPersistException {
 		LdapContext ctx = null;
 		
 		try {
@@ -84,12 +85,14 @@ public class LdapDepartmentManager implements DepartmentManager {
 			String oldName = dept.getId();
 			Attributes attrs = unmarshal(dept);
 			ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}
 	}
 	
-	public Department findById(String id) throws NamingException {
+	public Department findById(String id) throws UserPersistException {
 		LdapContext ctx = null;
 		Attributes attrs = null;
 		
@@ -100,13 +103,15 @@ public class LdapDepartmentManager implements DepartmentManager {
 			dept.setId(id);
 			
 			return dept;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}
 	}
 	
 	@Override
-	public List<Department> getChildrenById(String id) throws NamingException {
+	public List<Department> getChildrenById(String id) throws UserPersistException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<Department> deptList = null;
@@ -132,6 +137,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 			}
 			
 			return deptList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
 			LdapUtils.closeContext(ctx);
@@ -139,7 +146,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 	}
 	
 	@Override
-	public List<Department> findByName(String name) throws NamingException {
+	public List<Department> findByName(String name) throws UserPersistException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<Department> deptList = null;
@@ -164,6 +171,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 			}
 			
 			return deptList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
 			LdapUtils.closeContext(ctx);
