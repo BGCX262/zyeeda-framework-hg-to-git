@@ -47,9 +47,11 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	
 	private static final String AUDIT_LOG_FILE_PATH = "auditLogFilePath";
 	private static final String AUDIT_LOG_FLUSH_INTERVAL = "auditLogFlushInterval";
+	private static final String TASK_SERVER_PORT = "taskServerPort";
 	
 	private static final String DEFAUL_AUDIT_LOG_FILE_PATH = "/WEB-INF/logs/drools_audit";
 	private static final int DEFAULT_AUDIT_LOG_FLUSH_INTERVAL = 60 * 60 * 1000;
+	private static final int DEFAULT_TASK_SERVER_PORT = -1;
 	
 	private final ConfigurationService configSvc;
 	private final PersistenceService defaultPersistenceSvc;
@@ -61,7 +63,8 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	private TaskServer taskServer;
 	
 	private String auditLogFilePath;
-	private int auditLogFlushInterval;	
+	private int auditLogFlushInterval;
+	private int taskServerPort;
 	
 	public DroolsKnowledgeServiceProvider(
 			@Primary ConfigurationService configSvc,
@@ -84,9 +87,13 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	private void init(Configuration config) throws Exception {
 		this.auditLogFilePath = config.getString(AUDIT_LOG_FILE_PATH, DEFAUL_AUDIT_LOG_FILE_PATH);
 		this.auditLogFlushInterval = config.getInt(AUDIT_LOG_FLUSH_INTERVAL, DEFAULT_AUDIT_LOG_FLUSH_INTERVAL);
+		this.taskServerPort = config.getInt(TASK_SERVER_PORT, DEFAULT_TASK_SERVER_PORT);
 		
-		logger.debug("{} = {}", AUDIT_LOG_FILE_PATH, this.auditLogFilePath);
-		logger.debug("{} = {}", AUDIT_LOG_FLUSH_INTERVAL, this.auditLogFlushInterval);
+		if (logger.isDebugEnabled()) {
+			logger.debug("{} = {}", AUDIT_LOG_FILE_PATH, this.auditLogFilePath);
+			logger.debug("{} = {}", AUDIT_LOG_FLUSH_INTERVAL, this.auditLogFlushInterval);
+			logger.debug("{} = {}", TASK_SERVER_PORT, this.taskServerPort);
+		}
 		
 		File auditLogFile = new File(this.configSvc.getApplicationRoot(), this.auditLogFilePath);
 		if (!auditLogFile.exists()) {
@@ -124,7 +131,11 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 		// start task server
 		EntityManagerFactory emf = this.droolsTaskPersistenceSvc.getSessionFactory();
 		this.taskService = new TaskService(emf, SystemEventListenerFactory.getSystemEventListener());
-		this.taskServer = new MinaTaskServer(this.taskService);
+		if (this.taskServerPort < 0) {
+			this.taskServer = new MinaTaskServer(this.taskService);
+		} else {
+			this.taskServer = new MinaTaskServer(this.taskService, this.taskServerPort);
+		}
 		Thread taskServerThread = new Thread(this.taskServer, "DroolsTaskServer");
 		taskServerThread.start();
 	}
@@ -152,6 +163,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 	public <T> T execute(StatefulSessionCommand<T> command) throws Exception {
 		StatefulKnowledgeSession ksession = null;
 		KnowledgeRuntimeLogger rtLogger = null;
+		WSHumanTaskHandler taskHandler = null;
 
 		try {
 			Environment env = KnowledgeBaseFactory.newEnvironment();
@@ -168,7 +180,11 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 				ksession = JPAKnowledgeService.newStatefulKnowledgeSession(this.kbase, null, env);
 			}
 			
-			ksession.getWorkItemManager().registerWorkItemHandler("Human Task", new WSHumanTaskHandler());
+			taskHandler = new WSHumanTaskHandler();
+			if (this.taskServerPort > 0) {
+				taskHandler.setConnection("localhost", this.taskServerPort);
+			}
+			ksession.getWorkItemManager().registerWorkItemHandler("Human Task", taskHandler);
 			
 			//EmailWorkItemHandler emailHandler = new EmailWorkItemHandler();
 			//emailHandler.setConnection("mail.tangrui.net", "21", "webmaster@tangrui.net", "P@$ther0");
@@ -176,7 +192,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			
 			rtLogger = KnowledgeRuntimeLoggerFactory.newThreadedFileLogger(ksession, this.configSvc.mapPath(this.auditLogFilePath), this.auditLogFlushInterval);
 			//new JPAWorkingMemoryDbLogger(ksession);
-			new HistoryLogger(ksession, this.defaultPersistenceSvc);
+			new HistoryLogger(ksession, this.defaultPersistenceSvc, this.kbase);
 			
 			T result = command.execute(ksession);
 			
@@ -191,6 +207,9 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 				} catch (Throwable t) {
 					logger.error("Close knowledge runtime logger failed.", t);
 				}
+			}
+			if (taskHandler != null) {
+				taskHandler.dispose();
 			}
 			if (ksession != null) {
 				ksession.dispose();
