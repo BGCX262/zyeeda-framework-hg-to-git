@@ -24,6 +24,7 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.UserManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
@@ -37,7 +38,7 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public void persist(User user) throws NamingException {
+	public void persist(User user) throws UserPersistException {
 		LdapContext ctx = null;
 		LdapContext parentCtx = null;
 		
@@ -48,6 +49,8 @@ public class LdapUserManager implements UserManager {
 			parentCtx = (LdapContext) ctx.lookup(department);
 			Attributes attrs = LdapUserManager.unmarshal(user);
 			parentCtx.createSubcontext(dn, attrs);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
@@ -55,18 +58,20 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public void remove(String id) throws NamingException {
+	public void remove(String id) throws UserPersistException {
 		LdapContext ctx = null;
 		try {
 			ctx = this.ldapSvc.getLdapContext();
 			ctx.destroySubcontext(id);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}
 	}
 
 	@Override
-	public void update(User user) throws NamingException, ParseException {
+	public void update(User user) throws UserPersistException {
 		LdapContext ctx = null;
 		LdapContext parentCtx = null;
 		
@@ -74,8 +79,12 @@ public class LdapUserManager implements UserManager {
 			Attributes attrs = LdapUserManager.unmarshal(user);
 			String oldName = user.getDeptFullPath();
 			
-			ctx = this.ldapSvc.getLdapContext();
-			ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
+			try {
+				ctx = this.ldapSvc.getLdapContext();
+				ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
+			} catch (NamingException e) {
+				throw new UserPersistException(e);
+			} 
 		} finally {
 			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
@@ -83,7 +92,7 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public User findById(String id) throws NamingException, ParseException {
+	public User findById(String id) throws UserPersistException {
 		LdapContext cxt = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
@@ -100,14 +109,17 @@ public class LdapUserManager implements UserManager {
 				userList.add(user);
 			}
 			return userList.size() > 0 ? userList.get(0) : null;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(cxt);
 		}
 	}
 
 	@Override
-	public List<User> findByDepartmentId(String id)
-			throws NamingException {
+	public List<User> findByDepartmentId(String id) throws UserPersistException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
@@ -132,6 +144,8 @@ public class LdapUserManager implements UserManager {
 				userList.add(user);
 			}
 			return userList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
 			LdapUtils.closeContext(ctx);
@@ -139,7 +153,7 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public List<User> findByName(String name) throws NamingException {
+	public List<User> findByName(String name) throws UserPersistException {
 		LdapContext ctx = null;
 		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
@@ -164,13 +178,15 @@ public class LdapUserManager implements UserManager {
 				userList.add(user);
 			}
 			return userList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
 			LdapUtils.closeContext(ctx);
 		}
 	}
 
-	public void updatePassword(String id, String password) throws NamingException, ParseException {
+	public void updatePassword(String id, String password) throws UserPersistException {
 		LdapContext ctx = null;
 		
 		try {
@@ -180,13 +196,36 @@ public class LdapUserManager implements UserManager {
 					      new BasicAttribute("userPassword", "{MD5}" + password));
 			
 			ctx.modifyAttributes(id, mods);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeContext(ctx);
 		}
 	}
 	
 	@Override
-	public void setVisible(Boolean visible, String... ids)
+	public void enable(String... ids) throws UserPersistException {
+		try {
+			this.setVisible(true, ids);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
+		}
+	}
+	
+	@Override
+	public void disable(String... ids) throws UserPersistException {
+		try {
+			this.setVisible(false, ids);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
+		}
+	}
+	
+	private void setVisible(Boolean visible, String... ids)
 			throws NamingException, ParseException {
 		LdapContext ctx = null;
 		
@@ -262,7 +301,7 @@ public class LdapUserManager implements UserManager {
 //        return bytes;
 //	}
 	
-	private static Attributes unmarshal(User user/*, String module*/) {
+	private static Attributes unmarshal(User user) {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");

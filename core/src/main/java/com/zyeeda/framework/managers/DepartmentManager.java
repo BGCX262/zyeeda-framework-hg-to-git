@@ -2,21 +2,19 @@ package com.zyeeda.framework.managers;
 
 import java.util.List;
 
-import javax.naming.NamingException;
-
 import com.zyeeda.framework.entities.Department;
 
 public interface DepartmentManager {
 
-	public void persist(Department dept) throws NamingException;
+	public void persist(Department dept) throws UserPersistException;
 	
-	public Department findById(String id) throws NamingException;
+	public Department findById(String id) throws UserPersistException;
 	
-	public void remove(String id) throws NamingException;
+	public void remove(String id) throws UserPersistException;
 	
-	public void update(Department dept) throws NamingException;
+	public void update(Department dept) throws UserPersistException;
 	
-	public List<Department> getChildrenById(String id) throws NamingException;
+	public List<Department> getChildrenById(String id) throws UserPersistException;
 	
-	public List<Department> findByName(String name) throws NamingException;
+	public List<Department> findByName(String name) throws UserPersistException;
 }

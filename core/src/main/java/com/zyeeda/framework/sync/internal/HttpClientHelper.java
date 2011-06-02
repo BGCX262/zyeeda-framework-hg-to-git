@@ -25,19 +25,9 @@ public class HttpClientHelper {
 		HttpResponse response = client.execute(post);
 		Integer statusCode = response.getStatusLine().getStatusCode();
 		if (HttpStatus.SC_OK == statusCode) {
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				Header[] headers = response.getAllHeaders();
-			    for (int i = 0; i < headers.length; i++) {
-				   logger.debug("response head info:" + headers[i]);
-				}
-			} else {
-				logger.debug("no response info. ZDA");
-//				throw new RuntimeException();
-			}
+			return;
 		} else {
-			logger.debug("response is " + statusCode + ". ZDA");
-//			throw new RuntimeException();
+			printEntityInfo(response);
 		}
 	}
 	
@@ -46,19 +36,9 @@ public class HttpClientHelper {
 		HttpResponse response = client.execute(get);
 		Integer statusCode = response.getStatusLine().getStatusCode();
 		if (HttpStatus.SC_OK == statusCode) {
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				Header[] headers = response.getAllHeaders();
-			    for (int i = 0; i < headers.length; i++) {
-				   logger.debug("response head info:" + headers[i]);
-				}
-			} else {
-				logger.debug("no response info. ZDA");
-//				throw new RuntimeException();
-			}
+			return;
 		} else {
-			logger.debug("response is " + statusCode + ". ZDA");
-//			throw new RuntimeException();
+			printEntityInfo(response);
 		}
 	}
 	
@@ -67,19 +47,9 @@ public class HttpClientHelper {
 		HttpResponse response = client.execute(put);
 		Integer statusCode = response.getStatusLine().getStatusCode();
 		if (HttpStatus.SC_OK == statusCode) {
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				Header[] headers = response.getAllHeaders();
-			    for (int i = 0; i < headers.length; i++) {
-				   logger.debug("response head info:" + headers[i]);
-				}
-			} else {
-				logger.debug("no response info. ZDA");
-//				throw new RuntimeException();
-			}
+			return;
 		} else {
-			logger.debug("response is " + statusCode + ". ZDA");
-//			throw new RuntimeException();
+			printEntityInfo(response);
 		}
 	}
 	
@@ -88,19 +58,21 @@ public class HttpClientHelper {
 		HttpResponse response = client.execute(delete);
 		Integer statusCode = response.getStatusLine().getStatusCode();
 		if (HttpStatus.SC_OK == statusCode) {
-			HttpEntity entity = response.getEntity();
-			if (entity != null) {
-				Header[] headers = response.getAllHeaders();
-			    for (int i = 0; i < headers.length; i++) {
-				   logger.debug("response head info:" + headers[i]);
-				}
-			} else {
-				logger.debug("no response info. ZDA");
-//				throw new RuntimeException();
+			return;
+		} else {
+			printEntityInfo(response);
+		}
+	}
+	
+	private static void printEntityInfo(HttpResponse response) {
+		HttpEntity entity = response.getEntity();
+		if (entity != null) {
+			Header[] headers = response.getAllHeaders();
+		    for (int i = 0; i < headers.length; i++) {
+			   logger.info("response head info:{}", headers[i]);
 			}
 		} else {
-			logger.debug("response is " + statusCode + ". ZDA");
-//			throw new RuntimeException();
+			logger.error("no response info");
 		}
 	}
 }

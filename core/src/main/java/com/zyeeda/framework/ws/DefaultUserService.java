@@ -1,8 +1,5 @@
 package com.zyeeda.framework.ws;
 
-import java.text.ParseException;
-
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -14,6 +11,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import com.zyeeda.framework.entities.User;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.DefaultUserManager;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -27,10 +25,8 @@ public class DefaultUserService extends ResourceService {
 	@POST
 	@Path("/persist")
 	@Produces("application/json")
-	public User createUser(@FormParam("") User user) throws NamingException,
-			ParseException {
-		DefaultUserManager userMgr = new DefaultUserManager(this
-				.getPersistenceService());
+	public User createUser(@FormParam("") User user) throws UserPersistException {
+		DefaultUserManager userMgr = new DefaultUserManager(this.getPersistenceService());
 		if (userMgr.findById(user.getId()) != null) {
 			throw new RuntimeException("账号不能重复");
 		} else {
@@ -42,8 +38,7 @@ public class DefaultUserService extends ResourceService {
 	@PUT
 	@Path("/update")
 	@Produces("application/json")
-	public User editUser(@FormParam("") User user) throws NamingException,
-			ParseException {
+	public User editUser(@FormParam("") User user) throws UserPersistException {
 		DefaultUserManager userMg = new DefaultUserManager(this
 				.getPersistenceService());
 
@@ -71,7 +66,7 @@ public class DefaultUserService extends ResourceService {
 	public User editPassword(@QueryParam("id") String id,
 			@QueryParam("formerlyPassword") String formerlyPassword,
 			@QueryParam("nowPasswrd") String nowPasswrd)
-			throws NamingException, ParseException {
+	 			throws UserPersistException  {
 		DefaultUserManager userMg = new DefaultUserManager(this
 				.getPersistenceService());
 		User user = userMg.findById(id);
@@ -88,32 +83,18 @@ public class DefaultUserService extends ResourceService {
 	@PUT
 	@Path("/enable")
 	@Produces("application/json")
-	public User enable(@PathParam("id") String id,
-			@FormParam("status") Boolean visible) throws NamingException,
-			ParseException {
-		return this.setVisible(id, true);
+	public User enable(@PathParam("id") String id) throws UserPersistException {
+		DefaultUserManager userMg = new DefaultUserManager(this.getPersistenceService());
+		userMg.enable(id);
+		return userMg.findById(id);
 	}
 
 	@PUT
-	@Path("/{id}/unenable")
+	@Path("/{id}/disable")
 	@Produces("application/json")
-	public User unEnable(@PathParam("id") String id,
-			@FormParam("status") Boolean visible) throws NamingException,
-			ParseException {
-		return this.setVisible(id, false);
-	}
-
-	@PUT
-	@Path("/setVisible")
-	@Produces("application/json")
-	public User setVisible(@FormParam("id") String id,
-			@FormParam("status") Boolean visible) throws NamingException,
-			ParseException {
-
-		DefaultUserManager userMg = new DefaultUserManager(this
-				.getPersistenceService());
-		userMg.setVisible(visible, id);
-
+	public User disable(@PathParam("id") String id) throws UserPersistException {
+		DefaultUserManager userMg = new DefaultUserManager(this.getPersistenceService());
+		userMg.enable(id);
 		return userMg.findById(id);
 	}
 
