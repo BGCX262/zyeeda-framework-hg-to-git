@@ -28,15 +28,17 @@ public class TapestryIocJobFactory implements JobFactory {
 		JobDetail detail = bundle.getJobDetail();
 		Class<? extends Job> jobClass = detail.getJobClass();
 		try {
-			logger.debug("New job class {} via IoC container", jobClass.getSimpleName());
-			return this.resources.getService(IocUtils.getServiceId(jobClass), Job.class);
+			Job job = this.resources.getService(IocUtils.getServiceId(jobClass), Job.class);
+			logger.debug("New {} job instance from IoC container", jobClass.getSimpleName());
+			return job;
 		} catch (AnnotationException e) {
 			logger.trace(e.getMessage(), e);
 		}
 		
 		try {
-			logger.debug("New job class {} via constructor", jobClass.getSimpleName());
-			return jobClass.newInstance();
+			Job job = jobClass.newInstance();
+			logger.debug("New {} job instance via constructor", jobClass.getSimpleName());
+			return job;
 		} catch (InstantiationException e) {
 			throw new SchedulerException(e);
 		} catch (IllegalAccessException e) {

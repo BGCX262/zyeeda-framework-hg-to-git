@@ -9,6 +9,8 @@ import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
+import com.zyeeda.framework.scheduler.SchedulerService;
+import com.zyeeda.framework.scheduler.internal.QuartzSchedulerServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
 import com.zyeeda.framework.security.internal.OpenIdConsumerSecurityServiceProvider;
 import com.zyeeda.framework.sync.UserSyncService;
@@ -47,6 +49,10 @@ public class ResourceService {
 	
 	protected UserSyncService getUserSynchService() {
 		return this.reg.getService(IocUtils.getServiceId(HttpClientUserSyncServiceProvider.class), UserSyncService.class);
+	}
+	
+	protected SchedulerService<?> getSchedulerService() {
+		return this.reg.getService(IocUtils.getServiceId(QuartzSchedulerServiceProvider.class), SchedulerService.class);
 	}
 	
 }

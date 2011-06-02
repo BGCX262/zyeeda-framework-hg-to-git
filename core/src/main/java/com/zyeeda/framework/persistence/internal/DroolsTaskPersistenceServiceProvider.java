@@ -7,11 +7,11 @@ import org.hibernate.ejb.Ejb3Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
 import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.persistence.annotations.DroolsTask;
 
 @ServiceId("drools-task-persistence-service")
-@Marker(DroolsTaskPersistence.class)
+@Marker(DroolsTask.class)
 public class DroolsTaskPersistenceServiceProvider extends AbstractPersistenceServiceProvider
 		implements PersistenceService {
 	
