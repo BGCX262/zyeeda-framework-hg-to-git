@@ -2,6 +2,7 @@ package com.zyeeda.framework.ws;
 
 import java.io.IOException;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +11,6 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
@@ -44,28 +44,34 @@ public class MenuService extends ResourceService {
 		RoleManagerImpl roleMgr = new RoleManagerImpl(this
 				.getPersistenceService());
 		Set<String> rolesAuth = new HashSet<String>();
+		List<Menu> listMenu = new ArrayList<Menu>();
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);
 		boolean result = false;
-		for(Role role:roles){
-			logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
-			for(String permission:role.getPermissionSet()){
-				if(rolesAuth.size()>0){
-					for(String haveAuth:rolesAuth){
-						if(permission.equals(haveAuth)){
-							result = true;
+		if(roles.size() > 1){
+			for(Role role:roles){
+				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
+				for(String permission:role.getPermissionSet()){
+					if(rolesAuth.size()>0){
+						for(String haveAuth:rolesAuth){
+							if(permission.equals(haveAuth)){
+								result = true;
+								break;
+							}
 						}
-					}
-					if(result == false) {
+						if(result == false) {
+							rolesAuth.add(permission);
+						}
+					} else {
 						rolesAuth.add(permission);
-					}
-				} else {
-					rolesAuth.add(permission);
+					}					
 				}
-			}
+			}		
+			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
+		} else if(roles.size() == 1){
+			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
 		}
 		//Set<String> permissionSet = role.getPermissionSet();
-		List<Menu> listMenu = new ArrayList<Menu>();
 		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
