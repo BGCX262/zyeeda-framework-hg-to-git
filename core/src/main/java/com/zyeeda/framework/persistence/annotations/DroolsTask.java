@@ -1,4 +1,4 @@
-package com.zyeeda.framework.ioc.annotations;
+package com.zyeeda.framework.persistence.annotations;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -9,6 +9,6 @@ import java.lang.annotation.RetentionPolicy;
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface DroolsTaskPersistence {
+public @interface DroolsTask {
 
 }

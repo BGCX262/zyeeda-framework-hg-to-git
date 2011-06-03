@@ -163,7 +163,7 @@ public class DepartmentService extends ResourceService {
 		
 		deptVo.setId(dept.getId());
 		deptVo.setType("io");
-		deptVo.setLabel("<a>" + dept.getName() + "<a>");
+		deptVo.setLabel(dept.getName() );
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
 		
@@ -265,7 +265,7 @@ public class DepartmentService extends ResourceService {
 		
 		deptVo.setId(dept.getId());
 		deptVo.setType("io");
-		deptVo.setLabel("<a>" + dept.getName() + "<a>");
+		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
 		

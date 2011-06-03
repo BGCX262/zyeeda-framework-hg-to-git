@@ -56,8 +56,9 @@ public class DefaultPersistenceServiceProvider extends AbstractPersistenceServic
     private final SecurityService<?> securitySvc;
     
     public DefaultPersistenceServiceProvider(
-    		ValidationService validationSvc, 
-    		SecurityService<?> securitySvc, RegistryShutdownHub shutdownHub) {
+    		@Primary ValidationService validationSvc, 
+    		@Primary SecurityService<?> securitySvc, 
+    		RegistryShutdownHub shutdownHub) {
     	super(shutdownHub);
     	this.validationSvc = validationSvc;
     	this.securitySvc = securitySvc;

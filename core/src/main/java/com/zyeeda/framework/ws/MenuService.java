@@ -1,15 +1,34 @@
 package com.zyeeda.framework.ws;
 
 import java.io.IOException;
+
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
+d:qnaire:create
+d:qnaire:*
+d:*
+d:qnaire:colse
+d:analysis:quarter
+d:analysis:*
+d:organization:*
+d:qnaire:noRelease
+d:qnaire:*
+d:qnaire:survey
+d:answer:noReply
+d:answer:*
+d:message:*
+d:*
+d:answer:*
+d:answer:reply
+d:analysis:word
+d:analysis:*
+d:authorization:*
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
@@ -43,14 +62,15 @@ public class MenuService extends ResourceService {
 		RoleManagerImpl roleMgr = new RoleManagerImpl(this
 				.getPersistenceService());
 		Set<String> rolesAuth = new HashSet<String>();
+		List<Menu> listMenu = new ArrayList<Menu>();
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);
 		boolean result = false;
-		if(roles.size() == 1){
+		if(roles.size() > 1){
 			for(Role role:roles){
 				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
 				for(String permission:role.getPermissionSet()){
-					if(rolesAuth.size() > 0){
+					if(rolesAuth.size()>0){
 						for(String haveAuth:rolesAuth){
 							if(permission.equals(haveAuth)){
 								logger.debug("the value of the dept permission is agian ");
@@ -63,14 +83,14 @@ public class MenuService extends ResourceService {
 						}
 					} else {
 						rolesAuth.add(permission);
-					}
+					}					
 				}
-			}
-		} else {
-			rolesAuth.add(role.getPermissionSet());
+			}		
+			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
+		} else if(roles.size() == 1){
+			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
 		}
 		//Set<String> permissionSet = role.getPermissionSet();
-		List<Menu> listMenu = new ArrayList<Menu>();
 		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
