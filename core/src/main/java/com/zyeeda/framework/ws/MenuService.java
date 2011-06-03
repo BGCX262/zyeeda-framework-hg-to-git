@@ -46,22 +46,28 @@ public class MenuService extends ResourceService {
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);
 		boolean result = false;
-		for(Role role:roles){
-			logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
-			for(String permission:role.getPermissionSet()){
-				if(rolesAuth.size()>0){
-					for(String haveAuth:rolesAuth){
-						if(permission.equals(haveAuth)){
-							result = true;
+		if(roles.size() == 1){
+			for(Role role:roles){
+				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
+				for(String permission:role.getPermissionSet()){
+					if(rolesAuth.size() > 0){
+						for(String haveAuth:rolesAuth){
+							if(permission.equals(haveAuth)){
+								logger.debug("the value of the dept permission is agian ");
+								result = true;
+								break;
+							}
 						}
-					}
-					if(result == false) {
+						if(result == false) {
+							rolesAuth.add(permission);
+						}
+					} else {
 						rolesAuth.add(permission);
 					}
-				} else {
-					rolesAuth.add(permission);
 				}
 			}
+		} else {
+			rolesAuth.add(role.getPermissionSet());
 		}
 		//Set<String> permissionSet = role.getPermissionSet();
 		List<Menu> listMenu = new ArrayList<Menu>();
