@@ -73,7 +73,7 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 		logger.debug("auth response url = {}", httpReq.getRequestURI());
 		
 		// 如果请求的是验证地址
-		if (this.returnToUrl.equals(httpReq.getRequestURI())) {
+		if (this.pathsMatch(this.returnToUrl, request)) {
 			logger.debug("OpenID verify request detected, attempt to perform signin.");
 			boolean success = this.executeLogin(httpReq, httpRes);
 			logger.debug("OpenID login result = {}", success);
