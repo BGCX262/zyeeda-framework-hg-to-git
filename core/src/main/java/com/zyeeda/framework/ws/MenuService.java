@@ -7,25 +7,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-d:qnaire:create
-d:qnaire:*
-d:*
-d:qnaire:colse
-d:analysis:quarter
-d:analysis:*
-d:organization:*
-d:qnaire:noRelease
-d:qnaire:*
-d:qnaire:survey
-d:answer:noReply
-d:answer:*
-d:message:*
-d:*
-d:answer:*
-d:answer:reply
-d:analysis:word
-d:analysis:*
-d:authorization:*
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -71,7 +52,7 @@ public class MenuService extends ResourceService {
 				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
 				for(String permission:role.getPermissionSet()){
 					if(rolesAuth.size()>0){
-						for(String haveAuth:rolesAuth){
+						for(String haveAuth:rolesAuth){						
 							if(permission.equals(haveAuth)){
 								logger.debug("the value of the dept permission is agian ");
 								result = true;
@@ -79,6 +60,7 @@ public class MenuService extends ResourceService {
 							}
 						}
 						if(result == false) {
+							System.out.println("**********************" + permission);
 							rolesAuth.add(permission);
 						}
 					} else {
@@ -88,10 +70,11 @@ public class MenuService extends ResourceService {
 			}		
 			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		} else if(roles.size() == 1){
+			System.out.println("****************************222" );
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
 		}
 		//Set<String> permissionSet = role.getPermissionSet();
-		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
+		//listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
 
