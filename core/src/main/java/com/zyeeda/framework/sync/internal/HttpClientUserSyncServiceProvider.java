@@ -175,7 +175,7 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 	private String getFunctionNameToFieldName(String functionName) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(Character.toLowerCase(functionName.charAt("get".length())))
-			  .append(functionName.substring("get".length(), functionName.length()));
+			  .append(functionName.substring("get".length() + 1, functionName.length()));
 		
 		return buffer.toString();
 	}
