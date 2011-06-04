@@ -7,7 +7,6 @@ import org.apache.tapestry5.ioc.annotations.Startup;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
-import com.zyeeda.framework.ioc.annotations.DroolsTaskPersistence;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
 import com.zyeeda.framework.ldap.LdapService;
@@ -15,6 +14,7 @@ import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.openid.consumer.OpenIdConsumerService;
 import com.zyeeda.framework.openid.consumer.internal.DefaultOpenIdConsumerServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.persistence.annotations.DroolsTask;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.persistence.internal.DroolsTaskPersistenceServiceProvider;
 import com.zyeeda.framework.security.SecurityService;
@@ -53,7 +53,7 @@ public class FrameworkModule {
 			@Primary final TransactionService txSvc,
 			@Primary final ValidationService validationSvc,
 			@Primary final PersistenceService defaultPersistenceSvc,
-			@DroolsTaskPersistence final PersistenceService droolsTaskPersistenceSvc,
+			@DroolsTask final PersistenceService droolsTaskPersistenceSvc,
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc,
 			@Primary final KnowledgeService knowledgeSvc,

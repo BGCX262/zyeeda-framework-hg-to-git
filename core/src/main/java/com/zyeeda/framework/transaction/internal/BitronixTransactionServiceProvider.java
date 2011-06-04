@@ -16,10 +16,10 @@ import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.ioc.annotations.BTM;
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 import com.zyeeda.framework.transaction.TransactionServiceException;
+import com.zyeeda.framework.transaction.annotations.BTM;
 
 import bitronix.tm.Configuration;
 import bitronix.tm.TransactionManagerServices;

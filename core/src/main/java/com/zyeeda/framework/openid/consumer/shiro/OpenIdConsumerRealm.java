@@ -17,7 +17,7 @@ public class OpenIdConsumerRealm extends AuthorizingRealm {
 	private static final Logger logger = LoggerFactory.getLogger(OpenIdConsumerRealm.class);
 	
 	public OpenIdConsumerRealm() {
-		this.setAuthenticationTokenClass(OpenIdAuthenticationToken.class);
+		this.setAuthenticationTokenClass(PasswordFreeAuthenticationToken.class);
 		this.setCredentialsMatcher(new BypassCredentialsMatcher());
 	}
 
@@ -29,9 +29,6 @@ public class OpenIdConsumerRealm extends AuthorizingRealm {
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		logger.debug("authentication token type = {}", token.getClass().getName());
-		if (!(token instanceof OpenIdAuthenticationToken)) {
-			throw new AuthenticationException("Invalid authentication token.");
-		}
 		
 		Object principal = token.getPrincipal();
 		if (principal == null) {
