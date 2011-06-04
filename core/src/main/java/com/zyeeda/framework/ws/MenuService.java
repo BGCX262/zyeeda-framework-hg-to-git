@@ -67,12 +67,16 @@ public class MenuService extends ResourceService {
 					}					
 				}
 			}		
+			for(String menuAtuh:rolesAuth){
+				System.out.println("*****************************" + menuAtuh);
+			}		
 			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		} else if(roles.size() == 1){
+			for(String auth1:roles.get(0).getPermissionSet()){
+				System.out.println("*******************************" + auth1);
+			}
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
 		}
-		//Set<String> permissionSet = role.getPermissionSet();
-		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
 

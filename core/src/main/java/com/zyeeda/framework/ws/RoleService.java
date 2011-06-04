@@ -1,8 +1,6 @@
 package com.zyeeda.framework.ws;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
@@ -12,11 +10,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.RoleManager;

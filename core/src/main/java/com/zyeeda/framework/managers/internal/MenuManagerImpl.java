@@ -34,7 +34,9 @@ public class MenuManagerImpl implements MenuManager {
 			} 
 			Permission parentPermission = permissionMgr.getParentPermissionByPath(auth);
 			if (parentPermission == null) {
-				listMenu.add(menuMap.get(childMenu.getAuth()));
+				if(!(menuMap.containsKey(childMenu.getAuth()))){
+					listMenu.add(menuMap.get(childMenu.getAuth()));
+				}
 				continue;
 			}
 			if (menuMap.containsKey(parentPermission.getValue())) {
@@ -54,8 +56,8 @@ public class MenuManagerImpl implements MenuManager {
 						parentMenu.setId(parentPermission.getId());
 						parentMenu.setName(parentPermission.getName());
 							if (menuMap.get(parentMenu.getAuth()) == null) {
-								menuMap.put(parentMenu.getAuth(), parentMenu);
 								parentMenu.getPermissionSet().add(menuMap.get(authKey));
+								menuMap.put(parentMenu.getAuth(), parentMenu);
 							} else if(menuMap.get(parentMenu.getAuth()) != null) {
 								Menu menuKey = menuMap.get(parentMenu.getAuth());
 								menuKey.getPermissionSet().add(menuMap.get(authKey));
