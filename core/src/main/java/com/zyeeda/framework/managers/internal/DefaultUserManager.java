@@ -1,15 +1,10 @@
 package com.zyeeda.framework.managers.internal;
 
-import java.text.ParseException;
 import java.util.List;
-
-import javax.naming.NamingException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.managers.UserManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.base.DomainEntityManager;
 import com.zyeeda.framework.persistence.PersistenceService;
 
@@ -20,62 +15,66 @@ public class DefaultUserManager extends DomainEntityManager<User, String>
 		super(persistenceSvc);
 	}
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(DefaultUserManager.class);
-
 	@Override
-	public List<User> findByDepartmentId(String id) throws NamingException {
+	public List<User> findByDepartmentId(String id) {
 		return null;
 	}
 
 	@Override
-	public User findById(String id) throws NamingException, ParseException {
+	public User findById(String id) throws UserPersistException {
 		return super.find(id);
 	}
 
 	@Override
-	public List<User> findByName(String name) throws NamingException {
-		User user = new User();
-		user.setUsername(name);
+	public List<User> findByName(String name) throws UserPersistException {
 		return null;
 	}
 
 	@Override
-	public void persist(User user) throws NamingException {
+	public void persist(User user) throws UserPersistException {
 		super.persist(user);
 
 	}
 
 	@Override
-	public void remove(String id) throws NamingException {
+	public void remove(String id) throws UserPersistException {
 		super.removeById(id);
+	}
 
+	
+	@Override
+	public void disable(String... ids) throws UserPersistException {
+		this.setVisible(false, ids);
 	}
 
 	@Override
-	public void setVisible(Boolean visible, String... ids) {
-		for (String id : ids) {
-			super.em()
-					.createQuery(
-							"update com.zyeeda.framework.entities.User o set o.status = ?1 where o.id = ?2")
-					.setParameter(1, visible).setParameter(2, id)
-					.executeUpdate();
-		}
+	public void enable(String... ids) throws UserPersistException {
+		this.setVisible(true, ids);
 	}
 
 	@Override
-	public void update(User user) throws NamingException, ParseException {
-		super._merge(user);
+	public void update(User user) throws UserPersistException {
+		super.merge(user);
 	}
 
 	@Override
-	public void updatePassword(String id, String password)
-			throws NamingException, ParseException {
+	public void updatePassword(String id, String password) throws UserPersistException {
 		User user = new User();
 		user.setId(id);
 		user.setPassword(password);
 
-		super._merge(user);
+		super.merge(user);
 	}
 
+	private void setVisible(Boolean visible, String... ids) {
+		StringBuffer buffer = new StringBuffer();
+		for (String id : ids) {
+			buffer.append(id).append(",");
+		}
+		if (buffer.length() > 0) {
+			buffer.deleteCharAt(buffer.lastIndexOf(","));
+		}
+		super.em().createQuery("update com.zyeeda.framework.entities.User o set o.status = ?1 where o.id in(?2)")
+				                     .setParameter(1, visible).setParameter(2, buffer.toString()).executeUpdate();
+	}
 }

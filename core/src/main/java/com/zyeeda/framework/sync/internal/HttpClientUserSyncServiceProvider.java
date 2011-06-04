@@ -8,9 +8,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
@@ -36,19 +35,15 @@ import com.zyeeda.framework.utils.DatetimeUtils;
 public class HttpClientUserSyncServiceProvider extends AbstractService implements UserSyncService {
 
 	private static final String SYNC_URLS = "syncUrls";
-	private static final String CORE_POOL_SIZE = "corePoolSize";
-	private static final String KEEP_ALIVE_TIME = "keepAliveTime";
-	private static final String MAXIMUM_POOL_SIZE = "maximumPoolSize";
-	private static final String SYNC_ADD_PATH = "/rest/sync/persist";
+	private static final String NTHREADS = "nThreads";
+	private static final String SYNC_PERSIST_PATH = "/rest/sync/persist";
 	private static final String SYNC_UPDATE_PATH = "/rest/sync/update";
-	private static final String SYNC_SET_VISIBLE_PATH = "/rest/sync/setVisible";
-	
+	private static final String SYNC_ENABLE_PATH = "/rest/sync/enable";
+	private static final String SYNC_DISABLE_PATH = "/rest/sync/disable";
 	
 	private String syncUrls = null;
 	private String[] urls = null;
-	private Integer corePoolSize = null;
-	private Integer keepAliveTime = null;
-	private Integer maximumPoolSize = null;
+	private Integer nThreads = null;
 	private ThreadPoolExecutor poolExecutor = null;
 	
 	public HttpClientUserSyncServiceProvider(
@@ -63,9 +58,7 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 	public void init(Configuration config) throws Exception {
 		this.syncUrls = config.getString(HttpClientUserSyncServiceProvider.SYNC_URLS);
 		this.urls = StringUtils.split(this.syncUrls, ",");
-		this.corePoolSize = Integer.parseInt(config.getString(CORE_POOL_SIZE));
-		this.keepAliveTime = Integer.parseInt(config.getString(KEEP_ALIVE_TIME));
-		this.maximumPoolSize = Integer.parseInt(config.getString(MAXIMUM_POOL_SIZE));
+		this.nThreads = Integer.parseInt(config.getString(NTHREADS));
 		this.poolExecutor = this.getThreadPool();
 	}
 
@@ -76,13 +69,9 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		}
 		
 		HttpPost post = null;
+		HttpEntity entity = null;
 		try {
-			HttpEntity entity = this.getUrlEncodedFormEntity(this.buildMap(user));
-			for (String url : this.urls) {
-				post = new HttpPost(url + SYNC_ADD_PATH);
-				post.setEntity(entity);
-				this.poolExecutor.execute(new HttpPostTask(post));
-			}
+			entity = this.getUrlEncodedFormEntity(this.buildMap(user));
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
@@ -90,34 +79,23 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+		for (String url : this.urls) {
+			post = new HttpPost(url + SYNC_PERSIST_PATH);
+			post.setEntity(entity);
+			this.poolExecutor.execute(new HttpPostTask(post));
+		}
 	}
 	
 	@Override
-	public void setVisible(Boolean visible, String... ids) {
-		if (this.urls.length <= 0) {
-			return;
-		}
-		
-		HttpPut put = null;
-		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
-		HttpEntity entity = null;
-		
-		try {
-			for (String id : ids) {
-				formParams.add(new BasicNameValuePair("id", id.substring(id.indexOf("=") + 1, id.indexOf(","))));
-				formParams.add(new BasicNameValuePair("status", visible.toString()));
-				entity = new UrlEncodedFormEntity(formParams, "utf-8");
-				for (String url : this.urls) {
-					put = new HttpPut(url + SYNC_SET_VISIBLE_PATH);
-					put.setEntity(entity);
-					this.poolExecutor.execute(new HttpPutTask(put));
-				}
-			}
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+	public void enable(String... ids) {
+		setVisible(true, ids);
 	}
-
+	
+	@Override
+	public void disable(String... ids) {
+		setVisible(false, ids);
+	}
+	
 	@Override
 	public void update(User user) {
 		if (this.urls.length <= 0) {
@@ -125,13 +103,9 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		}
 		
 		HttpPut put = null;
+		HttpEntity entity = null;
 		try {
-			HttpEntity entity = this.getUrlEncodedFormEntity(this.buildMap(user));
-			for (String url : this.urls) {
-				put = new HttpPut(url + SYNC_UPDATE_PATH);
-				put.setEntity(entity);
-				this.poolExecutor.execute(new HttpPutTask(put));
-			}
+			entity = this.getUrlEncodedFormEntity(this.buildMap(user));
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalAccessException e) {
@@ -139,31 +113,75 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+		
+		for (String url : this.urls) {
+			put = new HttpPut(url + SYNC_UPDATE_PATH);
+			put.setEntity(entity);
+			this.poolExecutor.execute(new HttpPutTask(put));
+		}
 	}
 	
-	@SuppressWarnings("unchecked")
+	private void setVisible(Boolean visible, String... ids) {
+		if (this.urls.length <= 0) {
+			return;
+		}
+		
+		HttpPut put = null;
+		HttpEntity entity = null;
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		
+		StringBuffer buffer = null;
+		for (String id : ids) {
+			buffer = new StringBuffer();
+			buffer.append(StringUtils.substring(id, StringUtils.indexOf(id, "="), StringUtils.indexOf(id, ","))).append(",");
+		}
+		if (buffer.length() > 0) {
+			buffer.deleteCharAt(buffer.lastIndexOf(","));
+		}
+		formParams.add(new BasicNameValuePair("id", buffer.toString()));
+		formParams.add(new BasicNameValuePair("status", visible.toString()));
+		try {
+			entity = new UrlEncodedFormEntity(formParams, "utf-8");
+		} catch (UnsupportedEncodingException e) {
+			throw new RuntimeException(e);
+		}
+		String setVisibleUrl = null;
+		if (visible) {
+			setVisibleUrl = SYNC_ENABLE_PATH;
+		} else {
+			setVisibleUrl = SYNC_DISABLE_PATH;
+		}
+		for (String url : this.urls) {
+			put = new HttpPut(url + setVisibleUrl);
+			put.setEntity(entity);
+			this.poolExecutor.execute(new HttpPutTask(put));
+		}
+	}
+
+	
 	private Map<String, Object> buildMap(Object obj) throws IllegalArgumentException, 
 									IllegalAccessException, InvocationTargetException {
-		Class clazz = obj.getClass();
+		Class<?> clazz = obj.getClass();
 		Method methods[] = clazz.getDeclaredMethods();
 		Map<String, Object> paramsMap = new HashMap<String, Object>();
-		for (int i = 0; i < methods.length; i++) {  
+		for (int i = 0; i < methods.length; i ++) {
 		   if (methods[i].getName().indexOf("get") == 0) {  
 			   paramsMap.put(this.getFunctionNameToFieldName(methods[i].getName()), methods[i].invoke(obj, new Object[0]));
-		   }  
+		   }
 		}
 		return paramsMap;
 	}
 	
 	private String getFunctionNameToFieldName(String functionName) {
 		StringBuffer buffer = new StringBuffer();
-		buffer.append(Character.toLowerCase(functionName.charAt(3))).append(functionName.substring(4, functionName.length()));
+		buffer.append(Character.toLowerCase(functionName.charAt("get".length())))
+			  .append(functionName.substring("get".length() + 1, functionName.length()));
 		
 		return buffer.toString();
 	}
 	
 	private UrlEncodedFormEntity getUrlEncodedFormEntity(Map<String, Object> paramsMap) {
-		List<NameValuePair> formParams = new ArrayList<NameValuePair>();
+		List<NameValuePair> formParams = new ArrayList<NameValuePair>(paramsMap.size());
 		for (String key : paramsMap.keySet()) {
 			if (paramsMap.get(key) instanceof Boolean) {
 				formParams.add(new BasicNameValuePair(key, paramsMap.get(key).toString()));
@@ -173,22 +191,15 @@ public class HttpClientUserSyncServiceProvider extends AbstractService implement
 				formParams.add(new BasicNameValuePair(key, DatetimeUtils.formatDate((Date) paramsMap.get(key))));
 			}
 		}
-		UrlEncodedFormEntity uefEntity = null;
 		try {
-			uefEntity = new UrlEncodedFormEntity(formParams, "utf-8");
+			return new UrlEncodedFormEntity(formParams, "utf-8");
 		} catch (UnsupportedEncodingException e) {
 			throw new RuntimeException(e);
 		}
-		return uefEntity;
 	}
 	
 	private ThreadPoolExecutor getThreadPool() {
-		ThreadPoolExecutor threadPool = new ThreadPoolExecutor(
-				this.corePoolSize, this.maximumPoolSize, this.keepAliveTime,
-				TimeUnit.SECONDS, new ArrayBlockingQueue<Runnable>(2),
-				new ThreadPoolExecutor.DiscardOldestPolicy());
-		
-		return threadPool;
+		return (ThreadPoolExecutor) Executors.newFixedThreadPool(this.nThreads);
 	}
 
 }
