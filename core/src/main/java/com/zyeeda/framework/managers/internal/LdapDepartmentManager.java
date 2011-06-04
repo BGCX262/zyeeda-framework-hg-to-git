@@ -130,9 +130,10 @@ public class LdapDepartmentManager implements DepartmentManager {
 				String childId = String.format("%s,%s", entry.getName(), id);
 				
 				dept.setName((String)attr.get("ou").get());
-				dept.setDescription((String)attr.get("description").get());
+				if ( attr.get("description") != null) {
+					dept.setDescription((String) attr.get("description").get());
+				}
 				dept.setId(childId);
-				
 				deptList.add(dept);
 			}
 			
