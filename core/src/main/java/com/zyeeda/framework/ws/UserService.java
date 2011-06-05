@@ -2,6 +2,7 @@ package com.zyeeda.framework.ws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +23,7 @@ import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.sync.UserSyncService;
+import com.zyeeda.framework.utils.LdapEncryptUtils;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -34,19 +36,25 @@ public class UserService extends ResourceService {
 		super(ctx);
 	}
 	
+	private static String createUserDn(String parent, String id) {
+		return "uid=" + id + "," + parent;
+	}
+	
 	@POST
 	@Path("/{parent:.*}")
 	@Produces("application/json")
-	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws UserPersistException {
+	public User persist(@FormParam("") User user, @PathParam("parent") String parent) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		if (userMgr.findById(user.getId()) != null ) {
+		List<User> userList = userMgr.findByName(user.getId());
+		if (userList != null && userList.size() > 0) {
 			throw new RuntimeException("账号不能重复");
 		} else {
 			user.setDepartmentName(parent);
+			user.setDeptFullPath(createUserDn(parent, user.getId()));
 			userMgr.persist(user);
-			user = userMgr.findById(user.getId());
+			user = userMgr.findById(user.getDeptFullPath());
 			userSyncService.persist(user);
 			return user;
 		}
@@ -54,7 +62,7 @@ public class UserService extends ResourceService {
 	
 	@DELETE
 	@Path("/{id}")
-	public void removeUser(@PathParam("id") String id) throws UserPersistException {
+	public void remove(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		userMgr.remove(id);
@@ -63,19 +71,18 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws UserPersistException {
+	public User update(@FormParam("") User user, @PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
-		user.setDeptFullPath(id);
-		String uid = user.getDeptFullPath().substring(user.getDeptFullPath().indexOf("=") + 1, 
-				user.getDeptFullPath().indexOf(","));
+		String uid = id.substring(id.indexOf("=") + 1, id.indexOf(","));
 		if (!uid.equals(user.getId())) {
 			throw new RuntimeException("不能修改账号");
 		} else {
+			user.setDeptFullPath(id);
 			userMgr.update(user);
-			user = userMgr.findById(user.getId());
+			user = userMgr.findById(id);
 			userSyncService.update(user);
 			return user;
 		}
@@ -84,11 +91,11 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
-	public User getUserById(@PathParam("id") String id) throws UserPersistException {
+	public User findById(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
-		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
+		return userMgr.findById(id);
 	}
 	
 	@GET
@@ -115,19 +122,21 @@ public class UserService extends ResourceService {
 	@Path("/{id}/update_password")
 	@Produces("application/json")
 	public User updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
-			@FormParam("newPassword") String newPassword)  throws UserPersistException {
+			@FormParam("newPassword") String newPassword)  throws UserPersistException, UnsupportedEncodingException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
-		User u = userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
-		if (("{MD5}" + oldPassword).equals(u.getPassword())) {
-			if (!newPassword.equals(oldPassword)) {
-				userMgr.updatePassword(id, newPassword);
+		User u = userMgr.findById(id);
+		System.out.println("------" + LdapEncryptUtils.md5Encode(oldPassword));
+		System.out.println("------" + u.getPassword());
+		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
+			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
+				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));
 			}
 		} else {
 			throw new RuntimeException("旧密码输入错误");
 		}
-		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
+		return userMgr.findById(id);
 	}
 	
 	@PUT
@@ -141,7 +150,7 @@ public class UserService extends ResourceService {
 		
 		userMgr.enable(id);
 		userSyncService.enable(id);
-		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
+		return userMgr.findById(id);
 	}
 	
 	@PUT
@@ -155,7 +164,7 @@ public class UserService extends ResourceService {
 		
 		userMgr.disable(id);
 		userSyncService.disable(id);
-		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
+		return userMgr.findById(id);
 	}
 	
 	@POST

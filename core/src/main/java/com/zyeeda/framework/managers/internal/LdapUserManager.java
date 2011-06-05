@@ -1,5 +1,6 @@
 package com.zyeeda.framework.managers.internal;
 
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +27,13 @@ import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.DatetimeUtils;
+import com.zyeeda.framework.utils.LdapEncryptUtils;
 
 public class LdapUserManager implements UserManager {
 
 //	private static final Logger logger = LoggerFactory.getLogger(LdapUserManager.class);
+	
+	private static final String LDAP_DEFAULT_PASSWORD = "123456";
 
 	private LdapService ldapSvc;
 
@@ -40,19 +44,16 @@ public class LdapUserManager implements UserManager {
 	@Override
 	public void persist(User user) throws UserPersistException {
 		LdapContext ctx = null;
-		LdapContext parentCtx = null;
 		
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			String department = user.getDepartmentName();
-			String dn = String.format("uid=%s", user.getId());
-			parentCtx = (LdapContext) ctx.lookup(department);
 			Attributes attrs = LdapUserManager.unmarshal(user);
-			parentCtx.createSubcontext(dn, attrs);
+			ctx.createSubcontext(user.getDeptFullPath(), attrs);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new UserPersistException(e);
 		} finally {
-			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
 		}
 	}
@@ -73,48 +74,37 @@ public class LdapUserManager implements UserManager {
 	@Override
 	public void update(User user) throws UserPersistException {
 		LdapContext ctx = null;
-		LdapContext parentCtx = null;
 		
 		try {
+			String dn = user.getDeptFullPath();
+			ctx = this.ldapSvc.getLdapContext();
 			Attributes attrs = LdapUserManager.unmarshal(user);
-			String oldName = user.getDeptFullPath();
-			
-			try {
-				ctx = this.ldapSvc.getLdapContext();
-				ctx.modifyAttributes(oldName, DirContext.REPLACE_ATTRIBUTE, attrs);
-			} catch (NamingException e) {
-				throw new UserPersistException(e);
-			} 
+			ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (UnsupportedEncodingException e) {
+			throw new UserPersistException(e);
 		} finally {
-			LdapUtils.closeContext(parentCtx);
 			LdapUtils.closeContext(ctx);
 		}
 	}
 
 	@Override
 	public User findById(String id) throws UserPersistException {
-		LdapContext cxt = null;
-		NamingEnumeration<SearchResult> ne = null;
-		List<User> userList = null;
+		LdapContext ctx = null;
+		
 		try {
-			cxt = this.ldapSvc.getLdapContext();
-			ne = cxt.search("", "uid=" + id, SearchControlsFactory.getSearchControls(
-					SearchControls.SUBTREE_SCOPE));
-			SearchResult entry = null;
-			userList = new ArrayList<User>();
-			for (; ne.hasMore();) {
-				entry = ne.next();
-				Attributes attr = entry.getAttributes();
-				User user = LdapUserManager.marshal(attr);;
-				userList.add(user);
-			}
-			return userList.size() > 0 ? userList.get(0) : null;
+			ctx = this.ldapSvc.getLdapContext();
+			Attributes attrs = ctx.getAttributes(id);
+			User user = LdapUserManager.marshal(attrs);
+			
+			return user;
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
 		} finally {
-			LdapUtils.closeContext(cxt);
+			LdapUtils.closeContext(ctx);
 		}
 	}
 
@@ -128,23 +118,20 @@ public class LdapUserManager implements UserManager {
 			ctx = this.ldapSvc.getLdapContext();
 			ne = ctx.search(id, "(uid=*)", SearchControlsFactory.getSearchControls(
 					SearchControls.ONELEVEL_SCOPE));
-
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
+			
 			for (; ne.hasMore();) {
 				entry = ne.next();
-				User user = new User();
-				Attributes attr = entry.getAttributes();
-
-				user.setUsername((String) attr.get("cn").get());
-				user.setId((String) attr.get("uid").get());
-				user.setPassword(new String((byte[]) attr.get("userPassword").get()));
-				user.setDeptFullPath(id);
+				Attributes attrs = entry.getAttributes();
+				User user = LdapUserManager.marshal(attrs);
 
 				userList.add(user);
 			}
 			return userList;
 		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
 			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
@@ -160,7 +147,7 @@ public class LdapUserManager implements UserManager {
 
 		try {
 			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search("o=广州局", "(uid=*" + name + ")", SearchControlsFactory.
+			ne = ctx.search("o=广州局", "(uid=" + name + ")", SearchControlsFactory.
 					getSearchControls(SearchControls.SUBTREE_SCOPE));
 			SearchResult entry = null;
 			userList = new ArrayList<User>();
@@ -173,8 +160,8 @@ public class LdapUserManager implements UserManager {
 				Attributes attr = entry.getAttributes();
 				user.setUsername((String) attr.get("cn").get());
 				user.setId(dn);
-				user.setPassword(new String((byte[]) attr.get("userpassword")
-						.get()));
+				user.setPassword(new String((byte[]) attr.get("userpassword").get()));
+				
 				userList.add(user);
 			}
 			return userList;
@@ -193,7 +180,7 @@ public class LdapUserManager implements UserManager {
 			ctx = this.ldapSvc.getLdapContext();
 			ModificationItem[] mods = new ModificationItem[1];
 			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-					      new BasicAttribute("userPassword", "{MD5}" + password));
+					      new BasicAttribute("userPassword", password));
 			
 			ctx.modifyAttributes(id, mods);
 		} catch (NamingException e) {
@@ -301,7 +288,7 @@ public class LdapUserManager implements UserManager {
 //        return bytes;
 //	}
 	
-	private static Attributes unmarshal(User user) {
+	private static Attributes unmarshal(User user) throws UnsupportedEncodingException {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");
@@ -315,9 +302,11 @@ public class LdapUserManager implements UserManager {
 		attrs.put("uid", user.getId());
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + DigestUtils.md5Hex(user.getPassword()));
+			attrs.put("userPassword", "{MD5}" + LdapEncryptUtils.md5Encode(
+					DigestUtils.md5Hex(user.getPassword())));
 		} else {
-			attrs.put("userPassword", "{MD5}" + DigestUtils.md5Hex("123456"));
+			attrs.put("userPassword", "{MD5}" + LdapEncryptUtils.md5Encode(
+					DigestUtils.md5Hex(LDAP_DEFAULT_PASSWORD)));
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
