@@ -62,7 +62,7 @@ public class HttpSessionOpenIdConsumer implements OpenIdConsumer {
 
 		DiscoveryInformation discovered = this.retrieveDiscoveryInfo(httpReq);
 
-		StringBuffer receivingURL = httpReq.getRequestURL();
+		StringBuilder receivingURL = new StringBuilder(this.returnToUrl);
 		String queryString = httpReq.getQueryString();
 		if (queryString != null && queryString.length() > 0) {
 			receivingURL.append("?").append(httpReq.getQueryString());

@@ -18,7 +18,7 @@
                 <job-name>test-job</job-name>
                 <job-group>test-job-group</job-group>
                 <repeat-count>10</repeat-count>
-                <repeat-interval>2000</repeat-interval>
+                <repeat-interval>1000</repeat-interval>
             </simple>
         </trigger>
     </schedule>
