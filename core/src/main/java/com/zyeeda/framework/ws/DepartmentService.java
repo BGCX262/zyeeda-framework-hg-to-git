@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -197,7 +198,7 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children/{roleId}")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentIdAndRoleId(@Context HttpServletRequest request, 
-			@PathParam("id") String id, @PathParam("roleId") String roleId) throws NamingException {
+			@PathParam("id") String id, @PathParam("roleId") String roleId) throws NamingException, UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
 		Role role = roleMgr.find(id);
@@ -265,8 +266,7 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		
-		deptVo.setIo("/rest/depts/" + dept.getId() + "/children/" + roleId );
+		deptVo.setIo("rest/depts/" + dept.getId() + "/children/" + roleId );
 		deptVo.setKind("dept");
 		
 		return deptVo;
