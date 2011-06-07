@@ -1,6 +1,7 @@
 package com.zyeeda.framework.managers.internal;
 
 import java.io.IOException;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +18,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.zyeeda.framework.entities.Permission;
 import com.zyeeda.framework.managers.PermissionManager;
-import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public class PermissionManagerImpl  implements PermissionManager {
 	
 	
 
 	private final static String PERMISSION_FILE = "permission.xml";
-	public List<Permission> findSubPermissionById(String id)
+	public List<PermissionVo> findSubPermissionById(String id)
 			throws XPathExpressionException, IOException {
-		List<Permission> authList = null;
+		List<PermissionVo> authList = null;
 		InputStream is = null;
 		InputSource src = null;
 		XPathExpression exp = null;
@@ -41,7 +41,7 @@ public class PermissionManagerImpl  implements PermissionManager {
 			src = new InputSource(is);
 			NodeList list = (NodeList) exp
 					.evaluate(src, XPathConstants.NODESET);
-			authList = new ArrayList<Permission>();
+			authList = new ArrayList<PermissionVo>();
 			for (int i = 0; i < list.getLength(); i++) {
 				Element element = (Element) list.item(i);
 				NodeList children = element.getChildNodes();
@@ -49,7 +49,7 @@ public class PermissionManagerImpl  implements PermissionManager {
 					Node e = children.item(j);
 					if (e instanceof Element) {
 						Element el = (Element) e;
-						Permission permission = new Permission();
+						PermissionVo permission = new PermissionVo();
 						permission.setId(el.getAttribute("id"));
 						permission.setName(el.getAttribute("name"));
 						permission.setValue(el.getAttribute("value"));
@@ -68,12 +68,12 @@ public class PermissionManagerImpl  implements PermissionManager {
 		return authList;
 	}
 
-	public Permission getPermissionByPath(String auth) throws XPathExpressionException,
+	public PermissionVo getPermissionByPath(String auth) throws XPathExpressionException,
 			IOException {
 		InputStream is = null;
 		InputSource src = null;
 		XPathExpression exp = null;
-		Permission permission =new Permission();
+		PermissionVo permission =new PermissionVo();
 		if (auth != null) {
 			try {
 				XPathFactory fac = XPathFactory.newInstance();
@@ -96,12 +96,12 @@ public class PermissionManagerImpl  implements PermissionManager {
 		return permission;
 	}
 	
-	public Permission getParentPermissionByPath(String auth) throws XPathExpressionException,
+	public PermissionVo getParentPermissionByPath(String auth) throws XPathExpressionException,
 	IOException {
 			InputStream is = null;
 			InputSource src = null;
 			XPathExpression exp = null;
-			Permission permission = new Permission();
+			PermissionVo permission = new PermissionVo();
 			if (auth != null) {
 				try {
 					XPathFactory fac = XPathFactory.newInstance();
