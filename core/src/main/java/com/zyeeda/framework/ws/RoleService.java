@@ -1,6 +1,7 @@
 package com.zyeeda.framework.ws;
 
 import java.util.List;
+import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -10,19 +11,33 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.RoleManagerImpl;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/roles")
 public class RoleService extends ResourceService {
+	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
 
 	public RoleService(ServletContext ctx) {
 		super(ctx);
 	}
 
+	
+	public List<Role> getRoleBySubject(String subject){
+		EntityManager session = (EntityManager) this.getPersistenceService();// persistenceSvc.openSession();
+		List<Role> roleList = session.createNamedQuery("getRolesBySubject", Role.class).getResultList();
+		Search search = new Search();
+		search.addFilterEqual("subject", subject);
+		return roleList;
+	}
+	
+	
 	@GET
 	@Path("/")
 	@Produces("application/json")
