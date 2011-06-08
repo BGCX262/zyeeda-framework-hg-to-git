@@ -2,11 +2,9 @@ package com.zyeeda.framework.ws;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -21,6 +19,7 @@ import javax.ws.rs.core.Context;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.viewmodels.UserVo;
@@ -38,7 +37,7 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/{parent:.*}")
 	@Produces("application/json")
-	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws NamingException, ParseException {
+	public User createUser(@FormParam("") User user, @PathParam("parent") String parent) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -55,7 +54,7 @@ public class UserService extends ResourceService {
 	
 	@DELETE
 	@Path("/{id}")
-	public void removeUser(@PathParam("id") String id) throws NamingException {
+	public void removeUser(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		userMgr.remove(id);
@@ -64,7 +63,7 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws NamingException, ParseException {
+	public User editUser(@FormParam("") User user, @PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -85,7 +84,7 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
-	public User getUserById(@PathParam("id") String id) throws NamingException, ParseException {
+	public User getUserById(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
@@ -95,7 +94,7 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/search/{name}")
 	@Produces("application/json")
-	public List<UserVo> getUserListByName(@PathParam("name") String name) throws NamingException {
+	public List<UserVo> getUserListByName(@PathParam("name") String name) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
@@ -105,7 +104,7 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/userList/{deptId}")
 	@Produces("application/json")
-	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws NamingException {
+	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
@@ -116,7 +115,7 @@ public class UserService extends ResourceService {
 	@Path("/{id}/update_password")
 	@Produces("application/json")
 	public User updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
-			@FormParam("newPassword") String newPassword) throws NamingException, ParseException {
+			@FormParam("newPassword") String newPassword)  throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
@@ -135,16 +134,28 @@ public class UserService extends ResourceService {
 	@Path("/{id}/enable")
 	@Produces("application/json")
 	public User enable(@PathParam("id") String id, @FormParam("status") Boolean visible)
-			throws NamingException, ParseException {
-		return this.setVisible(id, true);
+			throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		UserSyncService userSyncService = this.getUserSynchService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		
+		userMgr.enable(id);
+		userSyncService.enable(id);
+		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 	}
 	
 	@PUT
 	@Path("/{id}/unenable")
 	@Produces("application/json")
-	public User unEnable(@PathParam("id") String id, @FormParam("status") Boolean visible)
-			throws NamingException, ParseException {
-		return this.setVisible(id, false);
+	public User disable(@PathParam("id") String id, @FormParam("status") Boolean visible)
+	 		throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		UserSyncService userSyncService = this.getUserSynchService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		
+		userMgr.disable(id);
+		userSyncService.disable(id);
+		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 	}
 	
 	@POST
@@ -171,15 +182,15 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
-	private User setVisible(String id, Boolean visible) throws NamingException, ParseException {
-		LdapService ldapSvc = this.getLdapService();
-		UserSyncService userSyncService = this.getUserSynchService();
-		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		
-		userMgr.setVisible(visible, id);
-		userSyncService.setVisible(visible, id);
-		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
-	}
+//	private User setVisible(String id, Boolean visible)  throws UserPersistException {
+//		LdapService ldapSvc = this.getLdapService();
+//		UserSyncService userSyncService = this.getUserSynchService();
+//		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+//		
+//		userMgr.setVisible(visible, id);
+//		userSyncService.enable(id);
+//		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
+//	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
@@ -202,6 +213,21 @@ public class UserService extends ResourceService {
 		userVo.setId(user.getId());
 		userVo.setType(type);
 		userVo.setLabel( user.getId());
+		userVo.setCheckName(user.getId());
+		userVo.setLeaf(true);
+		userVo.setUid(user.getId());
+		userVo.setDeptFullPath(user.getDeptFullPath());
+		userVo.setKind("user");
+
+		return userVo;
+	}
+
+	public static UserVo fillUserPropertiesToVo(User user, String type) {
+		UserVo userVo = new UserVo();
+
+		userVo.setId(user.getId());
+		userVo.setType(type);
+		userVo.setLabel("<a>" + user.getId() + "<a>");
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -35,8 +34,6 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/depts")
 public class DepartmentService extends ResourceService {
 	
-//	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
-
 	public DepartmentService(@Context ServletContext ctx) {
 		super(ctx);
 	}
@@ -44,7 +41,7 @@ public class DepartmentService extends ResourceService {
 	@POST
 	@Path("/{parent}")
 	@Produces("application/json")
-	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws NamingException {
+	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		if (deptMgr.findByName(dept.getName()) != null && 
@@ -61,7 +58,7 @@ public class DepartmentService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	@Produces("application/json")
-	public void removeDepartment(@PathParam("id") String id) throws NamingException {
+	public void removeDepartment(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptMgr.remove(id);
@@ -70,7 +67,7 @@ public class DepartmentService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws NamingException {
+	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
@@ -86,7 +83,7 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
-	public Department getDepartmentById(@PathParam("id") String id) throws NamingException {
+	public Department getDepartmentById(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
@@ -96,7 +93,7 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("/search/{name}")
 	@Produces("application/json")
-	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name) throws NamingException {
+	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.findByName(name));
@@ -106,7 +103,7 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentId(@Context HttpServletRequest request, 
-			@PathParam("id") String id) throws NamingException {
+			@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -163,7 +160,7 @@ public class DepartmentService extends ResourceService {
 		
 		deptVo.setId(dept.getId());
 		deptVo.setType("io");
-		deptVo.setLabel(dept.getName() );
+		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
 		

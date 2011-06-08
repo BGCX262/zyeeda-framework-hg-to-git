@@ -1,28 +1,26 @@
 package com.zyeeda.framework.managers;
 
-import java.text.ParseException;
 import java.util.List;
-
-import javax.naming.NamingException;
 
 import com.zyeeda.framework.entities.User;
 
 public interface UserManager {
 
-	public void persist(User user) throws NamingException;
+	public void persist(User user) throws UserPersistException;
 	
-	public void remove(String id) throws NamingException;
+	public void remove(String id) throws UserPersistException;
 	
-	public void update(User user) throws NamingException, ParseException;
+	public void update(User user) throws UserPersistException;
 	
-	public User findById(String id) throws NamingException, ParseException;
+	public User findById(String id) throws UserPersistException;
 	
-	public List<User> findByDepartmentId(String id) throws NamingException;
+	public List<User> findByDepartmentId(String id) throws UserPersistException;
 	
-	public List<User> findByName(String name) throws NamingException;
+	public List<User> findByName(String name) throws UserPersistException;
 	
-	public void updatePassword(String id, String password) throws NamingException, ParseException;
+	public void updatePassword(String id, String password) throws UserPersistException;
 	
-	public void setVisible(Boolean visible, String ...ids) throws NamingException, ParseException;
+	public void enable(String... ids) throws UserPersistException;
 	
+	public void disable(String... ids) throws UserPersistException;
 }

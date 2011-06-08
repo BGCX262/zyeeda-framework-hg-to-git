@@ -1,10 +1,13 @@
 package com.zyeeda.framework.knowledge.internal;
 
-import org.drools.WorkingMemory;
+import org.drools.KnowledgeBase;
 import org.drools.audit.WorkingMemoryLogger;
 import org.drools.audit.event.LogEvent;
 import org.drools.audit.event.RuleFlowLogEvent;
 import org.drools.audit.event.RuleFlowNodeLogEvent;
+import org.drools.definition.process.Node;
+import org.drools.definition.process.Process;
+import org.drools.definition.process.WorkflowProcess;
 import org.drools.event.KnowledgeRuntimeEventManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,21 +25,25 @@ public class HistoryLogger extends WorkingMemoryLogger {
 	private final static Logger logger = LoggerFactory.getLogger(HistoryLogger.class);
 	
 	private PersistenceService persistenceSvc;
+	private KnowledgeBase kbase;
 	
 	private ProcessHistoryManager pHisMgr;
 	private ActionHistoryManager aHisMgr;
 	
-	public HistoryLogger(WorkingMemory workingMemory, PersistenceService persistenceSvc) {
+	/*
+	public HistoryLogger(WorkingMemory workingMemory, PersistenceService persistenceSvc, KnowledgeService knowledgeSvc) {
 		super(workingMemory);
 		
 		this.persistenceSvc = persistenceSvc;
+		this.knowledgeSvc = knowledgeSvc;
 		this.init();
-	}
+	}*/
 	
-	public HistoryLogger(KnowledgeRuntimeEventManager session, PersistenceService persistenceSvc) {
+	public HistoryLogger(KnowledgeRuntimeEventManager session, PersistenceService persistenceSvc, KnowledgeBase kbase) {
 		super(session);
 		
 		this.persistenceSvc = persistenceSvc;
+		this.kbase = kbase;
 		this.init();
 	}
 	
@@ -87,6 +94,20 @@ public class HistoryLogger extends WorkingMemoryLogger {
 			case LogEvent.BEFORE_RULEFLOW_NODE_TRIGGERED: {
 				RuleFlowNodeLogEvent event = (RuleFlowNodeLogEvent) logEvent;
 				
+				String nodeType = null;
+				Process process = this.kbase.getProcess(event.getProcessId());
+				if (process instanceof WorkflowProcess) {
+					WorkflowProcess workflow = (WorkflowProcess) process;
+					try {
+						Node node = workflow.getNode(Long.parseLong(event.getNodeId()));
+						nodeType = node.getClass().getSimpleName();
+					} catch (NumberFormatException e) {
+						logger.warn("node is is not a long value", e);
+					}
+				} else {
+					logger.warn("process {} is not of WorkflowProcess type.", event.getProcessId());
+				}
+				
 				if (logger.isDebugEnabled()) {
 					StringBuilder sb = new StringBuilder();
 					sb.append("BEFORE RULEFLOW NODE TRIGGERED\n");
@@ -95,7 +116,8 @@ public class HistoryLogger extends WorkingMemoryLogger {
 					sb.append(String.format("\tprocess instance id = %s\n", event.getProcessInstanceId()));
 					sb.append(String.format("\tnode id = %s\n", event.getNodeId()));
 					sb.append(String.format("\tnode name = %s\n", event.getNodeName()));
-					sb.append(String.format("\tnode istance id = %s", event.getNodeInstanceId()));
+					sb.append(String.format("\tnode istance id = %s\n", event.getNodeInstanceId()));
+					sb.append(String.format("\tnode type = %s", nodeType));
 					logger.debug(sb.toString());
 				}
 				
@@ -110,6 +132,8 @@ public class HistoryLogger extends WorkingMemoryLogger {
 				actHist.setNodeId(event.getNodeId());
 				actHist.setNodeInstanceId(event.getNodeInstanceId());
 				actHist.setName(event.getNodeName());
+				actHist.setNodeType(nodeType);
+				
 				this.aHisMgr.persist(actHist);
 				break;
 			}

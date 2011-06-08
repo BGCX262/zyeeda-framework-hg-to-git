@@ -21,6 +21,8 @@ public class ActionHistory extends RevisionDomainEntity {
 	
 	private String nodeId;
 	
+	private String nodeType;
+	
 	private String nodeInstanceId;
 	
 	private Boolean alive = true;
@@ -63,6 +65,16 @@ public class ActionHistory extends RevisionDomainEntity {
 
 	public void setNodeId(String nodeId) {
 		this.nodeId = nodeId;
+	}
+	
+	@Basic
+	@Column(name = "F_NODE_TYPE")
+	public String getNodeType() {
+		return nodeType;
+	}
+	
+	public void setNodeType(String nodeType) {
+		this.nodeType = nodeType;
 	}
 
 	@Basic
