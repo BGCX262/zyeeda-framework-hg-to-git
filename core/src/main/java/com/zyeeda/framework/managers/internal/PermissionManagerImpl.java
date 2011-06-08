@@ -110,7 +110,6 @@ public class PermissionManagerImpl  implements PermissionManager {
 					is = this.getClass().getClassLoader().getResourceAsStream(PERMISSION_FILE);
 					src = new InputSource(is);
 					if(StringUtils.isNotBlank(auth) && auth != null ){
-						System.out.println("**************************" + auth);
 						Node node = (Node) exp.evaluate(src, XPathConstants.NODE);
 						Element elementNode = (Element) node;
 					    Element elementParent = (Element)elementNode.getParentNode();

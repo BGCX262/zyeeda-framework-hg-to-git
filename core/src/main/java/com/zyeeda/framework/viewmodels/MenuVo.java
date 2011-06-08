@@ -1,7 +1,7 @@
 package com.zyeeda.framework.viewmodels;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -10,11 +10,19 @@ public class MenuVo {
 	private String id;
 	private String name;
 	private String auth;
-	private Set<MenuVo> permissionSet = new HashSet<MenuVo>();
+	private List<MenuVo> permissionSet = new ArrayList<MenuVo>();
 	private MenuVo parentMenu;
 
 	public MenuVo getParentMenu() {
 		return parentMenu;
+	}
+
+	public List<MenuVo> getPermissionSet() {
+		return permissionSet;
+	}
+
+	public void setPermissionSet(List<MenuVo> permissionSet) {
+		this.permissionSet = permissionSet;
 	}
 
 	public void setParentMenu(MenuVo parentMenu) {
@@ -38,13 +46,13 @@ public class MenuVo {
 		this.id = id;
 	}
 
-	public Set<MenuVo> getPermissionSet() {
-		return permissionSet;
-	}
-
-	public void setPermissionSet(Set<MenuVo> permissionSet) {
-		this.permissionSet = permissionSet;
-	}
+//	public Set<MenuVo> getPermissionSet() {
+//		return permissionSet;
+//	}
+//
+//	public void setPermissionSet(Set<MenuVo> permissionSet) {
+//		this.permissionSet = permissionSet;
+//	}
 
 	public String getName() {
 		return name;
