@@ -6,6 +6,7 @@ public interface StatefulSessionCommand<T> {
 
 	public T execute(StatefulKnowledgeSession ksession);
 	
+	
 	public int getSessionId(); 
 	
 }
