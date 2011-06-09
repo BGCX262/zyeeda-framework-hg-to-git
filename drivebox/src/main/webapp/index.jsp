@@ -13,7 +13,7 @@ String param = request.getParameter("num");
 if ("1".equals(param)) {
 	throw new ServletException("Hello World!");
 } else {
-	out.print("Hello World!");
+	out.print("Hello! ");
 	out.print(SecurityUtils.getSubject().getPrincipal());
 }
 %>

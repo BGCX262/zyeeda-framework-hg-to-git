@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,12 +18,14 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.entities.Menu;
+import bitronix.tm.utils.CollectionUtils;
+
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.MenuManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.MenuManagerImpl;
 import com.zyeeda.framework.managers.internal.RoleManagerImpl;
+import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/menu")
@@ -37,45 +40,32 @@ public class MenuService extends ResourceService {
 	@GET
 	@Path("/")
 	@Produces("application/json")
-	public List<Menu> getMenu()throws XPathExpressionException, IOException {
+	public List<MenuVo> getMenu()throws XPathExpressionException, IOException {
 		String user = this.getSecurityService().getCurrentUser();
 		MenuManager menuMgr = new MenuManagerImpl();
 		RoleManagerImpl roleMgr = new RoleManagerImpl(this
 				.getPersistenceService());
-		Set<String> rolesAuth = new HashSet<String>();
-		List<Menu> listMenu = new ArrayList<Menu>();
+		List<String> rolesAuth = new ArrayList<String>();
+		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
-		roles = roleMgr.getRoleBySubject(user);
-		boolean result = false;
-		if(roles.size() > 1){
-			for(Role role:roles){
-				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
-				for(String permission:role.getPermissionSet()){
-					if(rolesAuth.size()>0){
-						for(String haveAuth:rolesAuth){						
-							if(permission.equals(haveAuth)){
-								logger.debug("the value of the dept permission is agian ");
-								result = true;
-								break;
-							}
-						}
-						if(result == false) {
-							System.out.println("**********************" + permission);
-							rolesAuth.add(permission);
-						}
-					} else {
-						rolesAuth.add(permission);
-					}					
-				}
-			}		
-				
-			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
-		} else if(roles.size() == 1){
-			System.out.println("****************************222" );
-			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
+		roles = roleMgr.getRoleBySubject(user);	
+		if(roles.size() == 1) {
+			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
+			return listMenu;
 		}
+		for(Role role:roles) {
+			logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
+			for(String permission:role.getPermissionList()){
+				if(rolesAuth.size() == 0){
+					rolesAuth.add(permission);
+					continue;
+				}
+				if(!(rolesAuth.contains(role))){
+					rolesAuth.add(permission);
+				}
+			}
+		}		
+		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
-
-
 }

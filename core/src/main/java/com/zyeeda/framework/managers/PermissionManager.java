@@ -5,16 +5,16 @@ import java.util.List;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import com.zyeeda.framework.entities.Permission;
+import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public interface PermissionManager {
 	
-	public List<Permission> findSubPermissionById(String id) throws XPathExpressionException, IOException;
+	public List<PermissionVo> findSubPermissionById(String id) throws XPathExpressionException, IOException;
 	
-	public  Permission getPermissionByPath(String auth) throws XPathExpressionException,
+	public  PermissionVo getPermissionByPath(String auth) throws XPathExpressionException,
 	IOException;
 	
-	public Permission getParentPermissionByPath(String auth) throws XPathExpressionException,
+	public PermissionVo getParentPermissionByPath(String auth) throws XPathExpressionException,
 	IOException;
 	
 }
