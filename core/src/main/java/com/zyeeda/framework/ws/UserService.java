@@ -197,7 +197,7 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType("io");
-		userVo.setLabel(user.getId());
+		userVo.setLabel( user.getId() );
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
@@ -221,6 +221,21 @@ public class UserService extends ResourceService {
 
 		return userVo;
 	}
+
+//	public static UserVo fillUserPropertiesToVo(User user, String type) {
+//		UserVo userVo = new UserVo();
+//
+//		userVo.setId(user.getId());
+//		userVo.setType(type);
+//		userVo.setLabel("<a>" + user.getId() + "<a>");
+//		userVo.setCheckName(user.getId());
+//		userVo.setLeaf(true);
+//		userVo.setUid(user.getId());
+//		userVo.setDeptFullPath(user.getDeptFullPath());
+//		userVo.setKind("user");
+//
+//		return userVo;
+//	}
 
 	public static List<UserVo> fillUserListPropertiesToVo(List<User> userList) {
 		List<UserVo> userVoList = new ArrayList<UserVo>(userList.size());

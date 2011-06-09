@@ -1,9 +1,7 @@
-package com.zyeeda.framework.entities;
+package com.zyeeda.framework.viewmodels;
 
-import javax.ws.rs.Path;
 
-@Path("/permission")
-public class Permission {
+public class PermissionVo {
 	private String id;
 	private String name;
 	private String value;
