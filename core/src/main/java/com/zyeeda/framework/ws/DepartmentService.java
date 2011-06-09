@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -23,6 +24,7 @@ import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.RoleManagerImpl;
@@ -197,7 +199,7 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children/{roleId}")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentIdAndRoleId(@Context HttpServletRequest request, 
-			@PathParam("id") String id, @PathParam("roleId") String roleId) throws NamingException {
+			@PathParam("id") String id, @PathParam("roleId") String roleId) throws NamingException, UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
 		Role role = roleMgr.find(id);
