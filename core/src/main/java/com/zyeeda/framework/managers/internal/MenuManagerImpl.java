@@ -36,9 +36,7 @@ public class MenuManagerImpl implements MenuManager {
 			} 
 			PermissionVo parentPermission = permissionMgr.getParentPermissionByPath(auth);
 			if (parentPermission == null) {
-				if(!(menuMap.containsKey(childMenu.getAuth()))){
 					listMenu.add(menuMap.get(childMenu.getAuth()));
-				}
 				continue;
 			}
 			if (menuMap.containsKey(parentPermission.getValue())) {
