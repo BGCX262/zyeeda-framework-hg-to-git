@@ -125,7 +125,7 @@ public class UserService extends ResourceService {
 				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
-			throw new RuntimeException("旧密码输入错�);
+			throw new RuntimeException("旧密码输入错误");
 		}
 		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
 	}
