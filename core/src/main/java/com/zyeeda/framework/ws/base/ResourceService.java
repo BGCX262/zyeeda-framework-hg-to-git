@@ -59,4 +59,7 @@ public class ResourceService {
 	protected KnowledgeService getKnowledgeService(){
 		return  this.reg.getService(KnowledgeService.class);
 	}
+	
+
+
 }

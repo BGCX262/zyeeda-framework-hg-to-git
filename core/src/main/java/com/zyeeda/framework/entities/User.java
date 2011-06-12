@@ -102,7 +102,9 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.mobile = mobile;
 	}
 
-	@Temporal(TemporalType.TIME) @Column(name = "F_BIRTHDAY", length = 19)
+	
+	@javax.persistence.Temporal(TemporalType.TIMESTAMP)
+	@javax.persistence.Column(name = "F_BIRTHDAY")
 	public Date getBirthday() {
 		return birthday;
 	}
@@ -111,7 +113,8 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.birthday = birthday;
 	}
 
-	@Temporal(TemporalType.TIME) @Column(name = "F_DATEOFWORK", length = 19)
+	@javax.persistence.Temporal(TemporalType.TIMESTAMP)
+	@javax.persistence.Column(name = "F_DATEOFWORK")
 	public Date getDateOfWork() {
 		return dateOfWork;
 	}
