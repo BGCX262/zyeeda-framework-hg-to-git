@@ -17,8 +17,6 @@ public class UserVo implements Serializable{
 	
 	private String label;
 	
-	
-	
 	private String uid;
 	
 	private boolean leaf;
