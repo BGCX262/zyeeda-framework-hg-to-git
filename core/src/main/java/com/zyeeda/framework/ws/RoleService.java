@@ -1,8 +1,12 @@
 package com.zyeeda.framework.ws;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.EntityManager;
+import java.util.Set;
+
 import javax.servlet.ServletContext;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -10,46 +14,105 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.managers.PermissionManager;
 import com.zyeeda.framework.managers.RoleManager;
-import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
+import com.zyeeda.framework.managers.internal.PermissionManagerImpl;
 import com.zyeeda.framework.managers.internal.RoleManagerImpl;
+import com.zyeeda.framework.viewmodels.PermissionVo;
+import com.zyeeda.framework.viewmodels.RoleWithUserVo;
+import com.zyeeda.framework.viewmodels.UserNameVo;
 import com.zyeeda.framework.ws.base.ResourceService;
-
 @Path("/roles")
-public class RoleService extends ResourceService {
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
-
-	public RoleService(ServletContext ctx) {
+public class RoleService extends ResourceService{
+	
+	private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
+	
+	public RoleService(@Context ServletContext ctx) {
 		super(ctx);
 	}
-
-	
-	public List<Role> getRoleBySubject(String subject){
-		EntityManager session = (EntityManager) this.getPersistenceService();// persistenceSvc.openSession();
-		List<Role> roleList = session.createNamedQuery("getRolesBySubject", Role.class).getResultList();
-		Search search = new Search();
-		search.addFilterEqual("subject", subject);
-		return roleList;
-	}
-	
 	
 	@GET
-	@Path("/")
+	@Path("/{id}/getRole")
+	@Produces("application/json")
+	public Role getOneRolesById(@PathParam("id") String id) {
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		return roleMgr.find(id);
+	}
+	
+	@GET
+	@Path("/getAllRoles")
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		logger.debug("this get all roles is success!");
 		return roleMgr.findAll();
 	}
-
+	
+	@DELETE
+	@Path("/")
+	@Produces("application/json")
+	public List<Role>  getRoles(@QueryParam("ids") String ids ){
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		if(roleMgr != null){
+			String[] id=ids.split(";");
+			for(String sigleId:id){
+				roleMgr.removeById(sigleId);
+			}
+		}
+		return roleMgr.findAll();
+	}
+	
+	@GET
+	@Path("/{id}/role_and_auth")
+	@Produces("application/json")
+	public RoleWithUserVo getRolesById(@PathParam("id") String id) throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		Role role = roleMgr.find(id);
+		logger.debug("this role's permission is " + role.getPermissions());
+		PermissionManager permissionMgr = new PermissionManagerImpl();
+		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
+		for(String userName:role.getSubjects()){
+			UserNameVo userVo = new UserNameVo();
+			userVo.setUserName(userName);
+			roleWithUserVo.getUserName().add(userVo);
+		}
+		for(String auth:role.getPermissionList()){
+			PermissionVo permission = new PermissionVo();
+		    permission = permissionMgr.getPermissionByPath(auth);
+			roleWithUserVo.getPermission().add(permission);
+		}
+		return roleWithUserVo;
+	}
+	
+	@POST
+	@Path("/{id}/edite")
+	@Produces("application/json")
+	public List<Role> editeRole(@PathParam("id") String id, @FormParam("") Role role){
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		Role newRole=roleMgr.find(id);
+		newRole.setName(role.getName());
+		newRole.setDescription(role.getDescription());
+		//newRole.setPermissions(role.getPermissions());
+		this.getPersistenceService().getCurrentSession().flush();
+		return roleMgr.findAll();
+	}
+	
+	
+	
 	@POST
 	@Path("/")
 	@Produces("application/json")
-	public Role creatRole(@FormParam("") Role role) {
+	public List<Role> creatRole(@FormParam("") Role role) {
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
 		String name = role.getName();
 		Search search = new Search();
@@ -61,7 +124,7 @@ public class RoleService extends ResourceService {
 			roleMgr.persist(role);
 			this.getPersistenceService().getCurrentSession().flush();
 		}
-		return roleMgr.find(role.getId());
+		return roleMgr.findAll();
 	}
 
 	@PUT
@@ -76,29 +139,117 @@ public class RoleService extends ResourceService {
 	}
 
 	@POST
-	@Path("/{id}/assign_user/{names}")
+	@Path("/{id}/assign_user")
 	@Produces("application/json")
-	public void assignRoleUser(@PathParam("id") String id,
-			@PathParam("names") String names) {
+	public void assignRoleUser(@PathParam("id") String id,@QueryParam("ids") String ids) {
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
 		Role role = roleMgr.find(id);
-		if(StringUtils.isNotBlank(names)){
-			String[] usersName = names.split(",");
+		role.getSubjects().clear();
+		if(StringUtils.isNotBlank(ids)){
+			String[] usersName = ids.split(",");
 			for (int i = 0; i < usersName.length; i++) {
 				role.getSubjects().add(usersName[i]);
 			}
 		}
+		this.getPersistenceService().getCurrentSession().flush();
 	}
-
-	@PUT
-	@Path("/{id}/assignAuth/{auth}")
+	
+	@GET
+	@Path("/{id}/subUser")
 	@Produces("application/json")
-	public Role assignRoleAuth(@PathParam("id") String id,
-			@PathParam("auth") String auth) {
+	public List<String> getUserByRoleId(@PathParam("id") String id){
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
 		Role role = roleMgr.find(id);
-		role.setPermissions(auth);
-		Role newRole=roleMgr.merge(role);
-		return newRole;
+		Set<String> user = role.getSubjects();
+		List<String>  list = new ArrayList<String>();
+		for(String userId:user){
+			list.add(userId);
+		}
+		return list;
 	}
+
+	@POST
+	@Path("/{id}/assign_auth")
+	@Produces("application/json")
+	public Role assignRoleAuth(@PathParam("id") String id,
+			@FormParam("") Role role) {
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		Role newrole = roleMgr.find(id);
+		newrole.setPermissions(role.getPermissions());
+		this.getPersistenceService().getCurrentSession().flush();
+		return newrole;
+	}
+	
+	@POST
+	@Path("/{id}/removeAuth")
+	@Produces("application/json")
+	public Role removeAuth(@PathParam("id") String id, @QueryParam("permission") String permission) throws XPathExpressionException, IOException{
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		Role role = roleMgr.find(id);
+		String[] permissions = permission.split(";");
+		List<String> permissionSet = role.getPermissionList();
+		for(String havaermissions : permissions){
+			if (permissionSet.contains(havaermissions)) {
+				permissionSet.remove(havaermissions);
+			}
+		}
+		String utils = StringUtils.join(permissionSet, ";");
+		role.setPermissions(utils);
+		this.getPersistenceService().getCurrentSession().flush();
+		return role;
+		
+	}
+
+	
+	@POST
+	@Path("/{id}/removeUser")
+	@Produces("application/json")
+	public RoleWithUserVo removeUser(@PathParam("id") String id, @QueryParam("subject") String subject) throws XPathExpressionException, IOException{
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		Role role = roleMgr.find(id);
+		String[] subjects = subject.split(";");
+		boolean result = false;
+		for(String subjectsSub:subjects){
+			for(String auth:role.getSubjects()){
+				if(auth.equals(subjectsSub)){
+					result = true;
+					logger.debug("this role's subject remove is success" );
+					break;
+				}
+			}
+			if(result) {
+				role.getSubjects().remove(subjectsSub);
+			}
+		}
+		this.getPersistenceService().getCurrentSession().flush();
+		PermissionManager permissionMgr = new PermissionManagerImpl();
+		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
+		for(String userName:role.getSubjects()){
+			UserNameVo userVo = new UserNameVo();
+			userVo.setUserName(userName);
+			roleWithUserVo.getUserName().add(userVo);
+		}
+		for(String auth:role.getPermissionList()){
+			PermissionVo permission = new PermissionVo();
+		    permission = permissionMgr.getPermissionByPath(auth);
+			roleWithUserVo.getPermission().add(permission);
+		}
+		//this.getPersistenceService().getCurrentSession().flush();
+		return roleWithUserVo;
+	}
+	
+	@POST
+	@Path("/get_roes_subuser")
+	@Produces("application/json")
+	public List<String>  getAllSubUser(){
+		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		String userName = this.getSecurityService().getCurrentUser();
+		List<Role> roleList = roleMgr.getRoleBySubject(userName);
+		List<String> subjectList = new ArrayList<String>();
+		for(Role role : roleList){
+			subjectList.addAll(role.getSubjects());
+		}
+		return subjectList;
+	}
+	
 }
