@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -43,7 +42,9 @@ public class DepartmentService extends ResourceService {
 	@POST
 	@Path("/{parent}")
 	@Produces("application/json")
-	public Department createDepartment(@FormParam("") Department dept, @PathParam("parent") String parent) throws UserPersistException {
+	public Department createDepartment(@FormParam("") Department dept,
+									   @PathParam("parent") String parent)
+								  throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		if (deptMgr.findByName(dept.getName()) != null && 
@@ -60,7 +61,8 @@ public class DepartmentService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	@Produces("application/json")
-	public void removeDepartment(@PathParam("id") String id) throws UserPersistException {
+	public void removeDepartment(@PathParam("id") String id)
+							throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptMgr.remove(id);
@@ -69,7 +71,9 @@ public class DepartmentService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public Department editDepartment(@FormParam("") Department dept, @PathParam("id") String id) throws UserPersistException {
+	public Department editDepartment(@FormParam("") Department dept,
+									 @PathParam("id") String id)
+								throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
@@ -85,7 +89,8 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("/{id}")
 	@Produces("application/json")
-	public Department getDepartmentById(@PathParam("id") String id) throws UserPersistException {
+	public Department getDepartmentById(@PathParam("id") String id)
+								   throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
@@ -95,7 +100,8 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("/search/{name}")
 	@Produces("application/json")
-	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name) throws UserPersistException {
+	public List<DepartmentVo> getDepartmentListByName(@PathParam("name") String name)
+												 throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.findByName(name));
@@ -105,7 +111,8 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentId(@Context HttpServletRequest request, 
-			@PathParam("id") String id) throws UserPersistException {
+																   @PathParam("id") String id)
+															  throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -113,8 +120,10 @@ public class DepartmentService extends ResourceService {
 		List<UserVo> userVoList = null;
 		String type = request.getParameter("type");
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
-			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), type);
+			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id),
+																			type);
+			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id),
+					                                            type);
 		} else {
 			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
 			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
@@ -128,7 +137,8 @@ public class DepartmentService extends ResourceService {
 	
 	
 	
-	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVo(List<DepartmentVo> deptVoList, List<UserVo> userVoList) {
+	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVo(List<DepartmentVo> deptVoList,
+																List<UserVo> userVoList) {
 		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
 		for (DepartmentVo deptVo: deptVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
@@ -182,7 +192,8 @@ public class DepartmentService extends ResourceService {
 		return deptVoList;
 	}
 	
-	public static List<DepartmentVo> fillDepartmentListPropertiesToVo(List<Department> deptList, String type) {
+	public static List<DepartmentVo> fillDepartmentListPropertiesToVo(List<Department> deptList,
+																	  String type) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
 		DepartmentVo deptVo = null;
 		for (Department dept : deptList) {
@@ -199,7 +210,9 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children/{roleId}")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenNodesByDepartmentIdAndRoleId(@Context HttpServletRequest request, 
-			@PathParam("id") String id, @PathParam("roleId") String roleId) throws NamingException, UserPersistException {
+																			@PathParam("id") String id,
+																			@PathParam("roleId") String roleId)
+																	   throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
 		Role role = roleMgr.find(id);
@@ -225,7 +238,8 @@ public class DepartmentService extends ResourceService {
 	}
 	
 	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVoCheckUser(List<DepartmentVo> deptVoList, 
-			List<UserVo> userVoList, Set<String> userId) {
+																		 List<UserVo> userVoList,
+																		 Set<String> userId) {
 		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
 		for (DepartmentVo deptVo: deptVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
@@ -274,7 +288,9 @@ public class DepartmentService extends ResourceService {
 		return deptVo;
 	}
 	
-	public static List<DepartmentVo> fillDepartmentListPropertiesToVoByRoleId(List<Department> deptList, String type, String roleId) {
+	public static List<DepartmentVo> fillDepartmentListPropertiesToVoByRoleId(List<Department> deptList,
+																			  String type,
+																			  String roleId) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
 		DepartmentVo deptVo = null;
 		for (Department dept : deptList) {
