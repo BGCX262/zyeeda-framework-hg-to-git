@@ -244,11 +244,10 @@ public class LdapTemplate{
 		return this.namingEnumerationToQueryResult(ne);
 	}
 	
-	private List<Attributes> namingEnumerationToList(NamingEnumeration<SearchResult> ne)
+	private List<Attributes> namingEnumerationToList(
+								       NamingEnumeration<SearchResult> ne)
 								   throws NamingException {
-		if (ne == null) {
-			return null;
-		}
+
 		List<Attributes> attrList = new ArrayList<Attributes>();
 		while (ne.hasMore()) {
 			Attributes atrrs = ne.next().getAttributes();
