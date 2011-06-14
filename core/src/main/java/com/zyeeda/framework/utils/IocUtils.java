@@ -7,6 +7,7 @@ import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.slf4j.Logger;
 
+import com.zyeeda.framework.AnnotationException;
 import com.zyeeda.framework.FrameworkConstants;
 
 public class IocUtils {
@@ -14,7 +15,7 @@ public class IocUtils {
 	public static String getServiceId(Class<?> clazz) {
 		ServiceId svcId = clazz.getAnnotation(ServiceId.class);
 		if (svcId == null) {
-			throw new RuntimeException("No [ServiceId] annotation defined.");
+			throw new AnnotationException("No [ServiceId] annotation defined.");
 		}
 		return svcId.value();
 	}

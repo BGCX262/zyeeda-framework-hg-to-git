@@ -22,6 +22,8 @@ public class DepartmentVo implements Serializable {
 	private String io;
 
 	private String kind;
+	
+	private String deptFullPath;
 
 	public String getId() {
 		return id;
@@ -77,6 +79,14 @@ public class DepartmentVo implements Serializable {
 
 	public void setKind(String kind) {
 		this.kind = kind;
+	}
+
+	public String getDeptFullPath() {
+		return deptFullPath;
+	}
+
+	public void setDeptFullPath(String deptFullPath) {
+		this.deptFullPath = deptFullPath;
 	}
 
 }
