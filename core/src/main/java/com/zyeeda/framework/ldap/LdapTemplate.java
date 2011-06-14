@@ -105,13 +105,13 @@ public class LdapTemplate{
 			if (!cascade){
 				this.ctx.unbind(dn);
 			} else {
-//				NamingEnumeration<Binding> enumeration = this.ctx.listBindings(dn);
-//				while (enumeration.hasMore()) {
-//					Binding binding = (Binding) enumeration.next();
-//					unbind(binding.getNameInNamespace().replaceAll(DN, ""), cascade);
-//				}
-//				this.ctx.unbind(dn);
-				this.deleteRecursively(dn);
+				NamingEnumeration<Binding> enumeration = this.ctx.listBindings(dn);
+				while (enumeration.hasMore()) {
+					Binding binding = (Binding) enumeration.next();
+					unbind(binding.getNameInNamespace().replaceAll(DN, ""), cascade);
+				}
+				this.ctx.unbind(dn);
+				//this.deleteRecursively(dn);
 			}
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
