@@ -37,7 +37,9 @@ public class DepartmentService extends ResourceService {
 	@POST
 	@Path("/{parent}")
 	@Produces("application/json")
-	public Department persist(@FormParam("") Department dept, @PathParam("parent") String parent) throws UserPersistException {
+	public Department persist(@FormParam("") Department dept,
+							  @PathParam("parent") String parent)
+						 throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		if (deptMgr.findByName(dept.getName()) != null && 
@@ -64,17 +66,14 @@ public class DepartmentService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public Department update(@FormParam("") Department dept, @PathParam("id") String id) throws UserPersistException {
+	public Department update(@FormParam("") Department dept,
+							 @PathParam("id") String id)
+						throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		
-		String name = deptMgr.findById(dept.getId()).getName();
-		if (dept.getName().equals(name)) {
-			deptMgr.update(dept);
-			return deptMgr.findById(id);
-		} else {
-			throw new RuntimeException("不能修改部门名称");
-		}
+		dept.setId(id);
+		deptMgr.update(dept);
+		return deptMgr.findById(id);
 	}
 	
 	@GET
@@ -94,17 +93,19 @@ public class DepartmentService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
-		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.findByName(name));
+		return DepartmentService.fillPropertiesToVo(deptMgr.findByName(name));
 	}
 	
 	@GET
 	@Path("/search/{parent}/{name}")
 	@Produces("application/json")
-	public List<DepartmentVo> findByName(@PathParam("parent") String parent, @PathParam("name") String name) throws UserPersistException {
+	public List<DepartmentVo> findByName(@PathParam("parent") String parent,
+										 @PathParam("name") String name)
+									throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
-		return DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.findByName(parent, name));
+		return DepartmentService.fillPropertiesToVo(deptMgr.findByName(parent, name));
 	}
 	
 	@GET
@@ -120,19 +121,19 @@ public class DepartmentService extends ResourceService {
 		List<UserVo> userVoList = null;
 		String type = request.getParameter("type");
 		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id), type);
+			deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id), type);
 			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), type);
 		} else {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVo(deptMgr.getChildrenById(id));
+			deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id));
 			userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
 		}
-		
 		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
 		
 		return orgList;
 	}
 	
-	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVo(List<DepartmentVo> deptVoList, List<UserVo> userVoList) {
+	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVo(List<DepartmentVo> deptVoList,
+																List<UserVo> userVoList) {
 		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
 		for (DepartmentVo deptVo: deptVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
@@ -141,7 +142,7 @@ public class DepartmentService extends ResourceService {
 			orgNodeVo.setIo(deptVo.getIo());
 			orgNodeVo.setLabel(deptVo.getLabel());
 			orgNodeVo.setType(deptVo.getType());
-			orgNodeVo.setFullPath(deptVo.getId());
+			orgNodeVo.setFullPath(deptVo.getDeptFullPath());
 			orgNodeVo.setKind(deptVo.getKind());
 			
 			orgNodeVoList.add(orgNodeVo);
@@ -160,7 +161,6 @@ public class DepartmentService extends ResourceService {
 			
 			orgNodeVoList.add(orgNodeVo);
 		}
-		
 		return orgNodeVoList;
 	}
 	
@@ -172,31 +172,35 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		deptVo.setIo("/rest/depts/" + dept.getId() + "/children");
+		deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
+		deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children");
 		deptVo.setKind("dept");
 		
 		return deptVo;
 	}
 	
-	public static List<DepartmentVo> fillDepartmentListPropertiesToVo(List<Department> deptList) {
+	public static List<DepartmentVo> fillPropertiesToVo(List<Department> deptList,
+																	  String type) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
 		DepartmentVo deptVo = null;
 		for (Department dept : deptList) {
 			deptVo = DepartmentService.fillPropertiesToVo(dept);
-			deptVoList.add(deptVo);
-		}
-		return deptVoList;
-	}
-	
-	public static List<DepartmentVo> fillDepartmentListPropertiesToVo(List<Department> deptList, String type) {
-		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
-		DepartmentVo deptVo = null;
-		for (Department dept : deptList) {
-			deptVo = DepartmentService.fillPropertiesToVo(dept);
+			deptVo.setId(dept.getId());
 			deptVo.setIo(deptVo.getIo() + "?type=task");
 			deptVo.setType(type);
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;
 	}
+	
+	public static List<DepartmentVo> fillPropertiesToVo(List<Department> deptList) {
+		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
+		DepartmentVo deptVo = null;
+		for (Department dept : deptList) {
+			deptVo = DepartmentService.fillPropertiesToVo(dept);
+			deptVoList.add(deptVo);
+		}
+		return deptVoList;
+	}
+	
 }

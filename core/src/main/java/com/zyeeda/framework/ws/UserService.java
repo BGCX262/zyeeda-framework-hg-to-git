@@ -30,8 +30,6 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/users")
 public class UserService extends ResourceService {
 	
-//	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
-
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
 	}

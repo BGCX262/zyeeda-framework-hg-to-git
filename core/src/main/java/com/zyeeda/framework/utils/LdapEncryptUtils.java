@@ -18,6 +18,6 @@ public class LdapEncryptUtils {
 	}
 	
 	public static void main(String[] args) throws UnsupportedEncodingException {
-		System.out.println(md5Encode("e10adc3949ba59abbe56e057f20f883e"));
+		System.out.println(md5Encode("chinayangjie"));
 	}
 }
