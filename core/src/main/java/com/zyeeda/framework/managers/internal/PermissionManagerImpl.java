@@ -52,7 +52,8 @@ public class PermissionManagerImpl  implements PermissionManager {
 						PermissionVo permission = new PermissionVo();
 						permission.setId(el.getAttribute("id"));
 						permission.setName(el.getAttribute("name"));
-						permission.setValue(el.getAttribute("value"));
+						permission.setValue(el.getAttribute("value"));		
+						permission.setOrderBy(el.getAttribute("order"));
 						if (el.getAttribute("value").endsWith("*")) {
 							permission.setIsHaveIO(false);
 						}else{
@@ -65,6 +66,7 @@ public class PermissionManagerImpl  implements PermissionManager {
 		} finally {
 			is.close();
 		}
+		
 		return authList;
 	}
 
@@ -88,6 +90,7 @@ public class PermissionManagerImpl  implements PermissionManager {
 					permission.setId(elementNode.getAttribute("id"));
 					permission.setName(elementNode.getAttribute("name"));
 					permission.setValue(elementNode.getAttribute("value"));
+					permission.setOrderBy(elementNode.getAttribute("order"));
 				}
 			} finally {
 				is.close();
@@ -118,6 +121,7 @@ public class PermissionManagerImpl  implements PermissionManager {
 							permission.setId(elementParent.getAttribute("id")); 
 							 permission.setName(elementParent.getAttribute("name"));
 							 permission.setValue(elementParent.getAttribute("value"));
+							 permission.setOrderBy(elementParent.getAttribute("order"));
 						}
 						if(StringUtils.isBlank(elementParent.getAttribute("value"))){
 							permission = null;
