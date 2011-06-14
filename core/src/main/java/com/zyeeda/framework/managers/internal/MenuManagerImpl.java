@@ -23,7 +23,6 @@ public class MenuManagerImpl implements MenuManager {
 		Map<String, MenuVo> menuMap = new LinkedHashMap<String, MenuVo>();
 		String	root = null;
 		for (String auth : authList) {
-			System.out.println("*****************555" + auth);
 			PermissionVo childPermission = permissionMgr.getPermissionByPath(auth);
 			MenuVo childMenu = null;
 			if (childPermission != null) {
@@ -37,7 +36,7 @@ public class MenuManagerImpl implements MenuManager {
 			PermissionVo parentPermission = permissionMgr.getParentPermissionByPath(auth);
 			if (parentPermission == null) {
 					listMenu.add(menuMap.get(childMenu.getAuth()));
-				continue;
+					continue;
 			}
 			if (menuMap.containsKey(parentPermission.getValue())) {
 				MenuVo menuKey = menuMap.get(parentPermission.getValue());
