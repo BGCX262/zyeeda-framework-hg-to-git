@@ -169,14 +169,17 @@ public class LdapUserManager implements UserManager {
 				String dn = entry.getName();
 
 				Attributes attr = entry.getAttributes();
-				user.setUsername((String) attr.get("cn").get());
-				user.setId(dn);
-				user.setPassword(new String((byte[]) attr.get("userpassword")
-						.get()));
+//				user.setUsername((String) attr.get("cn").get());
+//				user.setId(dn);
+//				user.setPassword(new String((byte[]) attr.get("userpassword")
+//						.get()));
+				user = marshal(attr);
 				userList.add(user);
 			}
 			return userList;
 		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
 			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
