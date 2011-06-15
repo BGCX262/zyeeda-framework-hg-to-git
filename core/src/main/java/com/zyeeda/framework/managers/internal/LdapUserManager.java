@@ -1,6 +1,7 @@
 package com.zyeeda.framework.managers.internal;
 
 import java.io.UnsupportedEncodingException;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class LdapUserManager implements UserManager {
 	public LdapUserManager(LdapService ldapSvc) {
 		 this.ldapSvc = ldapSvc;
 	}
-
+	
 	@Override
 	public void persist(User user) throws UserPersistException {
 		try {
@@ -139,9 +140,7 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
-		} catch (ParseException e) {
-			throw new UserPersistException(e);
-		} finally {
+		}  finally {
 			LdapUtils.closeEnumeration(ne);
 			LdapUtils.closeContext(ctx);
 		}

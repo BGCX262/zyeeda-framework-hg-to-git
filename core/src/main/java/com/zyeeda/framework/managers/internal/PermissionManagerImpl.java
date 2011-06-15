@@ -66,7 +66,6 @@ public class PermissionManagerImpl implements PermissionManager {
 		} finally {
 			is.close();
 		}
-
 		return authList;
 	}
 
@@ -121,13 +120,10 @@ public class PermissionManagerImpl implements PermissionManager {
 					if (elementNode != null) {
 						permission.setId(elementParent.getAttribute("id"));
 						permission.setName(elementParent.getAttribute("name"));
-						permission
-								.setValue(elementParent.getAttribute("value"));
-						permission.setOrderBy(elementParent
-								.getAttribute("order"));
+						permission.setValue(elementParent.getAttribute("value"));
+						permission.setOrderBy(elementParent.getAttribute("order"));
 					}
-					if (StringUtils
-							.isBlank(elementParent.getAttribute("value"))) {
+					if (StringUtils.isBlank(elementParent.getAttribute("value"))) {
 						permission = null;
 					}
 				} else {
@@ -145,7 +141,6 @@ public class PermissionManagerImpl implements PermissionManager {
 		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 		List<String> auths = new ArrayList<String>();
 		for (String auth : authList) {
-			System.out.println("*****************545454*****"+auth);
 			allAuth.add(auth);
 			permissionList = findSubPermissionByValue(auth);
 			if (permissionList == null) {
