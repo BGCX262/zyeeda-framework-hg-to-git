@@ -3,7 +3,6 @@ package com.zyeeda.framework.managers.internal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
@@ -14,11 +13,9 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.realm.ldap.LdapUtils;
-
 import com.ibm.icu.text.SimpleDateFormat;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
@@ -33,8 +30,9 @@ public class LdapUserManager implements UserManager {
 
 	private LdapService ldapSvc;
 
+
 	public LdapUserManager(LdapService ldapSvc) {
-		this.ldapSvc = ldapSvc;
+		 this.ldapSvc = ldapSvc;
 	}
 
 	@Override
