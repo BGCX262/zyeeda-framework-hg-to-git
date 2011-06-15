@@ -158,8 +158,6 @@ public class LdapTemplate{
 			      					      String filter,
 			                              SearchControls cons)
 			                throws NamingException {
-//    	this.ctx.setRequestControls(new Control[]{
-//    	         new PagedResultsControl(5, Control.CRITICAL) });
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
 		return this.searchResultToList(ne);
 	}
@@ -306,8 +304,8 @@ public class LdapTemplate{
 	}
 	
 	private void deleteRecursively(String dn) throws NamingException {
-		LdapContext entry = (LdapContext) ctx.lookup("ou=subtree");
-		entry.setRequestControls(new Control[] { new TreeDeleteControl() });
+		LdapContext entry = (LdapContext) ctx.lookup(dn);
+		entry.setRequestControls(new Control[] {new TreeDeleteControl()});
 		try {
 			entry.unbind("");
 		} catch (OperationNotSupportedException e) {

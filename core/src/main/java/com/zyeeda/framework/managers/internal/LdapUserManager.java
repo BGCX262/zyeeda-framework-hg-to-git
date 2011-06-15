@@ -129,14 +129,17 @@ public class LdapUserManager implements UserManager {
 				String dn = entry.getName();
 
 				Attributes attr = entry.getAttributes();
-				user.setUsername((String) attr.get("cn").get());
-				user.setId(dn);
-				user.setPassword(new String((byte[]) attr.get("userpassword").get()));
+				user = marshal(attr);
+//				user.setUsername((String) attr.get("cn").get());
+//				user.setId(dn);
+//				user.setPassword(new String((byte[]) attr.get("userpassword").get()));
 				
 				userList.add(user);
 			}
 			return userList;
 		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
 			throw new UserPersistException(e);
 		} finally {
 			LdapUtils.closeEnumeration(ne);
@@ -263,9 +266,9 @@ public class LdapUserManager implements UserManager {
 		attrs.put("uid", user.getId());
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + LdapEncryptUtils.md5Encode(user.getPassword()));
+			attrs.put("userPassword", LdapEncryptUtils.md5Encode(user.getPassword()));
 		} else {
-			attrs.put("userPassword", "{MD5}" + LdapEncryptUtils.md5Encode(LDAP_DEFAULT_PASSWORD));
+			attrs.put("userPassword", LdapEncryptUtils.md5Encode(LDAP_DEFAULT_PASSWORD));
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -309,6 +312,7 @@ public class LdapUserManager implements UserManager {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
+System.out.println("**************" + user.getId());
 		user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
 		user.setPassword(user.getPassword().substring(5, user.getPassword().length()));
 		if (attrs.get("gender") != null) {

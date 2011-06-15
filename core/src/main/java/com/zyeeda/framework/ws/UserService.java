@@ -41,7 +41,8 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/{parent:.*}")
 	@Produces("application/json")
-	public User persist(@FormParam("") User user, @PathParam("parent") String parent) throws UserPersistException {
+	public User persist(@FormParam("") User user, @PathParam("parent") String parent)
+				   											throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -125,8 +126,6 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		System.out.println("------" + LdapEncryptUtils.md5Encode(oldPassword));
-		System.out.println("------" + u.getPassword());
 		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
 			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
 				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));
