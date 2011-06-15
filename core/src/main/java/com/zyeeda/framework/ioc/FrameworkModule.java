@@ -5,6 +5,8 @@ import org.apache.tapestry5.ioc.ServiceBinder;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.Startup;
 
+import com.zyeeda.framework.account.AccountService;
+import com.zyeeda.framework.account.internal.SystemAccountServiceProvider;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.knowledge.KnowledgeService;
@@ -43,6 +45,7 @@ public class FrameworkModule {
 		binder.bind(KnowledgeService.class, DroolsKnowledgeServiceProvider.class);
 		binder.bind(TransactionService.class, DefaultTransactionServiceProvider.class);
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
+                binder.bind(AccountService.class, SystemAccountServiceProvider.class);
 		//binder.bind(UserSyncService.class, HttpClientUserSyncServiceProvider.class);
 	}
 	
@@ -57,7 +60,8 @@ public class FrameworkModule {
 			@Primary final LdapService ldapSvc,
 			@Primary final SecurityService<?> securitySvc,
 			@Primary final KnowledgeService knowledgeSvc,
-			@Primary final OpenIdConsumerService consumerSvc ) throws Exception {
+			@Primary final OpenIdConsumerService consumerSvc,
+                        @Primary final AccountService accountSvc) throws Exception {
 			//@Primary final UserSyncService userSyncService) throws Exception {
 		
 		configSvc.start();
@@ -70,6 +74,7 @@ public class FrameworkModule {
 		securitySvc.start();
 		knowledgeSvc.start();
 		consumerSvc.start();
+                accountSvc.start();
 		//userSyncService.start();
 		
 	}
