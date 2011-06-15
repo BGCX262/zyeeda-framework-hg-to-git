@@ -1,12 +1,9 @@
 package com.zyeeda.framework.ws;
 
 import java.io.IOException;
-
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -17,7 +14,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bitronix.tm.utils.CollectionUtils;
 
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.MenuManager;
@@ -56,18 +52,16 @@ public class MenuService extends ResourceService {
 			logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
 			for(String permission:role.getPermissionList()){
 				if(rolesAuth.size() == 0){
-								logger.debug("the value of the dept permission is agian ");
-							System.out.println("**********************" + permission);
 					rolesAuth.add(permission);
 					continue;
 				}
-				if(!(rolesAuth.contains(role))){
+				if(!(rolesAuth.contains(permission))){
 					rolesAuth.add(permission);
 				}
+				
 			}
 		}		
 		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
-			System.out.println("****************************222" );
 		return listMenu;
 	}
 }
