@@ -28,7 +28,7 @@ import com.zyeeda.framework.service.AbstractService;
  * @LastChangedDate $LastChangedDate:  $
  * @LastChangedRevision $LastChangedRevision:  $
  */
-@ServiceId("system-account-service")
+@ServiceId("system-account-service-provider")
 @Marker(Primary.class)
 public class SystemAccountServiceProvider extends AbstractService implements AccountService {
 
