@@ -16,6 +16,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import com.zyeeda.framework.entities.User;
@@ -249,4 +250,7 @@ public class UserService extends ResourceService {
 		return userVoList;
 	}
 	
+	public static void updateAccount(@QueryParam("username") String username,@QueryParam("password") String password){
+		
+	}
 }
