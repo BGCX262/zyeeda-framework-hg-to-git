@@ -194,7 +194,6 @@ public class DepartmentService extends ResourceService {
 	}
 	
 	public static List<DepartmentVo> fillPropertiesToVo(List<Department> deptList) {
-		deptVo.setIo("rest/depts/" + dept.getId() + "/children/" + roleId );
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
 		DepartmentVo deptVo = null;
 		for (Department dept : deptList) {
