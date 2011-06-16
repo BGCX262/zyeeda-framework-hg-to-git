@@ -1,6 +1,8 @@
 package com.zyeeda.framework.ws;
 
 import java.util.List;
+
+import javax.persistence.EntityManager;
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -9,11 +11,13 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+
 import org.apache.commons.lang.StringUtils;
+
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.RoleManager;
-import com.zyeeda.framework.managers.internal.RoleManagerImpl;
+import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/roles")
@@ -22,12 +26,20 @@ public class RoleService extends ResourceService {
 	public RoleService(ServletContext ctx) {
 		super(ctx);
 	}
-
+	
+	public List<Role> getRoleBySubject(String subject){
+		EntityManager session = (EntityManager) this.getPersistenceService();// persistenceSvc.openSession();
+		List<Role> roleList = session.createNamedQuery("getRolesBySubject", Role.class).getResultList();
+		Search search = new Search();
+		search.addFilterEqual("subject", subject);
+		return roleList;
+	}
+	
 	@GET
 	@Path("/")
 	@Produces("application/json")
 	public List<Role> getRoles() {
-		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		return roleMgr.findAll();
 	}
 
@@ -35,7 +47,7 @@ public class RoleService extends ResourceService {
 	@Path("/")
 	@Produces("application/json")
 	public Role creatRole(@FormParam("") Role role) {
-		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String name = role.getName();
 		Search search = new Search();
 		search.addFilterEqual("name", name);
@@ -53,7 +65,7 @@ public class RoleService extends ResourceService {
 	@Path("/")
 	@Produces("application/json")
 	public Role editRole(@FormParam("") Role role) {
-		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role setRole=roleMgr.find(role.getId());
 		Role newRole=roleMgr.save(setRole);
 		this.getPersistenceService().getCurrentSession().flush();
@@ -65,7 +77,7 @@ public class RoleService extends ResourceService {
 	@Produces("application/json")
 	public void assignRoleUser(@PathParam("id") String id,
 			@PathParam("names") String names) {
-		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		if(StringUtils.isNotBlank(names)){
 			String[] usersName = names.split(",");
@@ -80,7 +92,7 @@ public class RoleService extends ResourceService {
 	@Produces("application/json")
 	public Role assignRoleAuth(@PathParam("id") String id,
 			@PathParam("auth") String auth) {
-		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		role.setPermissions(auth);
 		Role newRole=roleMgr.merge(role);

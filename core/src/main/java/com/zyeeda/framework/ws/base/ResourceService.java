@@ -5,6 +5,7 @@ import javax.servlet.ServletContext;
 import org.apache.tapestry5.ioc.Registry;
 
 import com.zyeeda.framework.FrameworkConstants;
+import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
 import com.zyeeda.framework.nosql.MongoDbService;
@@ -61,4 +62,7 @@ public class ResourceService {
 		return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
 	}
 	
+	protected KnowledgeService getKnowledgeService(){
+		return  this.reg.getService(KnowledgeService.class);
+	}
 }

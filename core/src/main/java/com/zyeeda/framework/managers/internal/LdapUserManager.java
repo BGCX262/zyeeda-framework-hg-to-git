@@ -1,10 +1,8 @@
 package com.zyeeda.framework.managers.internal;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -14,9 +12,6 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
-import javax.naming.ldap.Control;
-import javax.naming.ldap.LdapContext;
-import javax.naming.ldap.SortControl;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -339,6 +334,7 @@ public class LdapUserManager implements UserManager {
 		return user;
 	}
 	
+	/*
 	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)
 			throws NamingException, IOException {
 		LdapContext ctx = this.ldapSvc.getLdapContext();
@@ -350,6 +346,7 @@ public class LdapUserManager implements UserManager {
 		}
 		return new LdapTemplate(ctx);
 	}
+	*/
 	
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());

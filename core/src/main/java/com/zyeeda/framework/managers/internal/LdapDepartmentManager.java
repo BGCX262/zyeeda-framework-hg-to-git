@@ -1,17 +1,12 @@
 package com.zyeeda.framework.managers.internal;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchControls;
-import javax.naming.ldap.Control;
-import javax.naming.ldap.LdapContext;
-import javax.naming.ldap.SortControl;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -172,6 +167,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());
 	}
 	
+	/*
 	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)
 			throws NamingException, IOException {
 		LdapContext ctx = this.ldapSvc.getLdapContext();
@@ -183,4 +179,5 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 		return new LdapTemplate(ctx);
 	}
+	*/
 }

@@ -1,5 +1,6 @@
 <%@ page import="java.util.Map"%>
 <%@ page import="org.openid4java.message.AuthRequest"%>
+<%@ page import="org.apache.shiro.SecurityUtils" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%
@@ -16,6 +17,7 @@ AuthRequest authReq = (AuthRequest) request.getAttribute("message");
     <% if (authReq == null) { %>
     <body>
         <h1>当前用户已登录！</h1>
+        <%= SecurityUtils.getSubject().getPrincipal().toString() %>
     </body>
     <% } else { 
     	Map<?, ?> params = authReq.getParameterMap(); %>
