@@ -1,3 +1,6 @@
+// Copyright 2011, Zyeeda, Inc. All Rights Reserved.
+// Confidential and Proprietary Information of Zyeeda, Inc.
+
 package com.zyeeda.framework.account.internal;
 
 import java.util.Iterator;
@@ -14,7 +17,18 @@ import com.zyeeda.framework.account.AccountService;
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.service.AbstractService;
 
-@ServiceId("system-account-service")
+/**
+ * account support service implement 
+ *
+ * @author Qi Zhao
+ * @date 2011-06-15
+ *
+ * @LastChanged
+ * @LastChangedBy $LastChangedBy:  $
+ * @LastChangedDate $LastChangedDate:  $
+ * @LastChangedRevision $LastChangedRevision:  $
+ */
+@ServiceId("system-account-service-provider")
 @Marker(Primary.class)
 public class SystemAccountServiceProvider extends AbstractService implements AccountService {
 
