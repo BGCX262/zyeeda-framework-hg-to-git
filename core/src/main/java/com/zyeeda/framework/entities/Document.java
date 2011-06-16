@@ -1,34 +1,69 @@
 package com.zyeeda.framework.entities;
 
 import java.io.InputStream;
-import java.util.Date;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.zyeeda.framework.entities.base.SimpleDomainEntity;
+import com.zyeeda.framework.entities.base.RevisionDomainEntity;
 
 @Entity
 @Table(name = "ZDA_SYS_DOCUMENTS")
 @XmlRootElement(name = "document")
-public class Document extends SimpleDomainEntity {
+public class Document extends RevisionDomainEntity {
 
 	private static final long serialVersionUID = -5913731949268189623L;
 	
+	// 外键
 	private String foreignId;
+	// 排序
 	private int weight;
+	// 所有者
 	private String owner;
-	private String creator;
-
-
-	private Date createdTime;
-    private String lastModifier;
-    private Date lastModifiedTime;
+	// 文件大小
     private long fileSize;
-	
-    public long getFileSize() {
+    // 文件类型，保存文件扩展名
+    private String fileType;
+    // 文件类型（完整的  Media Type）
+    private String contentType;
+    // 文件类型（Media Type 的主类型）
+    private String primaryType;
+    // 文件类型（Media Type 的子类型）
+    private String subType;
+    // 关键字
+    private String keyword;
+    // 类别
+    private String category;
+    
+    // 文件内容
+    private InputStream content;
+
+	public String getForeignId() {
+		return foreignId;
+	}
+
+	public void setForeignId(String foreignId) {
+		this.foreignId = foreignId;
+	}
+
+	public int getWeight() {
+		return weight;
+	}
+
+	public void setWeight(int weight) {
+		this.weight = weight;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	public long getFileSize() {
 		return fileSize;
 	}
 
@@ -36,104 +71,20 @@ public class Document extends SimpleDomainEntity {
 		this.fileSize = fileSize;
 	}
 
-	private String fileType; 
-    private String keyword;
-    private InputStream content;
-    private String contentType;
-    
-
-
-	private String subType;
-    private String type;
-    
-    
-    
-    
-    public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-
-
-
-	public Document() {
-    	Date now = new Date();
-    	this.createdTime = now;
-    	this.lastModifiedTime = now;
-    }
-    
-	public String getForeignId() {
-		return foreignId;
-	}
-	public void setForeignId(String foreignId) {
-		this.foreignId = foreignId;
-	}
-	public int getWeight() {
-		return weight;
-	}
-	public void setWeight(int weight) {
-		this.weight = weight;
-	}
-	public String getOwner() {
-		return owner;
-	}
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
-	public String getCreator() {
-		return creator;
-	}
-	public void setCreator(String creator) {
-		this.creator = creator;
-	}
-	public Date getCreatedTime() {
-		return createdTime;
-	}
-	public void setCreatedTime(Date createdTime) {
-		this.createdTime = createdTime;
-	}
-	public String getLastModifier() {
-		return lastModifier;
-	}
-	public void setLastModifier(String lastModifier) {
-		this.lastModifier = lastModifier;
-	}
-	public Date getLastModifiedTime() {
-		return lastModifiedTime;
-	}
-	public void setLastModifiedTime(Date lastModifiedTime) {
-		this.lastModifiedTime = lastModifiedTime;
-	}
-	
-
-	public String getKeyword() {
-		return this.keyword;
-	}
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
-	}
-	public static long getSerialversionuid() {
-		return serialVersionUID;
-	}
-
-	@Transient
-	public InputStream getContent() {
-		return content;
-	}
-	
-	public void setContent(InputStream content) {
-		this.content = content;
-	}
-    
-    public String getFileType() {
+	public String getFileType() {
 		return fileType;
 	}
 
 	public void setFileType(String fileType) {
 		this.fileType = fileType;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 
 	public String getSubType() {
@@ -144,13 +95,37 @@ public class Document extends SimpleDomainEntity {
 		this.subType = subType;
 	}
 
-	public String getType() {
-		return type;
+	public String getPrimaryType() {
+		return primaryType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setPrimaryType(String primaryType) {
+		this.primaryType = primaryType;
 	}
 
+	public String getKeyword() {
+		return keyword;
+	}
 
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public InputStream getContent() {
+		return content;
+	}
+
+	public void setContent(InputStream content) {
+		this.content = content;
+	}
+    
+    
 }

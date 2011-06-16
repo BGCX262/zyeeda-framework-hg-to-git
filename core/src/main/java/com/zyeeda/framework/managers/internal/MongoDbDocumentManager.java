@@ -1,9 +1,6 @@
 package com.zyeeda.framework.managers.internal;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,10 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.MongoException;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -27,75 +25,178 @@ import com.mongodb.gridfs.GridFSFile;
 import com.zyeeda.framework.entities.Document;
 import com.zyeeda.framework.managers.DocumentException;
 import com.zyeeda.framework.managers.DocumentManager;
+import com.zyeeda.framework.nosql.MongoDbService;
 
 public class MongoDbDocumentManager implements DocumentManager {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(MongoDbDocumentManager.class);
-	private static String addr = "localhost";
-	private static int port = 27017;
-	private static String DB = "test";
-
-	// mongo 没有关闭
-	// TODO
-	private DBCollection getCollection(String addr, int port, String test)
-			throws UnknownHostException, MongoException {
-		DBCollection collection = null;
-		Mongo mongo = new Mongo(addr, port);
-		collection = mongo.getDB(DB).getCollection("test");
-		return collection;
-
+	private static final Logger logger = LoggerFactory.getLogger(MongoDbDocumentManager.class);
+	
+	private final static String COLLECTION_NAME = "docs";
+	
+	private MongoDbService mongodbSvc;
+	
+	public MongoDbDocumentManager(MongoDbService mongodbSvc) {
+		this.mongodbSvc = mongodbSvc;
 	}
-
+	
+	@Deprecated
+	private DBCollection getCollection() {
+		DB db = this.mongodbSvc.getDefaultDatabase();
+		DBCollection collection = db.getCollection(COLLECTION_NAME);
+		return collection;
+	}
+	
+	private DBCollection getFilesCollection() {
+		DB db = this.mongodbSvc.getDefaultDatabase();
+		DBCollection collection = db.getCollection("fs.files");
+		return collection;
+	}
 	
 	@Override
-	public void persist(Document document) throws IOException,
-			DocumentException {
-		InputStream is = null;
-		try {
-			is = document.getContent();
-			DBCollection collection = this.getCollection(addr, port, DB);
-
-			GridFS gridFS = new GridFS(collection.getDB());
-			GridFSFile gridFSFile = gridFS.createFile(is);
-			this.setData(gridFSFile, document);
-		} catch (UnknownHostException e) {
-			throw new DocumentException(e);
-		} catch (MongoException e) {
-			throw new DocumentException(e);
-		} finally {
-			if (is != null) {
-				is.close();
-			}
-		}
+	public void persist(Document document) {
+		GridFSFile file = this.document2GridFSFile(document);
+		logger.info("saving uplaoded file {} ...", document.getName());
+		file.save();
+		logger.info("file {} saved", document.getName());
+		
+		document.setId(file.getId().toString());
 	}
-
-	public void setData(GridFSFile gridFSFile, Document document) {
-		logger.debug("setData Document.creator= {}", document.getCreator());
-		gridFSFile.put("filename", document.getName());// 数据库自带filename
-		gridFSFile.put("description", document.getDescription());
-		gridFSFile.put("creator", document.getCreator());
-		gridFSFile.put("uploadDate", document.getCreatedTime());// 数据库自带uploadDate
-		gridFSFile.put("lastModifier", document.getLastModifier());
-		gridFSFile.put("lastModifiedTime", document.getLastModifiedTime());
-		gridFSFile.put("foreignId", document.getForeignId());
-		gridFSFile.put("weight", document.getWeight());
-		gridFSFile.put("owner", document.getOwner());
-		gridFSFile.put("fileType", document.getFileType());// 数据库自带fileType
-		gridFSFile.put("keyword", document.getKeyword());
-		gridFSFile.put("subType", document.getSubType());
-		gridFSFile.put("type", document.getType());
-		gridFSFile.put("contentType", document.getContentType());// 数据库自带contentType
-		gridFSFile.save();
-	}
-
 	
-	// 集合的查
+	@Override
+	public Document findById(String id, boolean includeContent) {
+		DBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(id));
+		
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		GridFSDBFile file = fs.findOne(query);
+		
+		return this.gridFSDBFile2Document(file, includeContent);
+	}
+	
+	@Override
+	public Document findByIdAndFileName(String id, String fileName) {
+		logger.trace("find by id [{}] and file name [{}]", id, fileName);
+		
+		DBObject query = new BasicDBObject();
+		query.put("_id", new ObjectId(id));
+		query.put("filename", fileName);
+		
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		GridFSDBFile file = fs.findOne(query);
+		
+		return this.gridFSDBFile2Document(file);
+	}
+	
+	@Override
+	public void removeById(String id) {
+		logger.trace("remove by id = {}", id);
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		fs.remove(new ObjectId(id));
+	}
+	
+	@Override
+	public long countByForeignId(String foreignId) {
+		DBObject query = new BasicDBObject();
+		query.put("foreignId", foreignId);
+		DBCollection c = this.getFilesCollection();
+		return c.count(query);
+	}
+	
+	@Override
+	public void replaceForeignId(String oldForeignId, String newForeignId) {
+		DBObject query = new BasicDBObject();
+		query.put("foreignId", oldForeignId);
+		DBObject update = BasicDBObjectBuilder.start(
+				"$set", BasicDBObjectBuilder.start("foreignId", newForeignId).get()
+		).get();
+		
+		DBCollection collection = this.getFilesCollection();
+		collection.updateMulti(query, update);
+	}
+
+	private GridFSFile document2GridFSFile(Document document) {
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		GridFSFile file = fs.createFile(document.getContent());
+		
+		file.put("filename", document.getName()); // 数据库自带filename
+		file.put("description", document.getDescription());
+		file.put("creator", document.getCreator());
+		file.put("uploadDate", document.getCreatedTime()); // 数据库自带uploadDate
+		file.put("lastModifier", document.getLastModifier());
+		file.put("lastModifiedTime", document.getLastModifiedTime());
+		
+		file.put("foreignId", document.getForeignId());
+		file.put("weight", document.getWeight());
+		file.put("owner", document.getOwner());
+		file.put("keyword", document.getKeyword());
+		
+		file.put("fileType", document.getFileType()); // 数据库自带fileType
+		file.put("contentType", document.getContentType()); // 数据库自带contentType
+		file.put("subType", document.getSubType());
+		file.put("primaryType", document.getPrimaryType());
+		
+		if (logger.isDebugEnabled()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("filename = " + document.getName() + "\n");
+			sb.append("\tdescription = " + document.getDescription() + "\n");
+			sb.append("\tcreator = " + document.getCreator() + "\n");
+			sb.append("\tuploadDate = " + document.getCreatedTime() + "\n");
+			sb.append("\tlastModifier = " + document.getLastModifier() + "\n");
+			sb.append("\tlastModifiedTime = " + document.getLastModifiedTime() + "\n");
+			
+			sb.append("\tforeignId = " + document.getForeignId() + "\n");
+			sb.append("\tweight = " + document.getWeight() + "\n");
+			sb.append("\towner = " + document.getOwner() + "\n");
+			sb.append("\tkeyword = " + document.getKeyword() + "\n");
+			
+			sb.append("\tfileType = " + document.getFileType() + "\n");
+			sb.append("\tcontentType = " +document.getContentType() + "\n");
+			sb.append("\tprimaryType = " + document.getPrimaryType() + "\n");
+			sb.append("\tsubType = " + document.getSubType() + "\n");
+			
+			logger.debug(sb.toString());
+		}
+		
+		return file;
+	}
+	
+	private Document gridFSDBFile2Document(GridFSDBFile file, boolean includeContent) {
+		Document document = new Document();
+		
+		document.setId(file.getId().toString());
+		document.setName(file.getFilename());
+		document.setDescription((String) file.get("description"));
+		document.setCreator((String) file.get("creator"));
+		document.setCreatedTime((Date) file.get("createdTime"));
+		document.setLastModifier((String) file.get("lastModifier"));
+		document.setLastModifiedTime((Date) file.get("lastModifiedTime"));
+		document.setForeignId((String) file.get("foreignId"));
+		document.setWeight((Integer) file.get("weight"));
+		document.setOwner((String) file.get("owner"));
+		document.setFileSize(file.getLength());
+		document.setFileType((String) file.get("fileType"));
+		document.setKeyword((String) file.get("keyword"));
+		document.setContent(file.getInputStream());
+		
+		document.setSubType((String) file.get("subType"));
+		document.setPrimaryType((String) file.get("primaryType"));
+		
+		if (includeContent) {
+			document.setContentType(file.getContentType());
+		}
+		
+		return document;
+	}
+	
+	private Document gridFSDBFile2Document(GridFSDBFile file) {
+		return this.gridFSDBFile2Document(file, true);
+	}
+
 	private List<Document> find(Map<String, Object> map,
 			Map<String, Object> map1, String foreignId, int skip, int limit)
 			throws DocumentException, MongoException {
 		try {
-			DBCollection collection = this.getCollection(addr, port, DB);
+			DBCollection collection = this.getCollection();
 			GridFS gridFS = new GridFS(collection.getDB());
 			BasicDBObject basicDBObject = new BasicDBObject();
 			if (StringUtils.isNotBlank(foreignId)) {
@@ -141,11 +242,11 @@ public class MongoDbDocumentManager implements DocumentManager {
 				document.setKeyword((String) gridFSDBFile.get("keyword"));
 				document.setContentType(gridFSDBFile.getContentType());
 				document.setSubType((String) gridFSDBFile.get("subType"));
-				document.setType((String) gridFSDBFile.get("type"));
+				document.setPrimaryType((String) gridFSDBFile.get("primaryType"));
 				documentList.add(document);
 			}
 			return documentList;
-		} catch (UnknownHostException e) {
+		} catch (Exception e) {
 			throw new DocumentException(e);
 		}
 	}
@@ -171,26 +272,14 @@ public class MongoDbDocumentManager implements DocumentManager {
 		}
 	}
 
-	@Override
-	public void removeById(String id) throws DocumentException {
-		logger.debug("remove by id = {}", id);
-		try {
-			DBCollection collection = this.getCollection(addr, port, DB);
-			GridFS gridFS = new GridFS(collection.getDB());
-			gridFS.remove(new ObjectId(id));
-		} catch (MongoException e) {
-			throw new DocumentException(e);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		}
-	}
+	
 
 	// 批量删除
 	@Override
 	public void allremoveById(String[] id) throws DocumentException {
 		logger.debug("remove by id = {}", id);
 		try {
-			DBCollection collection = this.getCollection(addr, port, DB);
+			DBCollection collection = this.getCollection();
 			GridFS gridFS = new GridFS(collection.getDB());
 			for (int i = 0; i < id.length; i++) {
 				logger.debug("removeId = {}", id[i]);
@@ -198,12 +287,45 @@ public class MongoDbDocumentManager implements DocumentManager {
 			}
 		} catch (MongoException e) {
 			throw new DocumentException(e);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
 		}
 	}
 
 	@Override
+	public int findNumber(String owner, String foreignId, String[] keyword)
+			throws DocumentException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int findNumber(String foreignId, String[] keyword)
+			throws DocumentException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int findOwnerNumber(String owner, String foreignId)
+			throws DocumentException {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public List<Document> findByKeyword(String owner, String foreignId,
+			int skip, int limit) throws DocumentException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void updateDocument(Document document) throws UnknownHostException,
+			DocumentException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/*@Override
 	public void updateDocument(Document document) throws DocumentException {
 		try {
 			logger.debug("updateDocument keyword={}", document.getKeyword());
@@ -239,56 +361,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 		}
 	}
 
-	@Override
-	public Document findByIdAndFileName(String id, String fileName)
-			throws DocumentException {
-		logger.debug("find by id [{}] and file name [{}]", id, fileName);
-		DBCollection collection;
-		try {
-			collection = this.getCollection(addr, port, DB);
-			GridFS gridFS = new GridFS(collection.getDB());
-			BasicDBObject object = new BasicDBObject();
-			object.put("filename", fileName);
-			object.put("_id", new ObjectId(id));
-			GridFSDBFile gridFSDbFile = gridFS.findOne(object);
-			if (gridFSDbFile != null) {
-				Document document = new Document();
-				document.setId(gridFSDbFile.getId().toString());
-				document.setName(gridFSDbFile.getFilename());
-				document.setDescription((String) gridFSDbFile
-						.get("description"));
-				document.setCreator((String) gridFSDbFile.get("creator"));
-				document.setCreatedTime((Date) gridFSDbFile.get("createdTime"));
-				document.setLastModifier((String) gridFSDbFile
-						.get("lastModifier"));
-				document.setLastModifiedTime((Date) gridFSDbFile
-						.get("lastModifiedTime"));
-				document.setForeignId((String) gridFSDbFile.get("foreignId"));
-				Object weightObj = gridFSDbFile.get("weight");
-				if (weightObj != null) {
-					document
-							.setWeight(Integer.parseInt((weightObj.toString())));
-				}
-				document.setOwner((String) gridFSDbFile.get("owner"));
-				document.setFileSize(gridFSDbFile.getLength()); // 系统默认的
-				document.setFileType((String) gridFSDbFile.get("fileType"));
-				document.setKeyword((String) gridFSDbFile.get("keyword"));
-				document.setContent(gridFSDbFile.getInputStream());
-				document.setContentType(gridFSDbFile.getContentType());
-				document.setSubType((String) gridFSDbFile.get("subType"));
-				document.setType((String) gridFSDbFile.get("type"));
-				return document;
-			} else {
-				return null;
-			}
-
-		} catch (UnknownHostException e) {
-			throw new DocumentException(e);
-		} catch (MongoException e) {
-			throw new DocumentException(e);
-
-		}
-	}
+	
 
 //	@Override
 //	public List<Document> findByKeyword(String owner, int skip, int limit)
@@ -411,6 +484,6 @@ public class MongoDbDocumentManager implements DocumentManager {
 			throw new DocumentException(e);
 		}
 
-	}
+	}*/
 
 }
