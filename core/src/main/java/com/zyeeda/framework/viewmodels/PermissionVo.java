@@ -7,6 +7,17 @@ public class PermissionVo {
 	private String value;
 	private Boolean isHaveIO;
 	private int path = 0;
+	private String orderBy;
+	
+	
+
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
 
 	public int getPath() {
 		return path;
