@@ -188,16 +188,6 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
-//	private User setVisible(String id, Boolean visible)  throws UserPersistException {
-//		LdapService ldapSvc = this.getLdapService();
-//		UserSyncService userSyncService = this.getUserSynchService();
-//		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-//		
-//		userMgr.setVisible(visible, id);
-//		userSyncService.enable(id);
-//		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
-//	}
-	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 

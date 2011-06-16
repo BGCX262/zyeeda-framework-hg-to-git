@@ -1,12 +1,17 @@
 package com.zyeeda.framework.managers.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchControls;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.SortControl;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -81,8 +86,14 @@ public class LdapDepartmentManager implements DepartmentManager {
 		
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String filter = "";
+			if (StringUtils.isBlank(dn)) {
+				filter = "o=*";
+			} else {
+				filter = "ou=*";
+			}
 			attrList = ldapTemplate.getResultList(dn,
-												  "ou=*", 
+												  filter,
 												  SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
 			deptList = new ArrayList<Department>(attrList.size());
 			for (Attributes attr : attrList) {
@@ -157,18 +168,19 @@ public class LdapDepartmentManager implements DepartmentManager {
 		return dept;
 	}
 	
-//	public static void deleteRecursively(LdapContext ctx) throws NamingException {
-//		NamingEnumeration<Binding> ne = ctx.listBindings("");
-//		while (ne.hasMore()) {
-//			Binding b = (Binding) ne.next();
-//			if (b.getObject() instanceof LdapContext) {
-//		    	deleteRecursively((LdapContext) b.getObject());
-//			}
-//		}
-//		ctx.unbind("");
-//	}
-	
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());
+	}
+	
+	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)
+			throws NamingException, IOException {
+		LdapContext ctx = this.ldapSvc.getLdapContext();
+		if (orderBy != null) {
+			for (String key : orderBy.keySet()) {
+				ctx.setRequestControls(new Control[] { new SortControl(key,
+						orderBy.get(key)) });
+			}
+		}
+		return new LdapTemplate(ctx);
 	}
 }
