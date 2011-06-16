@@ -136,28 +136,23 @@ public class PermissionManagerImpl implements PermissionManager {
 		return permission;
 	}
 
-	private void getParentPermissionListAuthByPath(List<String> authList,
-			Set<String> allAuth) throws XPathExpressionException, IOException {
+	private void getParentPermissionListAuthByPath(String auth, Set<String> allAuth) throws XPathExpressionException, IOException {
 		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
-		List<String> auths = new ArrayList<String>();
-		for (String auth : authList) {
-			allAuth.add(auth);
+		//List<String> auths = new ArrayList<String>();
 			permissionList = findSubPermissionByValue(auth);
-			if (permissionList == null) {
-				break;
-			}
 			for (PermissionVo permission : permissionList) {
-				auths.add(permission.getValue());
 				allAuth.add(permission.getValue());
+				getParentPermissionListAuthByPath(permission.getValue(), allAuth);
 			}
-			getParentPermissionListAuthByPath(auths, allAuth);
-		}
+		
 	}
 
 	public String getParentPermissionListAuthByList(List<String> authList)
 			throws XPathExpressionException, IOException {
 		Set<String> allAuth = new HashSet<String>();
-		getParentPermissionListAuthByPath(authList, allAuth);
+		for (String auth : authList) {
+			getParentPermissionListAuthByPath(auth, allAuth);
+		}
 		String utils = StringUtils.join(allAuth, ";");
 		return utils;
 	}
