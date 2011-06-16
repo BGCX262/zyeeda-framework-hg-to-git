@@ -252,5 +252,5 @@ public class UserService extends ResourceService {
 	
 	public static void updateAccount(@QueryParam("username") String username,@QueryParam("password") String password){
 		
-	}
+	}	
 }
