@@ -50,7 +50,7 @@ public class AuthService extends ResourceService {
 		if (list.size() > 0) {
 			for (int i = 0; i < list.size(); i++) {
 				PermissionVo permission = (PermissionVo) list.get(i);
-				AuthVO authVO = new AuthVO();
+				AuthVO authVO = new AuthVO(); 
 				authVO.setId(permission.getId());
 				authVO.setLabel("<a>" + permission.getName() + "</a>");
 				authVO.setType("task");

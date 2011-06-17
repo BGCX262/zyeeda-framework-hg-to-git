@@ -19,6 +19,7 @@ import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -172,10 +173,14 @@ public class RoleService extends ResourceService{
 	@Path("/{id}/assign_auth")
 	@Produces("application/json")
 	public Role assignRoleAuth(@PathParam("id") String id,
-			@FormParam("") Role role) {
+			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		PermissionManager permissionMgr = new PermissionManagerImpl();
 		Role newrole = roleMgr.find(id);
-		newrole.setPermissions(role.getPermissions());
+		String[] str = role.getPermissions().split(";");
+		List<String> authList = CollectionUtils.asList(str);
+		String authArray = permissionMgr.getParentPermissionListAuthByList(authList);
+		newrole.setPermissions(authArray); 
 		this.getPersistenceService().getCurrentSession().flush();
 		return newrole;
 	}

@@ -1,15 +1,17 @@
 package com.zyeeda.framework.managers.internal;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.xpath.XPathExpressionException;
 
 import com.zyeeda.framework.managers.MenuManager;
 import com.zyeeda.framework.managers.PermissionManager;
+import com.zyeeda.framework.utils.MenuListComparator;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 
@@ -22,7 +24,7 @@ public class MenuManagerImpl implements MenuManager {
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		Map<String, MenuVo> menuMap = new LinkedHashMap<String, MenuVo>();
 		String	root = null;
-		for (String auth : authList) {
+		for (String auth : authList) { 
 			PermissionVo childPermission = permissionMgr.getPermissionByPath(auth);
 			MenuVo childMenu = null;
 			if (childPermission != null) {
@@ -54,6 +56,7 @@ public class MenuManagerImpl implements MenuManager {
 						parentMenu.setAuth(parentPermission.getValue());
 						parentMenu.setId(parentPermission.getId());
 						parentMenu.setName(parentPermission.getName());
+						parentMenu.setOrderBy(parentPermission.getOrderBy());
 							if (!(menuMap.containsKey(parentMenu.getAuth()))) {
 								parentMenu.getPermissionSet().add(menuMap.get(authKey));
 								menuMap.put(parentMenu.getAuth(), parentMenu);
@@ -68,6 +71,12 @@ public class MenuManagerImpl implements MenuManager {
 					} 
 			}
 		}
+		if(listMenu.size() > 0){
+			MenuListComparator comparator = new MenuListComparator();
+			Collections.sort(listMenu, comparator);
+			for(MenuVo men : listMenu){
+			}
+		}
 		return listMenu;
 	}
 	
@@ -76,19 +85,9 @@ public class MenuManagerImpl implements MenuManager {
 		menu.setAuth(permission.getValue());
 		menu.setId(permission.getId());
 		menu.setName(permission.getName());
+		menu.setOrderBy(permission.getOrderBy());
 		return menu;
 	}
 	
-	public static void main(String[] args) {
-		Map<String, String> map = new LinkedHashMap<String, String>();
-		for (int i = 0; i < 10; i ++) {
-			map.put(new Integer(i).toString(), new Integer(i).toString());
-		}
-		String v = map.get("3");
-		map.put("3", "XX");
-		System.out.println(v);
-		for (String key : map.keySet()) {
-			System.out.println(map.get(key));
-		}
-	}
+	
 }
