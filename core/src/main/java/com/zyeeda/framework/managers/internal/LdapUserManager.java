@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -13,11 +12,8 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.realm.ldap.LdapUtils;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
@@ -100,6 +96,7 @@ public class LdapUserManager implements UserManager {
 			userList = new ArrayList<User>(attrsList.size());
 			for (Attributes attrs : attrsList) {
 				User user = LdapUserManager.marshal(attrs);
+				user.setDeptFullPath("uid=" + user.getId() + "," + id);
 				userList.add(user);
 			}
 			return userList;
@@ -112,35 +109,24 @@ public class LdapUserManager implements UserManager {
 
 	@Override
 	public List<User> findByName(String name) throws UserPersistException {
-		LdapContext ctx = null;
-		NamingEnumeration<SearchResult> ne = null;
 		List<User> userList = null;
 
 		try {
-			ctx = this.ldapSvc.getLdapContext();
-			ne = ctx.search("o=广州局", "(uid=" + name + ")", SearchControlsFactory.
-					getSearchControls(SearchControls.SUBTREE_SCOPE));
-			SearchResult entry = null;
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
+																    "(uid=" + name + ")",
+																    SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
 			userList = new ArrayList<User>();
 			
-			for (; ne.hasMore();) {
-				entry = ne.next();
-				User user = new User();
-				String dn = entry.getName();
-
-				Attributes attr = entry.getAttributes();
-				user.setUsername((String) attr.get("cn").get());
-				user.setId(dn);
-				user.setPassword(new String((byte[]) attr.get("userpassword").get()));
-				
+			for (Attributes attrs : attrsList) {
+				User user = LdapUserManager.marshal(attrs);
 				userList.add(user);
 			}
 			return userList;
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
-		} finally {
-			LdapUtils.closeEnumeration(ne);
-			LdapUtils.closeContext(ctx);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
 		}
 	}
 
@@ -263,9 +249,9 @@ public class LdapUserManager implements UserManager {
 		attrs.put("uid", user.getId());
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", "{MD5}" + LdapEncryptUtils.md5Encode(user.getPassword()));
+			attrs.put("userPassword", LdapEncryptUtils.md5Encode(user.getPassword()));
 		} else {
-			attrs.put("userPassword", "{MD5}" + LdapEncryptUtils.md5Encode(LDAP_DEFAULT_PASSWORD));
+			attrs.put("userPassword", LdapEncryptUtils.md5Encode(LDAP_DEFAULT_PASSWORD));
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -347,6 +333,20 @@ public class LdapUserManager implements UserManager {
 		
 		return user;
 	}
+	
+	/*
+	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)
+			throws NamingException, IOException {
+		LdapContext ctx = this.ldapSvc.getLdapContext();
+		if (orderBy != null) {
+			for (String key : orderBy.keySet()) {
+				ctx.setRequestControls(new Control[] { new SortControl(key,
+						orderBy.get(key)) });
+			}
+		}
+		return new LdapTemplate(ctx);
+	}
+	*/
 	
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());

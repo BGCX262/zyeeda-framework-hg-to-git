@@ -6,10 +6,10 @@ import java.util.Set;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import com.zyeeda.framework.entities.Menu;
+import com.zyeeda.framework.viewmodels.MenuVo;
 
 public interface MenuManager {
 	
-	public List<Menu> getMenuListByPermissionAuth(Set<String> authList) throws XPathExpressionException, IOException;
+	public List<MenuVo> getMenuListByPermissionAuth(Set<String> authList) throws XPathExpressionException, IOException;
 
 }

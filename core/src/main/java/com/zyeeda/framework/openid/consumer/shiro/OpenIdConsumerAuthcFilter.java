@@ -1,13 +1,20 @@
 package com.zyeeda.framework.openid.consumer.shiro;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
+import org.apache.shiro.web.util.SavedRequest;
+import org.apache.shiro.web.util.WebUtils;
 import org.apache.tapestry5.ioc.Registry;
 import org.openid4java.discovery.Identifier;
 import org.openid4java.message.AuthRequest;
@@ -21,6 +28,7 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 	
 	private static final Logger logger = LoggerFactory.getLogger(OpenIdConsumerAuthcFilter.class);
 	
+	private String callbackUrl;
 	private String returnToUrl;
 	
     @Override
@@ -33,6 +41,16 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
         logger.trace("Adding login url to applied paths.");
         this.appliedPaths.put(getLoginUrl(), null);
     }
+    
+	public void setReturnToUrl(String returnToUrl) {
+		/*String previous = this.returnToUrl;
+        if (previous != null) {
+            this.appliedPaths.remove(previous);
+        }*/
+        this.returnToUrl = returnToUrl;
+        /*logger.trace("Adding OpenId returnTo url to applied paths.");
+        this.appliedPaths.put(this.returnToUrl, null);*/
+	}
 
 	@Override
 	protected AuthenticationToken createToken(ServletRequest request,
@@ -57,23 +75,42 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		HttpServletResponse httpRes = (HttpServletResponse) response;
 		
+		if (logger.isDebugEnabled()) {
+			Cookie[] cookies = httpReq.getCookies();
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					logger.debug(cookie.getName() + " : " + cookie.getValue());
+				}
+			}
+		}
+		
 		Registry registry = IocUtils.getRegistry(this.getServletContext());
 		OpenIdConsumerService openidConsumer = registry.getService(OpenIdConsumerService.class);
 		
-		// 如果请求的是登录地址
+		if (logger.isDebugEnabled()) {
+			logger.debug("http request uri = {}", httpReq.getRequestURI());
+			logger.debug("login url = {}", this.getLoginUrl());
+		}
 		if (this.isLoginRequest(httpReq, httpRes)) {
-			// 继续进入 OpenID 的登录界面
+			// 如果请求的是登录地址，继续进入 OpenID 的登录界面
 			logger.debug("OpenID login request detected, redirect to OP endpoint.");
 			AuthRequest authReq = openidConsumer.authRequest(httpReq, httpRes);
 			httpReq.setAttribute("message", authReq);
 			return true;
 		}
 		
-		logger.debug("return to url = {}", this.returnToUrl);
-		logger.debug("auth response url = {}", httpReq.getRequestURI());
+		logger.debug("success url = {}", this.getSuccessUrl());
+		if (this.pathsMatch(this.getSuccessUrl(), request)) {
+			// 如果请求的是认证成功地址 （一般是首页），重定向到登录界面
+			logger.debug("Trying to visit login success URL, redirect to sign in page.");
+			WebUtils.getAndClearSavedRequest(request);
+			this.redirectToLogin(request, response);
+			return false;
+		}
 		
-		// 如果请求的是验证地址
-		if (this.returnToUrl.equals(httpReq.getRequestURI())) {
+		logger.debug("return to url = {}", this.returnToUrl);
+		if (this.pathsMatch(this.returnToUrl, request)) {
+			// 如果请求的是验证地址，处理登录
 			logger.debug("OpenID verify request detected, attempt to perform signin.");
 			boolean success = this.executeLogin(httpReq, httpRes);
 			logger.debug("OpenID login result = {}", success);
@@ -86,9 +123,8 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 			return false;
 		}
 		
-		// 请求其它地址
+		// 请求其它地址，返回 401
 		logger.debug("Permission denied on visiting resource [{}].", httpReq.getPathInfo());
-		logger.debug("Forward to authentication url [{}].", this.getLoginUrl());
 		this.saveRequest(request);
 		httpRes.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         return false;
@@ -108,8 +144,24 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 		return false;
 	}
 	
-	public void setReturnToUrl(String returnToUrl) {
-		this.returnToUrl = returnToUrl;
+	protected boolean issueSuccessRedirect(HttpServletRequest httpReq, HttpServletResponse httpRes) throws IOException {
+		SavedRequest savedRequest = WebUtils.getAndClearSavedRequest(httpReq);
+		if (savedRequest == null) {
+			logger.debug("saved request is null");
+			WebUtils.issueRedirect(httpReq, httpRes, this.getSuccessUrl());
+			return false;
+		}
+		
+		Map<String, String> params = new HashMap<String, String>(2);
+		params.put("_url", savedRequest.getRequestUrl());
+		params.put("_method", savedRequest.getMethod());
+		logger.debug("saved request is {}", params);
+		WebUtils.issueRedirect(httpReq, httpRes, this.callbackUrl, params);
+		return false;
+	}
+	
+	public void setCallbackUrl(String callbackUrl) {
+		this.callbackUrl = callbackUrl;
 	}
 
 }

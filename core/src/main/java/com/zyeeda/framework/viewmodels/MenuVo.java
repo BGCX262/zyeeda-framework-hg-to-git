@@ -1,4 +1,4 @@
-package com.zyeeda.framework.entities;
+package com.zyeeda.framework.viewmodels;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,18 +6,18 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "menuVo")
-public class Menu {
+public class MenuVo {
 	private String id;
 	private String name;
 	private String auth;
-	private Set<Menu> permissionSet = new HashSet<Menu>();
-	private Menu parentMenu;
+	private Set<MenuVo> permissionSet = new HashSet<MenuVo>();
+	private MenuVo parentMenu;
 
-	public Menu getParentMenu() {
+	public MenuVo getParentMenu() {
 		return parentMenu;
 	}
 
-	public void setParentMenu(Menu parentMenu) {
+	public void setParentMenu(MenuVo parentMenu) {
 		this.parentMenu = parentMenu;
 	}
 
@@ -38,11 +38,11 @@ public class Menu {
 		this.id = id;
 	}
 
-	public Set<Menu> getPermissionSet() {
+	public Set<MenuVo> getPermissionSet() {
 		return permissionSet;
 	}
 
-	public void setPermissionSet(Set<Menu> permissionSet) {
+	public void setPermissionSet(Set<MenuVo> permissionSet) {
 		this.permissionSet = permissionSet;
 	}
 

@@ -105,13 +105,7 @@ public class LdapTemplate{
 			if (!cascade){
 				this.ctx.unbind(dn);
 			} else {
-				NamingEnumeration<Binding> enumeration = this.ctx.listBindings(dn);
-				while (enumeration.hasMore()) {
-					Binding binding = (Binding) enumeration.next();
-					unbind(binding.getNameInNamespace().replaceAll(DN, ""), cascade);
-				}
-				this.ctx.unbind(dn);
-				//this.deleteRecursively(dn);
+				this.deleteRecursively(dn);
 			}
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
@@ -158,8 +152,6 @@ public class LdapTemplate{
 			      					      String filter,
 			                              SearchControls cons)
 			                throws NamingException {
-//    	this.ctx.setRequestControls(new Control[]{
-//    	         new PagedResultsControl(5, Control.CRITICAL) });
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
 		return this.searchResultToList(ne);
 	}
@@ -306,8 +298,8 @@ public class LdapTemplate{
 	}
 	
 	private void deleteRecursively(String dn) throws NamingException {
-		LdapContext entry = (LdapContext) ctx.lookup("ou=subtree");
-		entry.setRequestControls(new Control[] { new TreeDeleteControl() });
+		LdapContext entry = (LdapContext) ctx.lookup(dn);
+		entry.setRequestControls(new Control[] {new TreeDeleteControl()});
 		try {
 			entry.unbind("");
 		} catch (OperationNotSupportedException e) {
@@ -316,7 +308,7 @@ public class LdapTemplate{
         }
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public void deleteRecursively(LdapContext entry) 
     								throws NamingException {
 		NamingEnumeration ne = entry.listBindings("");

@@ -44,7 +44,8 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/{parent:.*}")
 	@Produces("application/json")
-	public User persist(@FormParam("") User user, @PathParam("parent") String parent) throws UserPersistException {
+	public User persist(@FormParam("") User user, @PathParam("parent") String parent)
+				   											throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -128,8 +129,6 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		System.out.println("------" + LdapEncryptUtils.md5Encode(oldPassword));
-		System.out.println("------" + u.getPassword());
 		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
 			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
 				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));
@@ -192,16 +191,6 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
-//	private User setVisible(String id, Boolean visible)  throws UserPersistException {
-//		LdapService ldapSvc = this.getLdapService();
-//		UserSyncService userSyncService = this.getUserSynchService();
-//		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-//		
-//		userMgr.setVisible(visible, id);
-//		userSyncService.enable(id);
-//		return userMgr.findById(id.substring(id.indexOf("=") + 1, id.indexOf(",")));
-//	}
-	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 
@@ -222,7 +211,7 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType(type);
-		userVo.setLabel("<a>" + user.getId() + "<a>");
+		userVo.setLabel( user.getId());
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());

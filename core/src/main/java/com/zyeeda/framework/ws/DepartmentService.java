@@ -112,7 +112,8 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenById(@Context HttpServletRequest request, 
-			@PathParam("id") String id) throws UserPersistException {
+													@PathParam("id") String id)
+											   throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
