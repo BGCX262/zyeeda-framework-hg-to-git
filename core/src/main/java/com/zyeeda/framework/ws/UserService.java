@@ -16,13 +16,15 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
+import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.utils.LdapEncryptUtils;
 import com.zyeeda.framework.viewmodels.UserVo;
@@ -250,7 +252,38 @@ public class UserService extends ResourceService {
 		return userVoList;
 	}
 	
-	public static void updateAccount(@QueryParam("username") String username,@QueryParam("password") String password){
-		
+//	@POST
+//	@Path("/{id}")
+//	@Produces("application/json")
+//	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
+//		if(objAccount == null){
+//			throw new RuntimeException("用户名或密码不能为空");
+//		}else{
+//			objAccount.setUserFullPath(fullPath);
+//		}
+//		return objAccount;
+//	}	
+	
+	@POST
+	@Path("/{id}")
+	@Produces("application/json")
+	public Account updateAccounts(@FormParam("") Account objAccount, @PathParam("id") String id) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+
+		if(objAccount == null){
+			throw new RuntimeException("用户名或密码为空");
+		}else{
+			objAccount.setUserFullPath(id);
+			objAccountManager.update(objAccount);
+			return objAccount;
+		}
 	}	
+	
+//	public static void mockSignIn(@FormParam("") Account objAccount){
+//		objAccount = new Account();
+//		if(objAccount != null){
+//			
+//		}
+//	}
 }

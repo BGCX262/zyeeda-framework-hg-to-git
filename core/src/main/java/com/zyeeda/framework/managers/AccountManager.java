@@ -8,7 +8,7 @@ import java.util.List;
 import com.zyeeda.framework.entities.Account;
 
 /**
- * account manager api
+ * account manager  
  *
  * @author Qi Zhao
  * @date 2011-06-15
