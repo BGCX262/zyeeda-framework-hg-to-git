@@ -21,7 +21,7 @@ import org.xml.sax.InputSource;
 import com.zyeeda.framework.managers.PermissionManager;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 
-public class PermissionManagerImpl  implements PermissionManager {
+public class DefaultPermissionManager implements PermissionManager {
 	
 	
 

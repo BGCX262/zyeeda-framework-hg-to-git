@@ -38,13 +38,6 @@
             <name>JBoss Repository</name>
             <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
         </repository>
-        <!--
-        <repository>
-            <id>DataNucleus_Repos2</id>
-            <name>DataNucleus Repository</name>
-            <url>http://www.datanucleus.org/downloads/maven2/</url>
-        </repository>
-        -->
     </repositories>
 
     <properties>
@@ -55,6 +48,13 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-catalina</artifactId>
+            <version>7.0.14</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

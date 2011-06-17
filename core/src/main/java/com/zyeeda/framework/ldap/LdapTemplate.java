@@ -1,17 +1,25 @@
 package com.zyeeda.framework.ldap;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.naming.Binding;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.OperationNotSupportedException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.Control;
 import javax.naming.ldap.LdapContext;
+
 import org.apache.shiro.realm.ldap.LdapUtils;
 
-import com.zyeeda.framework.ldap.LdapService;
 /**
  * Ldap Common operation class
  * @author gary.wang
@@ -21,6 +29,8 @@ import com.zyeeda.framework.ldap.LdapService;
  */
 public class LdapTemplate{
 
+	private static String DN = ",dc=ehv,dc=csg,dc=cn";
+	
 	@SuppressWarnings("unused")
 	private LdapService ldapSvc;
 	
@@ -67,6 +77,14 @@ public class LdapTemplate{
 		}
 	}
 	
+	public void modifyAttributes(String dn, Attributes attrs) throws NamingException {
+		this.ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+	}
+	
+	public void modifyAttributes(String dn, ModificationItem[] mods) throws NamingException {
+		this.ctx.modifyAttributes(dn, mods);
+	}
+	
 	/**
 	 * Delete a context by dn, not cascade
 	 * @param dn - the full path of the context
@@ -82,21 +100,16 @@ public class LdapTemplate{
 	 * @param cascade - if cascade is true it will delete all children
 	 * @throws NamingException - if a naming exception is encountered
 	 */
-	private void unbind(String dn, Boolean cascade) throws NamingException {
+	public void unbind(String dn, Boolean cascade) throws NamingException {
 		try {
 			if (!cascade){
 				this.ctx.unbind(dn);
 			} else {
-				NamingEnumeration<Binding> enumeration = this.ctx.listBindings(dn);
-				while (enumeration.hasMore()) {
-					Binding binding = (Binding) enumeration.next();
-					unbind(binding.getNameInNamespace(),cascade);
-				}
-				this.ctx.unbind(dn);
+				this.deleteRecursively(dn);
 			}
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
-		} 
+		}
 	}
 	
 	/**
@@ -124,7 +137,7 @@ public class LdapTemplate{
 			      				   		  Attributes matchingAttributes)
 			      		    throws NamingException {
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name, matchingAttributes);
-		return this.namingEnumerationToList(ne);
+		return this.searchResultToList(ne);
 	}
 	
 	/**
@@ -133,13 +146,14 @@ public class LdapTemplate{
      * @param cons - the search controls that control the search. If null, the default search controls are used (equivalent to (new SearchControls())). 
 	 * @return - the list of Attributes
 	 * @throws NamingException - if a naming exception is encountered
+	 * @throws IOException 
 	 */
     public List<Attributes> getResultList(String name,
 			      					      String filter,
 			                              SearchControls cons)
 			                throws NamingException {
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
-		return this.namingEnumerationToList(ne);
+		return this.searchResultToList(ne);
 	}
 	
     /**
@@ -154,9 +168,9 @@ public class LdapTemplate{
 							              String[] attributesToReturn)
 							throws NamingException {
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
-												 matchingAttributes,
-												 attributesToReturn);
-		return this.namingEnumerationToList(ne);
+												 			 matchingAttributes,
+												             attributesToReturn);
+		return this.searchResultToList(ne);
 	}
 	
 	/**
@@ -176,7 +190,7 @@ public class LdapTemplate{
 															 filterExpr,
 															 filterArgs,
 															 cons);
-		return this.namingEnumerationToList(ne);
+		return this.searchResultToList(ne);
 	}
 	
 	 /**
@@ -193,7 +207,7 @@ public class LdapTemplate{
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
 															 matchingAttributes,
 															 attributesToReturn);
-		return this.namingEnumerationToQueryResult(ne);
+		return this.searchResultToQueryResult(ne);
 	}
 	
 	/**
@@ -206,7 +220,7 @@ public class LdapTemplate{
             						      Attributes matchingAttributes)
      						       throws NamingException {
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name, matchingAttributes);
-		return this.namingEnumerationToQueryResult(ne);
+		return this.searchResultToQueryResult(ne);
 	}
 	
 	/**
@@ -221,7 +235,7 @@ public class LdapTemplate{
             						      SearchControls cons)
      						       throws NamingException {
 		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
-		return this.namingEnumerationToQueryResult(ne);
+		return this.searchResultToQueryResult(ne);
 	}
 	
 	/**
@@ -241,13 +255,27 @@ public class LdapTemplate{
 															 filterExpr,
 															 filterArgs,
 															 cons);
-		return this.namingEnumerationToQueryResult(ne);
+		return this.searchResultToQueryResult(ne);
 	}
 	
-	private List<Attributes> namingEnumerationToList(
-								       NamingEnumeration<SearchResult> ne)
+	public Map<String, Attributes> searchResultToMap(NamingEnumeration<SearchResult> ne)
+																	throws NamingException{
+		Map<String, Attributes> map = null;
+		if(ne != null){
+			SearchResult entry = null;
+			map = new HashMap<String, Attributes>();
+			while(ne.hasMore()){
+				entry = ne.next();
+				Attributes attrs = entry.getAttributes();
+				map.put(entry.getNameInNamespace().replaceAll(DN, ""), attrs);
+			}
+		}
+		return map;
+	}
+	
+	private List<Attributes> searchResultToList(
+								          NamingEnumeration<SearchResult> ne)
 								   throws NamingException {
-
 		List<Attributes> attrList = new ArrayList<Attributes>();
 		while (ne.hasMore()) {
 			Attributes atrrs = ne.next().getAttributes();
@@ -255,18 +283,41 @@ public class LdapTemplate{
 				attrList.add(atrrs);
 			}
 		}
-		
 		return attrList;
 	}
 	
-	private QueryResult<Attributes> namingEnumerationToQueryResult(
+	private QueryResult<Attributes> searchResultToQueryResult(
 										  NamingEnumeration<SearchResult> ne)
-									throws NamingException {
-		List<Attributes> attrList = this.namingEnumerationToList(ne);
+								   throws NamingException {
+		List<Attributes> attrList = this.searchResultToList(ne);
 		QueryResult<Attributes> qr = new QueryResult<Attributes>();
 		qr.setResultList(attrList);
 		qr.setTotalRecords(attrList.size() + 0l);
 		
 		return qr;
+	}
+	
+	private void deleteRecursively(String dn) throws NamingException {
+		LdapContext entry = (LdapContext) ctx.lookup(dn);
+		entry.setRequestControls(new Control[] {new TreeDeleteControl()});
+		try {
+			entry.unbind("");
+		} catch (OperationNotSupportedException e) {
+            entry.setRequestControls(new Control[0]);
+            deleteRecursively(entry);
+        }
+	}
+	
+	@SuppressWarnings("rawtypes")
+	public void deleteRecursively(LdapContext entry) 
+    								throws NamingException {
+		NamingEnumeration ne = entry.listBindings("");
+		while (ne.hasMore()) {
+		    Binding b = (Binding) ne.next();
+		    if (b.getObject() instanceof LdapContext) {
+		        deleteRecursively((LdapContext) b.getObject());
+		    }
+		}
+		entry.unbind("");
 	}
 }

@@ -1,1 +1,25 @@
-Hi, welcome to the blank page!
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+        <title>测试页面</title>
+
+        <link rel="stylesheet" type="text/css" href="public/style/zui-override.css" />
+        <link rel="stylesheet" type="text/css" href="public/style/zui-messagebox.css" />
+        <link rel="stylesheet" type="text/css" href="public/lib/yui3/build/cssfonts/fonts-min.css"/>
+    </head>
+
+    <body class="yui-skin-sam">
+        <h3>测试附件管理</h3>
+        <form action="attachments/commit.jsp" method="post">
+            <div id="attachment"></div>
+            <input type="submit" value="commit" />
+        </form>
+    </body>
+
+    <script type="text/javascript" src="public/lib/yui3/build/yui/yui-min.js"></script>
+    <script type="text/javascript" src="public/lib/mustache/mustache.js"></script>
+    <script type="text/javascript" src="public/lib/zui/build/zui-common/zui-common.js"></script>
+    <script type="text/javascript" src="attachments/lib/zyeeda/attachment-demo.js"></script>
+    <script type="text/javascript" src="attachments/lib/zyeeda/main.js"></script>
+</html>
