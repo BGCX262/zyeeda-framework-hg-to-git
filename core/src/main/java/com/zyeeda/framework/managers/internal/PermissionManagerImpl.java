@@ -141,7 +141,11 @@ public class PermissionManagerImpl implements PermissionManager {
 		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 		List<String> auths = new ArrayList<String>();
 		for (String auth : authList) {
-			allAuth.add(auth);
+			//allAuth.add(auth);
+			if(allAuth.contains(auth)){
+				continue;
+			}
+			System.out.println("*********************88888888"+auth);
 			permissionList = findSubPermissionByValue(auth);
 			if (permissionList == null) {
 				break;
