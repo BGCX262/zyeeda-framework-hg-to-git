@@ -7,5 +7,7 @@ import com.zyeeda.framework.entities.Role;
 
 public interface RoleManager extends GenericDAO<Role, String> {
 
+		public Role getRoleById(String hql);
+		
 		public  List<Role> getRoleBySubject(String subject);
 }

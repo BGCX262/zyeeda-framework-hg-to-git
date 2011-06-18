@@ -2,9 +2,7 @@ package com.zyeeda.framework.ws;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -16,11 +14,12 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.MenuManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
-import com.zyeeda.framework.managers.internal.DefaultMenuManager;
-import com.zyeeda.framework.managers.internal.DefaultRoleManager;
+import com.zyeeda.framework.managers.internal.MenuManagerImpl;
+import com.zyeeda.framework.managers.internal.RoleManagerImpl;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -38,40 +37,31 @@ public class MenuService extends ResourceService {
 	@Produces("application/json")
 	public List<MenuVo> getMenu()throws XPathExpressionException, IOException {
 		String user = this.getSecurityService().getCurrentUser();
-		MenuManager menuMgr = new DefaultMenuManager();
-		DefaultRoleManager roleMgr = new DefaultRoleManager(this
+		MenuManager menuMgr = new MenuManagerImpl();
+		RoleManagerImpl roleMgr = new RoleManagerImpl(this
 				.getPersistenceService());
-		Set<String> rolesAuth = new HashSet<String>();
+		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
-		roles = roleMgr.getRoleBySubject(user);
-		boolean result = false;
-		if(roles.size() > 1){
-			for(Role role:roles){
-				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
-				for(String permission:role.getPermissionSet()){
-					if(rolesAuth.size()>0){
-						for(String haveAuth:rolesAuth){
-							if(permission.equals(haveAuth)){
-								result = true;
-								break;
-							}
-						}
-						if(result == false) {
-							rolesAuth.add(permission);
-						}
-					} else {
-						rolesAuth.add(permission);
-					}					
-				}
-			}		
-				
-			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
-		} else if(roles.size() == 1){
-			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
+		roles = roleMgr.getRoleBySubject(user);	
+		if(roles.size() == 1) {
+			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
+			return listMenu;
 		}
+		for(Role role:roles) {
+			logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
+			for(String permission:role.getPermissionList()){
+				if(rolesAuth.size() == 0){
+					rolesAuth.add(permission);
+					continue;
+				}
+				if(!(rolesAuth.contains(permission))){
+					rolesAuth.add(permission);
+				}
+				
+			}
+		}		
+		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}
-
-
 }
