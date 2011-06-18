@@ -1,6 +1,7 @@
 package com.zyeeda.framework.ws;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -18,6 +19,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
@@ -33,6 +41,8 @@ import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/users")
 public class UserService extends ResourceService {
+	
+	private Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
@@ -257,11 +267,32 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/accounts/{id}")
 	@Produces("application/json")
+	public Account updateAccounts(@FormParam("userList") String userListJson, @PathParam("id") String id) throws UserPersistException{
+//		LdapService ldapSvc = this.getLdapService();
+//		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		ObjectMapper mapper = new ObjectMapper();
+		List<Account> userList = null;
+		try {
+			 userList = mapper.readValue(userListJson,
+					new TypeReference<List<Account>>() {
+			});
+			 
+			logger.debug("UserList size is {}", userList.size());
+		} catch (JsonParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (JsonMappingException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+	}
+	
+	/*
+	@POST
+	@Path("/accounts/{id}")
+	@Produces("application/json")
 	public Account updateAccounts(@FormParam("") Account objAccount, @PathParam("id") String id) throws UserPersistException{
-//		System.out.println("***********************************");
-//		System.out.println("***********************************" + objAccount.getUserName());
-//		System.out.println("***********************************" + objAccount.getPassword());
-//		System.out.println("***********************************" + objAccount.getUserFullPath());
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 
@@ -273,7 +304,7 @@ public class UserService extends ResourceService {
 			return objAccount;
 		}
 	}
-	
+	*/
 	@GET
 	@Path("/accounts/{id}")
 	@Produces("application/json")

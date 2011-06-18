@@ -63,20 +63,15 @@ public class AccountHelper {
 	public static Account convertAttributesToAccount(Attributes attributes)
 			throws NamingException {
 		Account account = new Account();
-
-		account
-				.setSystemName(attributes.get("systemName").get() != null ? (String) attributes
+		account.setSystemName(attributes.get("systemName").get() != null ? (String) attributes
 						.get("systemName").get()
 						: "");
-		account
-				.setUserName(attributes.get("username").get() != null ? (String) attributes
+		account.setUserName(attributes.get("username").get() != null ? (String) attributes
 						.get("username").get()
 						: "");
-		account
-				.setPassword(attributes.get("password").get() != null ? (String) attributes
+		account.setPassword(attributes.get("password").get() != null ? (String) attributes
 						.get("password").get()
 						: "");
-
 		return account;
 	}
 
