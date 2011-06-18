@@ -10,6 +10,6 @@ import com.zyeeda.framework.viewmodels.MenuVo;
 
 public interface MenuManager {
 	
-	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList) throws XPathExpressionException, IOException;
+	public List<MenuVo> getMenuListByPermissionAuth(Set<String> authList) throws XPathExpressionException, IOException;
 
 }

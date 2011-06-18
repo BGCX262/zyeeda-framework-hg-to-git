@@ -25,6 +25,4 @@ syntax: regexp
 syntax: regexp
 ^core/src/main/java/com/zyeeda/framework/sync/internal/UserSyncThreadPool\.java$
 syntax: regexp
-^core/src/test/java/com/zyeeda/framework/unittest/JunitTest\.java$
-syntax: regexp
-^core/src/test/java/com/zyeeda/framework/unittest/JunitTest\.java$
+^core/src/main/java/com/zyeeda/framework/managers/internal/BaseLdapManager\.java$

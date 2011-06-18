@@ -8,6 +8,8 @@ import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
+import com.zyeeda.framework.nosql.MongoDbService;
+import com.zyeeda.framework.nosql.internal.DefaultMongoDbServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.scheduler.SchedulerService;
@@ -56,10 +58,11 @@ public class ResourceService {
 		return this.reg.getService(IocUtils.getServiceId(QuartzSchedulerServiceProvider.class), SchedulerService.class);
 	}
 	
+	protected MongoDbService getMongoDbService() {
+		return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
+	}
+	
 	protected KnowledgeService getKnowledgeService(){
 		return  this.reg.getService(KnowledgeService.class);
 	}
-	
-
-
 }

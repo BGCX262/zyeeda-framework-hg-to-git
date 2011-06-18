@@ -33,8 +33,6 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 	public List<ActionHistory> findListByProcessId(Long processInsId){
 		Search search = new Search();
 		search.addFilterEqual("processInstanceId", processInsId);
-		search.addFilterEqual("nodeType", "StateNode");
-		search.addSortDesc("createdTime");
 		return this.search(search);
 	}
 	
