@@ -17,6 +17,7 @@ import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public class DefaultMenuManager implements MenuManager {
 
+	@SuppressWarnings("unchecked")
 	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList)
 			throws XPathExpressionException, IOException {
 		
@@ -74,8 +75,6 @@ public class DefaultMenuManager implements MenuManager {
 		if(listMenu.size() > 0){
 			MenuListComparator comparator = new MenuListComparator();
 			Collections.sort(listMenu, comparator);
-			for(MenuVo men : listMenu){
-			}
 		}
 		return listMenu;
 	}
@@ -88,6 +87,5 @@ public class DefaultMenuManager implements MenuManager {
 		menu.setOrderBy(permission.getOrderBy());
 		return menu;
 	}
-	
 	
 }

@@ -9,7 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.FetchType;
 import javax.persistence.Column;
 import javax.persistence.Basic;
 import javax.persistence.JoinColumn;
