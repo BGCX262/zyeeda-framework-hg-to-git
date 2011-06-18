@@ -1,9 +1,13 @@
 package com.zyeeda.framework.viewmodels;
 
 import java.util.ArrayList;
+
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
+
+import com.zyeeda.framework.utils.MenuListComparator;
 
 @XmlRootElement(name = "menuVo")
 public class MenuVo {
@@ -12,12 +16,25 @@ public class MenuVo {
 	private String auth;
 	private List<MenuVo> permissionSet = new ArrayList<MenuVo>();
 	private MenuVo parentMenu;
+	private String orderBy;
+	
+	public String getOrderBy() {
+		return orderBy;
+	}
+
+	public void setOrderBy(String orderBy) {
+		this.orderBy = orderBy;
+	}
 
 	public MenuVo getParentMenu() {
 		return parentMenu;
 	}
 
 	public List<MenuVo> getPermissionSet() {
+		if(permissionSet.size() > 0) {
+			MenuListComparator comparator = new  MenuListComparator();
+			Collections.sort(permissionSet, comparator);
+		}
 		return permissionSet;
 	}
 

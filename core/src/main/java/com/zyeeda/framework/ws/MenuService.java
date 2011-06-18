@@ -1,12 +1,8 @@
 package com.zyeeda.framework.ws;
 
 import java.io.IOException;
-
-
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -18,7 +14,6 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import bitronix.tm.utils.CollectionUtils;
 
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.MenuManager;
@@ -60,9 +55,10 @@ public class MenuService extends ResourceService {
 					rolesAuth.add(permission);
 					continue;
 				}
-				if(!(rolesAuth.contains(role))){
+				if(!(rolesAuth.contains(permission))){
 					rolesAuth.add(permission);
 				}
+				
 			}
 		}		
 		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
