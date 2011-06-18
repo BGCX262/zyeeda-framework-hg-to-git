@@ -205,7 +205,7 @@ public class DocumentService extends ResourceService {
 	}
 	
 	@GET
-	@Path("/list")
+	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
 	public DocumentsVo listByForeignId(@QueryParam("foreignId") String foreignId) {
 		logger.debug("foreign id = {}", foreignId);
