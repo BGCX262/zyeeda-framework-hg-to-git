@@ -15,12 +15,12 @@ import com.zyeeda.framework.utils.MenuListComparator;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 
-public class MenuManagerImpl implements MenuManager {
+public class DefaultMenuManager implements MenuManager {
 
 	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList)
 			throws XPathExpressionException, IOException {
 		
-		PermissionManager permissionMgr = new PermissionManagerImpl();
+		PermissionManager permissionMgr = new DefaultPermissionManager();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		Map<String, MenuVo> menuMap = new LinkedHashMap<String, MenuVo>();
 		String	root = null;

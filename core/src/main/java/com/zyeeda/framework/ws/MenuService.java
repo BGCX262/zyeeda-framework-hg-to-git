@@ -14,12 +14,11 @@ import javax.xml.xpath.XPathExpressionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.MenuManager;
+import com.zyeeda.framework.managers.internal.DefaultMenuManager;
+import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
-import com.zyeeda.framework.managers.internal.MenuManagerImpl;
-import com.zyeeda.framework.managers.internal.RoleManagerImpl;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -37,8 +36,9 @@ public class MenuService extends ResourceService {
 	@Produces("application/json")
 	public List<MenuVo> getMenu()throws XPathExpressionException, IOException {
 		String user = this.getSecurityService().getCurrentUser();
-		MenuManager menuMgr = new MenuManagerImpl();
-		RoleManagerImpl roleMgr = new RoleManagerImpl(this
+		MenuManager menuMgr = new DefaultMenuManager();
+
+		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();

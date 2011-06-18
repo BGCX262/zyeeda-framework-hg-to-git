@@ -87,8 +87,13 @@ public class HistoryLogger extends WorkingMemoryLogger {
 				}
 				
 				ProcessHistory history = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
-				history.setEnded(true);
-				this.pHisMgr.save(history);
+				if (history == null) {
+					logger.warn("Cannot find process history by process instance id {}.", event.getProcessInstanceId());
+				} else {
+					history.setEnded(true);
+					this.pHisMgr.save(history);
+				}
+				
 				break;
 			}
 			case LogEvent.BEFORE_RULEFLOW_NODE_TRIGGERED: {
@@ -122,8 +127,12 @@ public class HistoryLogger extends WorkingMemoryLogger {
 				}
 				
 				ProcessHistory proHist = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
-				proHist.setCurrentState(event.getNodeName());
-				this.pHisMgr.save(proHist);
+				if (proHist == null) {
+					logger.warn("Cannot find process history by process instance id {}.", event.getProcessInstanceId());
+				} else {
+					proHist.setCurrentState(event.getNodeName());
+					this.pHisMgr.save(proHist);
+				}
 				
 				ActionHistory actHist = new ActionHistory();
 				actHist.setProcessId(event.getProcessId());
@@ -153,11 +162,21 @@ public class HistoryLogger extends WorkingMemoryLogger {
 				}
 				
 				ProcessHistory proHist = this.pHisMgr.findByProcessInstanceId(event.getProcessInstanceId());
-				this.pHisMgr.save(proHist);
+				if (proHist == null) {
+					logger.warn("Cannot find process history by process instance id {}.", event.getProcessInstanceId());
+				} else {
+					this.pHisMgr.save(proHist);	
+				}
 				
 				ActionHistory actHist = aHisMgr.findAlive(event.getProcessInstanceId(), event.getNodeInstanceId());
-				actHist.setAlive(false);
-				this.aHisMgr.save(actHist);
+				if (actHist == null) {
+					logger.warn("Cannot find action history by process instance id {} and node instance id {}.", 
+							event.getProcessInstanceId(), event.getNodeInstanceId());
+				} else {
+					actHist.setAlive(false);
+					this.aHisMgr.save(actHist);
+				}
+				
 				break;
 			}
 		default:

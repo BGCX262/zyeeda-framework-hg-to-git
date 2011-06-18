@@ -24,9 +24,9 @@ import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.UserPersistException;
+import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
-import com.zyeeda.framework.managers.internal.RoleManagerImpl;
 import com.zyeeda.framework.viewmodels.DepartmentVo;
 import com.zyeeda.framework.viewmodels.OrganizationNodeVo;
 import com.zyeeda.framework.viewmodels.UserVo;
@@ -117,7 +117,8 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}/children")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getChildrenById(@Context HttpServletRequest request, 
-			@PathParam("id") String id) throws UserPersistException {
+													@PathParam("id") String id)
+											   throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
@@ -218,7 +219,7 @@ public class DepartmentService extends ResourceService {
 																			@PathParam("roleId") String roleId)
 																	   throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
-		RoleManager roleMgr = new RoleManagerImpl(this.getPersistenceService());
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		Set<String> roleByUser = new HashSet<String>();
 		if(role != null) {

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -73,6 +74,15 @@ public class OpenIdConsumerAuthcFilter extends AuthenticatingFilter {
 		
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		HttpServletResponse httpRes = (HttpServletResponse) response;
+		
+		if (logger.isDebugEnabled()) {
+			Cookie[] cookies = httpReq.getCookies();
+			if (cookies != null) {
+				for (Cookie cookie : cookies) {
+					logger.debug(cookie.getName() + " : " + cookie.getValue());
+				}
+			}
+		}
 		
 		Registry registry = IocUtils.getRegistry(this.getServletContext());
 		OpenIdConsumerService openidConsumer = registry.getService(OpenIdConsumerService.class);

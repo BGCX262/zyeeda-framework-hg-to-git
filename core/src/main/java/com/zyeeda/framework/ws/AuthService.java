@@ -14,8 +14,9 @@ import javax.xml.xpath.XPathExpressionException;
 
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.PermissionManager;
-import com.zyeeda.framework.managers.internal.PermissionManagerImpl;
-import com.zyeeda.framework.managers.internal.RoleManagerImpl;
+import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
+import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.viewmodels.AuthVO;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 import com.zyeeda.framework.ws.base.ResourceService;
@@ -34,9 +35,9 @@ public class AuthService extends ResourceService {
 	public List<AuthVO> getPermissionById(@PathParam("id") String id,
 			@PathParam("role_id") String roleId)
 			throws XPathExpressionException, IOException {
-		RoleManagerImpl roleMgr = new RoleManagerImpl(this
+		RoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
-		PermissionManager permissionMgr = new PermissionManagerImpl();
+		PermissionManager permissionMgr = new DefaultPermissionManager();
 		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
 		Role role = roleMgr.find(roleId);
 		List<AuthVO> authVO = getAuthList(list, roleId, role

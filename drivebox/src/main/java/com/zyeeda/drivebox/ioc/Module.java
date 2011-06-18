@@ -12,6 +12,8 @@ import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.knowledge.internal.DroolsKnowledgeServiceProvider;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
+import com.zyeeda.framework.nosql.MongoDbService;
+import com.zyeeda.framework.nosql.internal.DefaultMongoDbServiceProvider;
 import com.zyeeda.framework.openid.consumer.OpenIdConsumerService;
 import com.zyeeda.framework.openid.consumer.internal.DefaultOpenIdConsumerServiceProvider;
 import com.zyeeda.framework.persistence.PersistenceService;
@@ -49,6 +51,7 @@ public class Module {
 		binder.bind(OpenIdConsumerService.class, DefaultOpenIdConsumerServiceProvider.class);
 		binder.bind(UserSyncService.class, HttpClientUserSyncServiceProvider.class);
 		binder.bind(SchedulerService.class, QuartzSchedulerServiceProvider.class);
+		binder.bind(MongoDbService.class, DefaultMongoDbServiceProvider.class);
 		
 		binder.bind(Job.class, TestJob.class);
 	}
@@ -67,21 +70,23 @@ public class Module {
 			@Primary final KnowledgeService knowledgeSvc,
 			@Primary final OpenIdConsumerService consumerSvc,
 			@Primary final UserSyncService userSyncSvc,
-			@Primary final SchedulerService<?> schedulerSvc) throws Exception {
+			@Primary final SchedulerService<?> schedulerSvc,
+			@Primary final MongoDbService mongodbSvc) throws Exception {
 		
 		configSvc.start();
 		tplSvc.start();
-		txSvc.start();
-		validationSvc.start();
-		defaultPersistenceSvc.start();
-		droolsTaskPersistenceSvc.start();
+		//txSvc.start();
+		//validationSvc.start();
+		//defaultPersistenceSvc.start();
+		//droolsTaskPersistenceSvc.start();
 		ldapSvc.start();
 		securitySvc.start();
 		virtualSecuritySvc.start();
-		knowledgeSvc.start();
+		//knowledgeSvc.start();
 		consumerSvc.start();
-		userSyncSvc.start();
-		schedulerSvc.start();
+		//userSyncSvc.start();
+		//schedulerSvc.start();
+		mongodbSvc.start();
 		
 	}
 
