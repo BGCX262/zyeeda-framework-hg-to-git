@@ -45,6 +45,16 @@ public class DictionaryService extends ResourceService {
 		return dictMgr.find(dict.getId());
 	}
 	
+	@GET
+	@Path("/{id}")
+	@Produces("application/xml")
+	public List<Dictionary> getListExceptId(@PathParam("id") String id) {
+		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
+		Search search = new Search();
+		search.addFilterNotEqual("id", id);
+		return dictMgr.search(search);
+	}
+	
 	
 	
 }

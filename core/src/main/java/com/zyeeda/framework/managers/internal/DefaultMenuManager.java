@@ -2,33 +2,34 @@ package com.zyeeda.framework.managers.internal;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import com.zyeeda.framework.managers.MenuManager;
 import com.zyeeda.framework.managers.PermissionManager;
+import com.zyeeda.framework.utils.MenuListComparator;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public class DefaultMenuManager implements MenuManager {
 
-	public List<MenuVo> getMenuListByPermissionAuth(Set<String> authList)
+	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList)
 			throws XPathExpressionException, IOException {
 		
 		PermissionManager permissionMgr = new DefaultPermissionManager();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
-		Map<String, MenuVo> menuMap = new HashMap<String, MenuVo>();
+		Map<String, MenuVo> menuMap = new LinkedHashMap<String, MenuVo>();
 		String	root = null;
-		for (String auth : authList) {
+		for (String auth : authList) { 
 			PermissionVo childPermission = permissionMgr.getPermissionByPath(auth);
 			MenuVo childMenu = null;
 			if (childPermission != null) {
 				childMenu = this.convertPermission2Menu(childPermission);
-				if (!menuMap.containsKey(childMenu.getAuth())) {
+				if (!(menuMap.containsKey(childMenu.getAuth()))) {
 					menuMap.put(childMenu.getAuth(), childMenu);
 				}else{
 					continue;
@@ -36,10 +37,8 @@ public class DefaultMenuManager implements MenuManager {
 			} 
 			PermissionVo parentPermission = permissionMgr.getParentPermissionByPath(auth);
 			if (parentPermission == null) {
-				if(!(menuMap.containsKey(childMenu.getAuth()))){
 					listMenu.add(menuMap.get(childMenu.getAuth()));
-				}
-				continue;
+					continue;
 			}
 			if (menuMap.containsKey(parentPermission.getValue())) {
 				MenuVo menuKey = menuMap.get(parentPermission.getValue());
@@ -57,6 +56,7 @@ public class DefaultMenuManager implements MenuManager {
 						parentMenu.setAuth(parentPermission.getValue());
 						parentMenu.setId(parentPermission.getId());
 						parentMenu.setName(parentPermission.getName());
+						parentMenu.setOrderBy(parentPermission.getOrderBy());
 							if (!(menuMap.containsKey(parentMenu.getAuth()))) {
 								parentMenu.getPermissionSet().add(menuMap.get(authKey));
 								menuMap.put(parentMenu.getAuth(), parentMenu);
@@ -71,6 +71,12 @@ public class DefaultMenuManager implements MenuManager {
 					} 
 			}
 		}
+		if(listMenu.size() > 0){
+			MenuListComparator comparator = new MenuListComparator();
+			Collections.sort(listMenu, comparator);
+			for(MenuVo men : listMenu){
+			}
+		}
 		return listMenu;
 	}
 	
@@ -79,6 +85,9 @@ public class DefaultMenuManager implements MenuManager {
 		menu.setAuth(permission.getValue());
 		menu.setId(permission.getId());
 		menu.setName(permission.getName());
+		menu.setOrderBy(permission.getOrderBy());
 		return menu;
 	}
+	
+	
 }
