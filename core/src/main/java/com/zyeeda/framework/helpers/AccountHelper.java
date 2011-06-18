@@ -12,58 +12,84 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchResult;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.zyeeda.framework.entities.Account;
 
 /**
- * help the between the attributes and account convert. 
+ * help the between the attributes and account convert.
  * 
  * @author Qi Zhao
  * @date 2011-06-15
- *
+ * 
  * @LastChanged
- * @LastChangedBy $LastChangedBy:  $
- * @LastChangedDate $LastChangedDate:  $
- * @LastChangedRevision $LastChangedRevision:  $
+ * @LastChangedBy $LastChangedBy: $
+ * @LastChangedDate $LastChangedDate: $
+ * @LastChangedRevision $LastChangedRevision: $
  */
 public class AccountHelper {
 
-    public static Attributes convertAccountToAttributes(Account account) {
-        Attributes attributes = new BasicAttributes();
-        attributes.put("objectClass", "inetOrgPerson");
-        attributes.put("objectClass", "organizationalPerson");
-        attributes.put("objectClass", "person");
-        attributes.put("objectClass", "top");
-        attributes.put("objectClass", "userReferenceSystem");
+	public static Attributes convertAccountToAttributes(Account account) {
+		Attributes attributes = new BasicAttributes();
+		attributes.put("objectClass", "inetOrgPerson");
+		attributes.put("objectClass", "organizationalPerson");
+		attributes.put("objectClass", "person");
+		attributes.put("objectClass", "top");
+		attributes.put("objectClass", "userReferenceSystem");
 
-        attributes.put("cn", account.getSystemName());
-        attributes.put("sn", account.getSystemName());
+		if (StringUtils.isNotBlank(account.getSystemName())) {
+			attributes.put("cn", account.getSystemName());
+			attributes.put("sn", account.getSystemName());
+			attributes.put("systemName", account.getSystemName());
+		} else {
+			attributes.put("cn", "fms");
+			attributes.put("sn", "fms");
+			attributes.put("systemName", "fms");
+		}
+		if (StringUtils.isNotBlank(account.getUserName())) {
+			attributes.put("username", account.getUserName());
+		} else {
+			attributes.put("username", "temp");
+		}
+		if (StringUtils.isNotBlank(account.getPassword())) {
+			attributes.put("password", account.getPassword());
+		} else {
+			attributes.put("password", "123456");
+		}
 
-        attributes.put("systemName", account.getSystemName());
-        attributes.put("username", account.getUserName());
-        attributes.put("password", account.getPassword());
+		return attributes;
+	}
 
-        return attributes;
-    }
+	public static Account convertAttributesToAccount(Attributes attributes)
+			throws NamingException {
+		Account account = new Account();
 
-    public static Account convertAttributesToAccount(Attributes attributes) throws NamingException {
-        Account account = new Account();
+		account
+				.setSystemName(attributes.get("systemName").get() != null ? (String) attributes
+						.get("systemName").get()
+						: "");
+		account
+				.setUserName(attributes.get("username").get() != null ? (String) attributes
+						.get("username").get()
+						: "");
+		account
+				.setPassword(attributes.get("password").get() != null ? (String) attributes
+						.get("password").get()
+						: "");
 
-        account.setSystemName(attributes.get("systemName").get() != null ? (String) attributes.get("systemName").get() : "");
-        account.setUserName(attributes.get("username").get() != null ? (String) attributes.get("username").get() : "");
-        account.setPassword(attributes.get("password").get() != null ? (String) attributes.get("password").get() : "");
+		return account;
+	}
 
-        return account;
-    }
-    
-    public static List<Account> convertNameingEnumeractionToAccountList(NamingEnumeration<SearchResult> nes) throws NamingException {
-    	List<Account> accounts = new ArrayList<Account>();
-    	
-    	while (nes.hasMore()) {
-            Attributes attributes = nes.next().getAttributes();
-            Account account = convertAttributesToAccount(attributes);
-            accounts.add(account);
-    	}
-    	
-    	return accounts;
-    }
+	public static List<Account> convertNameingEnumeractionToAccountList(
+			NamingEnumeration<SearchResult> nes) throws NamingException {
+		List<Account> accounts = new ArrayList<Account>();
+
+		while (nes.hasMore()) {
+			Attributes attributes = nes.next().getAttributes();
+			Account account = convertAttributesToAccount(attributes);
+			accounts.add(account);
+		}
+
+		return accounts;
+	}
 }

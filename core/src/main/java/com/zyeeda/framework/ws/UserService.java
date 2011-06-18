@@ -27,6 +27,7 @@ import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.utils.LdapEncryptUtils;
+import com.zyeeda.framework.viewmodels.AccountVo;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -254,20 +255,40 @@ public class UserService extends ResourceService {
 //	}	
 	
 	@POST
-	@Path("/{id}")
+	@Path("/accounts/{id}")
 	@Produces("application/json")
 	public Account updateAccounts(@FormParam("") Account objAccount, @PathParam("id") String id) throws UserPersistException{
+//		System.out.println("***********************************");
+//		System.out.println("***********************************" + objAccount.getUserName());
+//		System.out.println("***********************************" + objAccount.getPassword());
+//		System.out.println("***********************************" + objAccount.getUserFullPath());
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 
 		if(objAccount == null){
 			throw new RuntimeException("用户名或密码为空");
-		}else{
-			objAccount.setUserFullPath(id);
+		} else {
+			objAccount.setUserFullPath("username=" + objAccount.getUserName() + "," + id);
 			objAccountManager.update(objAccount);
 			return objAccount;
 		}
-	}	
+	}
+	
+	@GET
+	@Path("/accounts/{id}")
+	@Produces("application/json")
+	public AccountVo getAccounts(@PathParam("id") String id) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		List<Account> list = objAccountManager.findByUserId(id);
+		AccountVo avo = new AccountVo();
+		avo.setAccounts(list);
+		return avo;
+	}
+
+//	public static void judgeConfigureSystem(){
+//		
+//	}
 	
 //	public static void mockSignIn(@FormParam("") Account objAccount){
 //		objAccount = new Account();

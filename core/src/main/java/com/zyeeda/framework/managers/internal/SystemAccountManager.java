@@ -14,6 +14,8 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 
 import org.apache.shiro.realm.ldap.LdapUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.helpers.AccountHelper;
@@ -24,82 +26,93 @@ import com.zyeeda.framework.managers.UserPersistException;
 
 /**
  * system account manager implement
- *
+ * 
  * @author Qi Zhao
  * @date 2011-06-15
- *
+ * 
  * @LastChanged
- * @LastChangedBy $LastChangedBy:  $
- * @LastChangedDate $LastChangedDate:  $
- * @LastChangedRevision $LastChangedRevision:  $
+ * @LastChangedBy $LastChangedBy: $
+ * @LastChangedDate $LastChangedDate: $
+ * @LastChangedRevision $LastChangedRevision: $
  */
 public class SystemAccountManager implements AccountManager {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SystemAccountManager.class);
 
-    public static final String DEFAULT_DN_PREFIX = ",dc=ehv,dc=csg,dc=cn";
+	public static final String DEFAULT_DN_PREFIX = ",dc=ehv,dc=csg,dc=cn";
 
-    private LdapService ldapSvc;
+	private LdapService ldapSvc;
 
-    public SystemAccountManager(LdapService ldapSvc) {
-        this.ldapSvc = ldapSvc;
-    }
+	public SystemAccountManager(LdapService ldapSvc) {
+		this.ldapSvc = ldapSvc;
+	}
 
-    public List<Account> findByUserId(String userId) throws UserPersistException {
-        String fullDN = "uid=" + userId + DEFAULT_DN_PREFIX;
-        String filter = "(systemName=*)";
-        
-        return this.getAccountsByDNAndFilter(fullDN, filter);
-    }
+	public List<Account> findByUserId(String userId)
+			throws UserPersistException {
+		String fullDN = userId; //+ DEFAULT_DN_PREFIX;
+		String filter = "(systemName=*)";
+		
+		logger.debug("full dn = {}", fullDN);
+		logger.debug("filter = {}", filter);
+		return this.getAccountsByDNAndFilter(fullDN, filter);
+	}
 
-    public Account findByUserIdAndSystemName(String userId, String systemName) throws UserPersistException {
-        String fullDN = "uid=" + userId + DEFAULT_DN_PREFIX;
-        String filter = "systemName=" + systemName;
-        
-        List<Account> accounts = this.getAccountsByDNAndFilter(fullDN, filter);
-        
-        if (accounts != null && accounts.size() > 0) {
-        	return accounts.get(0);
-        }
-        
-        return null;
-    }
+	public Account findByUserIdAndSystemName(String userId, String systemName)
+			throws UserPersistException {
+		String fullDN = "uid=" + userId + DEFAULT_DN_PREFIX;
+		String filter = "systemName=" + systemName;
 
-    public void update(Account account) throws UserPersistException {
-        LdapContext context = null;
+		List<Account> accounts = this.getAccountsByDNAndFilter(fullDN, filter);
 
-        try {
-            context = this.getLdapContext();
-            Attributes attributes = AccountHelper.convertAccountToAttributes(account);
-            context.bind(account.getUserFullPath(), null, attributes);
-        } catch (NamingException e) {
-            throw new UserPersistException(e); 
-        } finally {
-            LdapUtils.closeContext(context);
-        }
-    }
+		if (accounts != null && accounts.size() > 0) {
+			return accounts.get(0);
+		}
 
-    private LdapContext getLdapContext() throws NamingException {
-        return this.ldapSvc.getLdapContext();
-    }
-    
-    private List<Account> getAccountsByDNAndFilter(String dn, String filter) throws UserPersistException {
-    	LdapContext context = null;
-    	List<Account> accounts = new ArrayList<Account>();
-    	
-    	try {
-            context = this.getLdapContext();
-            NamingEnumeration<SearchResult> nes = context.search(dn, filter, SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
-            
-            if (nes == null) {
-            	return accounts;
-            }
-            
-            accounts = AccountHelper.convertNameingEnumeractionToAccountList(nes);
+		return null;
+	}
 
-            return accounts;
-        } catch (NamingException e) {
-            throw new UserPersistException(e);
-        } finally {
-            LdapUtils.closeContext(context);
-        }
-    }
+	public void update(Account account) throws UserPersistException {
+		LdapContext context = null;
+
+		try {
+			context = this.getLdapContext();
+			Attributes attributes = AccountHelper
+					.convertAccountToAttributes(account);
+			context.bind(account.getUserFullPath(), null, attributes);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} finally {
+			LdapUtils.closeContext(context);
+		}
+	}
+
+	private LdapContext getLdapContext() throws NamingException {
+		return this.ldapSvc.getLdapContext();
+	}
+
+	private List<Account> getAccountsByDNAndFilter(String dn, String filter)
+			throws UserPersistException {
+		LdapContext context = null;
+		List<Account> accounts = new ArrayList<Account>();
+
+		try {
+			context = this.getLdapContext();
+			NamingEnumeration<SearchResult> nes = context.search(dn, filter,
+					SearchControlsFactory
+							.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+
+			if (nes == null) {
+				return accounts;
+			}
+
+			accounts = AccountHelper
+					.convertNameingEnumeractionToAccountList(nes);
+
+			return accounts;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} finally {
+			LdapUtils.closeContext(context);
+		}
+	}
 }
