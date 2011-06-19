@@ -9,8 +9,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Dictionary;
 import com.zyeeda.framework.managers.DictionaryManager;
@@ -37,7 +39,7 @@ public class DictionaryService extends ResourceService {
 	
 	@POST
 	@Path("/")
-	@Produces("application/xml")
+	@Produces("application/json")
 	public Dictionary createDictionary(@FormParam("") Dictionary dict) {
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
 		dictMgr.persist(dict);
@@ -46,15 +48,15 @@ public class DictionaryService extends ResourceService {
 	}
 	
 	@GET
-	@Path("/{id}")
-	@Produces("application/xml")
-	public List<Dictionary> getListExceptId(@PathParam("id") String id) {
+	@Path("/get_list_except")
+	@Produces("application/json")
+	public List<Dictionary> getListExceptId(@QueryParam("name") String name) {
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
 		Search search = new Search();
-		search.addFilterNotEqual("id", id);
+		//search.addField(Filter.equal("type", "defectLevel"), Filter.notEqual("name", name));
+		search.addFilterEqual("type", "defectLevel");
+		search.addFilterNotEqual("name", name);
 		return dictMgr.search(search);
 	}
-	
-	
 	
 }

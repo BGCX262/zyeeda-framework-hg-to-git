@@ -25,8 +25,6 @@ import com.zyeeda.framework.viewmodels.PermissionVo;
 public class DefaultPermissionManager implements PermissionManager {
 
 	
-	
-
 	private final static String PERMISSION_FILE = "permission.xml";
 
 	public List<PermissionVo> findSubPermissionById(String id)
@@ -141,7 +139,6 @@ public class DefaultPermissionManager implements PermissionManager {
 
 	private void getParentPermissionListAuthByPath(String auth, Set<String> allAuth) throws XPathExpressionException, IOException {
 		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
-		//List<String> auths = new ArrayList<String>();
 			permissionList = findSubPermissionByValue(auth);
 			for (PermissionVo permission : permissionList) {
 				allAuth.add(permission.getValue());
@@ -178,22 +175,24 @@ public class DefaultPermissionManager implements PermissionManager {
 			authList = new ArrayList<PermissionVo>();
 			for (int i = 0; i < list.getLength(); i++) {
 				Element element = (Element) list.item(i);
-				NodeList children = element.getChildNodes();
-				for (int j = 0; j < children.getLength(); j++) {
-					Node e = children.item(j);
-					if (e instanceof Element) {
-						Element el = (Element) e;
-						PermissionVo permission = new PermissionVo();
-						permission.setId(el.getAttribute("id"));
-						permission.setName(el.getAttribute("name"));
-						permission.setValue(el.getAttribute("value"));
-						permission.setOrderBy(el.getAttribute("order"));
-						if (el.getAttribute("value").endsWith("*")) {
-							permission.setIsHaveIO(false);
-						} else {
-							permission.setIsHaveIO(true);
+				if(element != null) {
+					NodeList children = element.getChildNodes();
+					for (int j = 0; j < children.getLength(); j++) {
+						Node e = children.item(j);
+						if (e instanceof Element) {
+							Element el = (Element) e;
+							PermissionVo permission = new PermissionVo();
+							permission.setId(el.getAttribute("id"));
+							permission.setName(el.getAttribute("name"));
+							permission.setValue(el.getAttribute("value"));
+							permission.setOrderBy(el.getAttribute("order"));
+							if (el.getAttribute("value").endsWith("*")) {
+								permission.setIsHaveIO(false);
+							} else {
+								permission.setIsHaveIO(true);
+							}
+							authList.add(permission);
 						}
-						authList.add(permission);
 					}
 				}
 			}
