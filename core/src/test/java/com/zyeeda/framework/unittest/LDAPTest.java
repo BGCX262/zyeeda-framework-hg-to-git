@@ -44,11 +44,11 @@ public class LDAPTest {
 		ctx.setRequestControls(new Control[] { new PagedResultsControl(
 				pageSize, Control.CRITICAL) });
 		String sortKey = "uid";
-	    ctx.setRequestControls(new Control[] {
-	             new SortControl(sortKey, Control.NONCRITICAL) });
+//	    ctx.setRequestControls(new Control[] {
+//	             new SortControl(sortKey, Control.NONCRITICAL) });
 	    System.out.println("------------" + ctx.getRequestControls());
 		// Perform the search
-		NamingEnumeration<SearchResult> results = ctx.search("", "(objectclass=*)",
+		NamingEnumeration<SearchResult> results = ctx.search("ou=变电检修试验部,o=广州局", "(objectclass=*)",
 				new SearchControls());
 
 		// Iterate over a batch of search results sent by the server
@@ -137,6 +137,25 @@ System.out.println(entry.getName());
 		ctx.bind(dn, null, attrs);
 	}
 	
+	public static void saveUserRefObject() throws NamingException {
+		LdapContext ctx = getLdapContext();
+		String dn = "username=y,uid=Test2,o=广州局";
+		Attributes attrs = new BasicAttributes();
+		
+		attrs.put("objectClass", "top");
+		attrs.put("objectClass", "person");
+		attrs.put("objectClass", "organizationalPerson");
+		attrs.put("objectClass", "inetOrgPerson");
+		attrs.put("objectClass", "userReferenceSystem");
+
+		attrs.put("cn", "Tes2");
+		attrs.put("sn", "Tes2");
+		attrs.put("username", "test");
+		attrs.put("password", DigestUtils.md5Hex("123456"));
+		attrs.put("systemName", "test");
+		ctx.bind(dn, null, attrs);
+	}
+	
 	public static void main(String[] args) throws NamingException, IOException {
 //		String root = "dc=ehv,dc=csg,dc=cn"; // root
 //
@@ -183,7 +202,8 @@ System.out.println(entry.getName());
 //		}
 //		System.exit(0);
 //		save();
-		sort();
+//		saveUserRefObject();
+		ldapPageView();
 	}
 
 }
