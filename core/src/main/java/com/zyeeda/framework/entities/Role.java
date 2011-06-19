@@ -1,5 +1,6 @@
 package com.zyeeda.framework.entities;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -108,6 +109,14 @@ public class Role extends SimpleDomainEntity {
 
 	public void setDeptementId(String deptementId) {
 		this.deptementId = deptementId;
+	}
+
+	@Transient
+	public List<String> getPermissionList() {
+		String permissions = this.getPermissions();
+		String[] permissionArray = StringUtils.split(permissions,
+				PERMISSION_SEPARATOR);
+		return CollectionUtils.asList(permissionArray);
 	}
 
 	/*

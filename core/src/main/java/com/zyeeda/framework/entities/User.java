@@ -102,7 +102,7 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.mobile = mobile;
 	}
 
-	@Temporal(TemporalType.TIME) @Column(name = "F_BIRTHDAY", length = 19)
+	@Temporal(TemporalType.TIMESTAMP) @Column(name = "F_BIRTHDAY", length = 19)
 	public Date getBirthday() {
 		return birthday;
 	}
@@ -111,7 +111,7 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.birthday = birthday;
 	}
 
-	@Temporal(TemporalType.TIME) @Column(name = "F_DATEOFWORK", length = 19)
+	@Temporal(TemporalType.TIMESTAMP) @Column(name = "F_DATEOFWORK", length = 19)
 	public Date getDateOfWork() {
 		return dateOfWork;
 	}
