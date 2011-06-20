@@ -2,9 +2,7 @@ package com.zyeeda.framework.ws;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -41,7 +39,7 @@ public class MenuService extends ResourceService {
 		MenuManager menuMgr = new DefaultMenuManager();
 		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
-		Set<String> rolesAuth = new HashSet<String>();
+		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);
@@ -49,7 +47,7 @@ public class MenuService extends ResourceService {
 		if(roles.size() > 1){
 			for(Role role:roles){
 				logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
-				for(String permission:role.getPermissionSet()){
+				for(String permission:role.getPermissionList()){
 					if(rolesAuth.size()>0){
 						for(String haveAuth:rolesAuth){
 							if(permission.equals(haveAuth)){
@@ -68,7 +66,7 @@ public class MenuService extends ResourceService {
 				
 			listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		} else if(roles.size() == 1){
-			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionSet());
+			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
 		}
 		return listMenu;
 	}

@@ -295,7 +295,9 @@ public class LdapUserManager implements UserManager {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
-		user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
+		if (attrs.get("userPassword").get() != null) {
+			user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
+		}
 		user.setPassword(user.getPassword().substring(5, user.getPassword().length()));
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());

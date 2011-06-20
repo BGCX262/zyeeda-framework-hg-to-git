@@ -24,7 +24,7 @@ public class SampleFlowResource {
 		
 		AbstractStatefulSessionCommand<String> command = new AbstractStatefulSessionCommand<String>() {
 			private static final long serialVersionUID = 803619017440949193L;
-
+ 
 			@Override
 			public String execute(StatefulKnowledgeSession ksession) {
 				//JPASessionMarshallingHelper helper = new JPASessionMarshallingHelper(ksession, null);
