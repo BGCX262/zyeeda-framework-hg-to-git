@@ -33,7 +33,7 @@ import com.zyeeda.framework.managers.internal.MongoDbDocumentManager;
 import com.zyeeda.framework.viewmodels.DocumentVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
-import static com.zyeeda.framework.ws.helpers.DocumentServiceHelper.document2Vo;
+import static com.zyeeda.framework.ws.DocumentServiceHelper.document2Vo;
 
 @Path("/docs")
 public class DocumentService extends ResourceService {
