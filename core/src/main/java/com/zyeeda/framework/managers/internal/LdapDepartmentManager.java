@@ -82,7 +82,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "";
-			if (StringUtils.isBlank(dn)) {
+			if ("root".equals(dn)) {
+				dn = "";
 				filter = "o=*";
 			} else {
 				filter = "ou=*";
@@ -95,7 +96,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 				Department department = marshal(attr);
 				department.setParent(dn);
 				department.setDeptFullPath(dn);
-				department.setParent(dn);
 				deptList.add(department);
 			}
 			

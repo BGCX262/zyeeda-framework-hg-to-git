@@ -19,8 +19,6 @@ public interface DocumentManager {
 	
 	public void replaceForeignId(String oldForeignId, String newForeignId);
 	
-	public List<Document> findByForeignId(String foreignId);
-	
 	
 	
 	
