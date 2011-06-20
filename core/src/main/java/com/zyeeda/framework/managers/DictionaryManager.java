@@ -5,4 +5,5 @@ import com.zyeeda.framework.entities.Dictionary;
 
 public interface DictionaryManager extends GenericDAO<Dictionary, String> {
 
+	public Dictionary getDictionaryByTypeAndName(String name);
 }

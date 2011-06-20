@@ -25,7 +25,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/menu")
 public class MenuService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
 		
 	public MenuService(@Context ServletContext ctx) {
 		super(ctx);
