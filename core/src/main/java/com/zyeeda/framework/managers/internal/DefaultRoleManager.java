@@ -21,12 +21,11 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 
 	public  List<Role> getRoleBySubject(String subject){
 		logger.debug("the value of the dept subject is = {}  ", subject);
-		//EntityManager session = (EntityManager)this.getPersistenceService().getCurrentSession();
 		TypedQuery<Role> query = this.em().createNamedQuery("getRolesBySubject", Role.class);
 		query.setParameter("subject", subject);
 		List<Role> roleList = query.getResultList();
-		logger.debug("the value of the dept subject size is = {}  ", roleList.size());
 		return roleList;
 	}
+
 	
 }

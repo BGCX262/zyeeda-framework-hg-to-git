@@ -1,6 +1,7 @@
 package com.zyeeda.framework.entities;
 
 import java.util.List;
+
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -9,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.FetchType;
 import javax.persistence.Column;
 import javax.persistence.Basic;
 import javax.persistence.JoinColumn;
@@ -53,8 +53,8 @@ public class Role extends SimpleDomainEntity {
 		this.subjects = subjects;
 	}
 
-	@Basic(fetch = FetchType.LAZY)
-	@Column(name = "F_PERMISSIONS", length = 4000)
+	@javax.persistence.Lob
+	@javax.persistence.Column(name = "F_PERMISSIONS")
 	public String getPermissions() {
 		return this.permissions;
 	}
@@ -63,13 +63,6 @@ public class Role extends SimpleDomainEntity {
 		this.permissions = permissions;
 	}
 
-	@Transient
-	public Set<String> getPermissionSet() {
-		String permissions = this.getPermissions();
-		String[] permissionArray = StringUtils.split(permissions,
-				PERMISSION_SEPARATOR);
-		return CollectionUtils.asSet(permissionArray);
-	}
 
 	@Basic
 	@Column(name = "F_SCOPE_TYPE")

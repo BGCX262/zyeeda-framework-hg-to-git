@@ -1,3 +1,11 @@
 ZUI.call(function(Z) {
-    new ZYEEDA.framework.zui.demo.AttachmentDemo().main(Z);
+    Z.cfg = {
+        uploader : {
+            totalCountUrl : '/drivebox/rest/docs/count',
+            uploadUrl : '/drivebox/rest/docs',
+            listUrl : '/drivebox/rest/docs'
+        }
+    };
+
+    ZYEEDA.com.zyeeda.zui.framework.demo.AttachmentDemo.main(Z);
 });

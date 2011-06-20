@@ -1,7 +1,11 @@
-package com.zyeeda.framework.ws.helpers;
+package com.zyeeda.framework.ws;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import com.zyeeda.framework.entities.Document;
 import com.zyeeda.framework.viewmodels.DocumentVo;
+import com.zyeeda.framework.viewmodels.DocumentsVo;
 
 public class DocumentServiceHelper {
 
@@ -20,6 +24,19 @@ public class DocumentServiceHelper {
 		vo.setViewUrl(String.format("/rest/docs/%s/view/%s", doc.getId(), doc.getName()));
 		
 		return vo;
+	}
+	
+	public static DocumentsVo documentList2Vo(List<Document> docs) {
+		DocumentsVo docsVo = new DocumentsVo();
+		docsVo.setTotalRecords(docs.size());
+		docsVo.setStartIndex(0);
+		
+		List<DocumentVo> docVos = new ArrayList<DocumentVo>(docs.size());
+		for (Document doc : docs) {
+			docVos.add(document2Vo(doc));
+		}
+		docsVo.setRecords(docVos);
+		return docsVo;
 	}
 	
 }

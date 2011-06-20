@@ -31,9 +31,11 @@ import com.zyeeda.framework.managers.DocumentException;
 import com.zyeeda.framework.managers.DocumentManager;
 import com.zyeeda.framework.managers.internal.MongoDbDocumentManager;
 import com.zyeeda.framework.viewmodels.DocumentVo;
+import com.zyeeda.framework.viewmodels.DocumentsVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
-import static com.zyeeda.framework.ws.helpers.DocumentServiceHelper.document2Vo;
+import static com.zyeeda.framework.ws.DocumentServiceHelper.document2Vo;
+import static com.zyeeda.framework.ws.DocumentServiceHelper.documentList2Vo;
 
 @Path("/docs")
 public class DocumentService extends ResourceService {
@@ -114,7 +116,7 @@ public class DocumentService extends ResourceService {
 			}
 		}
 	}
-
+	
 	@GET
 	@Path("/{id}/download/{fileName}")
 	@Produces("multipart/mixed")
@@ -200,6 +202,16 @@ public class DocumentService extends ResourceService {
 		logger.debug("foreign id = {}", foreignId);
 		DocumentManager docMgr = new MongoDbDocumentManager(this.getMongoDbService());
 		return docMgr.countByForeignId(foreignId);
+	}
+	
+	@GET
+	@Path("/")
+	@Produces(MediaType.APPLICATION_JSON)
+	public DocumentsVo listByForeignId(@QueryParam("foreignId") String foreignId) {
+		logger.debug("foreign id = {}", foreignId);
+		DocumentManager docMgr = new MongoDbDocumentManager(this.getMongoDbService());
+		List<Document> docs = docMgr.findByForeignId(foreignId);
+		return documentList2Vo(docs);
 	}
 	
 	/*@GET

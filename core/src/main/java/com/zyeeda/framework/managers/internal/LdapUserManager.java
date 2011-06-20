@@ -1,10 +1,10 @@
 package com.zyeeda.framework.managers.internal;
 
 import java.io.UnsupportedEncodingException;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -12,8 +12,8 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
-
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.realm.ldap.LdapUtils;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
@@ -30,10 +30,11 @@ public class LdapUserManager implements UserManager {
 
 	private LdapService ldapSvc;
 
-	public LdapUserManager(LdapService ldapSvc) {
-		this.ldapSvc = ldapSvc;
-	}
 
+	public LdapUserManager(LdapService ldapSvc) {
+		 this.ldapSvc = ldapSvc;
+	}
+	
 	@Override
 	public void persist(User user) throws UserPersistException {
 		try {
@@ -127,7 +128,7 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
-		}
+		} 
 	}
 
 	public void updatePassword(String id, String password) throws UserPersistException {

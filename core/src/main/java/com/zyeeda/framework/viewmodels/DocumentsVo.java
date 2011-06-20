@@ -6,47 +6,46 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "documentListView")
 public class DocumentsVo {
-
-	private int currentPage;
-	private int totalPage;
-	private int totalCount;
-	private String keyword;
-	private List<DocumentVo> docs;
 	
-	public int getCurrentPage() {
-		return currentPage;
-	}
-	public void setCurrentPage(int currentPage) {
-		this.currentPage = currentPage;
-	}
+	private int totalRecords;
+	private int startIndex;
+	private String sort;
+	private String dir;
+	private List<DocumentVo> records;
 	
-	public int getTotalPage() {
-		return totalPage;
+	public int getTotalRecords() {
+		return totalRecords;
 	}
-	public void setTotalPage(int totalPage) {
-		this.totalPage = totalPage;
+	public void setTotalRecords(int totalRecords) {
+		this.totalRecords = totalRecords;
 	}
 	
-	public int getTotalCount() {
-		return totalCount;
+	public int getStartIndex() {
+		return startIndex;
 	}
-	public void setTotalCount(int totalCount) {
-		this.totalCount = totalCount;
-	}
-	
-	public String getKeyword() {
-		return keyword;
-	}
-	public void setKeyword(String keyword) {
-		this.keyword = keyword;
+	public void setStartIndex(int startIndex) {
+		this.startIndex = startIndex;
 	}
 	
-	public List<DocumentVo> getDocs() {
-		return docs;
+	public String getSort() {
+		return sort;
 	}
-	public void setDocs(List<DocumentVo> docs) {
-		this.docs = docs;
+	public void setSort(String sort) {
+		this.sort = sort;
 	}
 	
+	public String getDir() {
+		return dir;
+	}
+	public void setDir(String dir) {
+		this.dir = dir;
+	}
+	
+	public List<DocumentVo> getRecords() {
+		return records;
+	}
+	public void setRecords(List<DocumentVo> records) {
+		this.records = records;
+	}
 	
 }
