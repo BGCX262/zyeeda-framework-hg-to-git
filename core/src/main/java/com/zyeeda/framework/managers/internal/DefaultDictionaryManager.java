@@ -1,5 +1,7 @@
 package com.zyeeda.framework.managers.internal;
 
+
+
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.managers.DictionaryManager;
 import com.zyeeda.framework.entities.Dictionary;
@@ -15,10 +17,9 @@ public class DefaultDictionaryManager extends DomainEntityManager<Dictionary, St
 	public Dictionary getDictionaryByTypeAndName(String name){
 		DictionaryManager dictMgr = new DefaultDictionaryManager(this.getPersistenceService());
 		Search search = new Search();
-		//search.addField(Filter.equal("type", "defectLevel"), Filter.notEqual("name", name));
 		search.addFilterEqual("type", "defectLevel");
 		search.addFilterEqual("name", name);
-		return dictMgr.searchUnique(search);
+		return  dictMgr.searchUnique(search);
 	}
 
 }
