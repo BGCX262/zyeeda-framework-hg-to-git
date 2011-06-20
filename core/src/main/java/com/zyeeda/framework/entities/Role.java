@@ -1,6 +1,7 @@
 package com.zyeeda.framework.entities;
 
 import java.util.List;
+
 import java.util.Set;
 
 import javax.persistence.Basic;

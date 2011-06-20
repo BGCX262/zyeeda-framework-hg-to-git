@@ -25,6 +25,8 @@ public interface DocumentManager {
 	
 	
 	
+	
+	
 	public int findNumber(String owner,String foreignId,String[] keyword) throws DocumentException;
 	
 	public int findNumber(String foreignId, String[] keyword) throws DocumentException;
