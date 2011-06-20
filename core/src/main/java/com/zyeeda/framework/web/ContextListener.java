@@ -19,16 +19,15 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.tapestry5.ioc.IOCUtilities;
 import org.apache.tapestry5.ioc.Registry;
 import org.apache.tapestry5.ioc.RegistryBuilder;
 import org.apache.tapestry5.ioc.def.ContributionDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.config.internal.ConfigurationServiceContributionDef;
 import com.zyeeda.framework.FrameworkConstants;
+import com.zyeeda.framework.config.internal.ConfigurationServiceContributionDef;
 import com.zyeeda.framework.ioc.CustomModuleDef;
 
 /**

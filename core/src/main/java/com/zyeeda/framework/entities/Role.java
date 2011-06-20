@@ -3,15 +3,15 @@ package com.zyeeda.framework.entities;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Basic;
-import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -108,14 +108,6 @@ public class Role extends SimpleDomainEntity {
 
 	public void setDeptementId(String deptementId) {
 		this.deptementId = deptementId;
-	}
-
-	@Transient
-	public List<String> getPermissionList() {
-		String permissions = this.getPermissions();
-		String[] permissionArray = StringUtils.split(permissions,
-				PERMISSION_SEPARATOR);
-		return CollectionUtils.asList(permissionArray);
 	}
 
 	/*
