@@ -105,6 +105,19 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 	}
 	
+	public Integer getChildrenCountById(String dn, String filter) throws UserPersistException {
+		List<Attributes> attrList = null;
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			attrList = ldapTemplate.getResultList(dn,
+												  filter,
+												  SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+			return attrList.size();
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
+	
 	public List<Department> findByName(String parent,
 									   String name) 
 								  throws UserPersistException {

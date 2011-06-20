@@ -84,6 +84,19 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		}
 	}
+	
+	public Integer getChildrenCountById(String id, String filter) throws UserPersistException {
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrsList = ldapTemplate.getResultList(id,
+															 		filter,
+															 		SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+		
+			return attrsList.size();
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
 
 	@Override
 	public List<User> findByDepartmentId(String id) throws UserPersistException {

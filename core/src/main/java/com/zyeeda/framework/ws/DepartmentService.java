@@ -57,10 +57,25 @@ public class DepartmentService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	@Produces("application/json")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+			 			 @PathParam("cascade") Boolean cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		deptMgr.remove(id);
+		LdapUserManager userManager = new LdapUserManager(ldapSvc);
+		if (cascade != null) {
+			deptMgr.remove(id);
+			return "{success: 'true'}";
+		} else {
+			Integer deptCount = deptMgr.getChildrenCountById(id, "(objectclass=*)");
+			Integer userCount = userManager.getChildrenCountById(id, "(objectclass=*)");
+			if (userCount > 0 || deptCount > 0) {
+				return "{success: 'false'}";
+			} else {
+				deptMgr.remove(id);
+				return "{success: 'true'}";
+			}
+		}
 	}
 	
 	@PUT

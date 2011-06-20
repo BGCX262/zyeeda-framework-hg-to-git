@@ -61,10 +61,23 @@ public class UserService extends ResourceService {
 	
 	@DELETE
 	@Path("/{id}")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+						 @PathParam("cascade") Boolean cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		userMgr.remove(id);
+		if (cascade != null) {
+			userMgr.remove(id);
+			return "{success: 'true'}";
+		} else {
+			Integer count = userMgr.getChildrenCountById(id, "(objectclass=*)");
+			if (count > 0) {
+				return "{success: 'false'}";
+			} else {
+				userMgr.remove(id);
+				return "{success: 'true'}";
+			}
+		}
 	}
 	
 	@PUT
