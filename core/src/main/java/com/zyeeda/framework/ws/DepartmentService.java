@@ -286,8 +286,7 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		
-		deptVo.setIo("/rest/depts/" + dept.getId() + "/children/" + roleId );
+		deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children/" + roleId );
 		deptVo.setKind("dept");
 		
 		return deptVo;
