@@ -99,7 +99,11 @@ public class LdapUserManager implements UserManager {
 			userList = new ArrayList<User>(attrsList.size());
 			for (Attributes attrs : attrsList) {
 				User user = LdapUserManager.marshal(attrs);
-				user.setDeptFullPath("uid=" + user.getId() + "," + id);
+				if (StringUtils.isNotBlank(id)) {
+					user.setDeptFullPath("uid=" + user.getId() + "," + id);
+				} else {
+					user.setDeptFullPath("uid=" + user.getId());
+				}
 				userList.add(user);
 			}
 			return userList;
