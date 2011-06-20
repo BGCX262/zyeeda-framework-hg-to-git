@@ -72,10 +72,10 @@ public class UserService extends ResourceService {
 		} else {
 			Integer count = userMgr.getChildrenCountById(id, "(objectclass=*)");
 			if (count > 0) {
-				return "{success: 'false'}";
+				return "{\"success\": \"false\"}";
 			} else {
 				userMgr.remove(id);
-				return "{success: 'true'}";
+				return "{\"success\": \"true\"}";
 			}
 		}
 	}

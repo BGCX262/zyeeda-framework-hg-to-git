@@ -65,15 +65,15 @@ public class DepartmentService extends ResourceService {
 		LdapUserManager userManager = new LdapUserManager(ldapSvc);
 		if (cascade != null) {
 			deptMgr.remove(id);
-			return "{success: 'true'}";
+			return "{\"success\": \"true\"}";
 		} else {
 			Integer deptCount = deptMgr.getChildrenCountById(id, "(objectclass=*)");
 			Integer userCount = userManager.getChildrenCountById(id, "(objectclass=*)");
 			if (userCount > 0 || deptCount > 0) {
-				return "{success: 'false'}";
+				return "{\"success\": \"false\"}";
 			} else {
 				deptMgr.remove(id);
-				return "{success: 'true'}";
+				return "{\"success\": \"true\"}";
 			}
 		}
 	}
