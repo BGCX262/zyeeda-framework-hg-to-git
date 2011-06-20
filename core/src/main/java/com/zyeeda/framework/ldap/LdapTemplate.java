@@ -311,7 +311,7 @@ public class LdapTemplate{
 	@SuppressWarnings("rawtypes")
 	public void deleteRecursively(LdapContext entry) 
     								throws NamingException {
-		NamingEnumeration ne = entry.listBindings("");
+		NamingEnumeration<Binding> ne = entry.listBindings("");
 		while (ne.hasMore()) {
 		    Binding b = (Binding) ne.next();
 		    if (b.getObject() instanceof LdapContext) {

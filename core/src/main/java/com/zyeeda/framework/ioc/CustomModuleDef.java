@@ -17,8 +17,8 @@ public class CustomModuleDef implements ModuleDef {
 		this.defs = CollectionUtils.asSet(defs);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	@SuppressWarnings("rawtypes")
 	public Class getBuilderClass() {
 		return null;
 	}

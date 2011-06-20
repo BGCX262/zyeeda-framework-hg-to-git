@@ -82,7 +82,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "";
-			if (StringUtils.isBlank(dn)) {
+			System.out.println("dn--------------" + dn);
+			if ("root".equals(dn)) {
+				dn = "";
 				filter = "o=*";
 			} else {
 				filter = "ou=*";

@@ -28,7 +28,6 @@ public class AuthService extends ResourceService {
 		super(ctx);
 	}
 
-	// final private String path="src/a.xml";
 	@GET
 	@Path("/{id}/{role_id}")
 	@Produces("application/json")
