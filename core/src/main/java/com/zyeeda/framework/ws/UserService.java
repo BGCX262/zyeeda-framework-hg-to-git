@@ -267,17 +267,25 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/accounts/{id}")
 	@Produces("application/json")
-	public Account updateAccounts(@FormParam("userList") String userListJson, @PathParam("id") String id) throws UserPersistException{
-//		LdapService ldapSvc = this.getLdapService();
-//		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+	public List<Account> updateAccounts(@FormParam("userList") String userListJson, @PathParam("id") String id) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 		ObjectMapper mapper = new ObjectMapper();
 		List<Account> userList = null;
 		try {
-			 userList = mapper.readValue(userListJson,
+			userList = mapper.readValue(userListJson,
 					new TypeReference<List<Account>>() {
-			});
-			 
-			logger.debug("UserList size is {}", userList.size());
+					});
+			for (Account account : userList) {
+//				account.setUserFullPath(id);
+				Account newAccount = objAccountManager.findByUserIdAndSystemName(id, account.getSystemName());
+				newAccount.setUserName(account.getUserName());
+				newAccount.setPassword(account.getPassword());
+				newAccount.setVisible(account.getVisible());
+				newAccount.setUserFullPath(id);
+				objAccountManager.update(newAccount);
+			}
+//			logger.debug("UserList size is {}", userList.size());
 		} catch (JsonParseException e) {
 			logger.error(e.getMessage(), e);
 		} catch (JsonMappingException e) {
@@ -285,7 +293,19 @@ public class UserService extends ResourceService {
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 		}
-		return null;
+		return userList;
+	}
+	//findByUserIdAndSystemName
+	@GET
+	@Path("/accounts/{id}")
+	@Produces("application/json")
+	public AccountVo getAccounts(@PathParam("id") String id) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		List<Account> list = objAccountManager.findByUserId(id);
+		AccountVo avo = new AccountVo();
+		avo.setAccounts(list);
+		return avo;
 	}
 	
 	/*
@@ -305,17 +325,6 @@ public class UserService extends ResourceService {
 		}
 	}
 	*/
-	@GET
-	@Path("/accounts/{id}")
-	@Produces("application/json")
-	public AccountVo getAccounts(@PathParam("id") String id) throws UserPersistException{
-		LdapService ldapSvc = this.getLdapService();
-		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
-		List<Account> list = objAccountManager.findByUserId(id);
-		AccountVo avo = new AccountVo();
-		avo.setAccounts(list);
-		return avo;
-	}
 
 //	public static void judgeConfigureSystem(){
 //		

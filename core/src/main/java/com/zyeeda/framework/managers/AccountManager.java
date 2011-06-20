@@ -25,4 +25,6 @@ public interface AccountManager {
     public Account findByUserIdAndSystemName(String userId, String systemName) throws UserPersistException;
 
     public void update(Account account) throws UserPersistException;
+    
+    public void remove(String systemName) throws UserPersistException;
 }

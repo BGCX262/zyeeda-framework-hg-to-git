@@ -9,6 +9,7 @@ import java.util.List;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
@@ -59,9 +60,11 @@ public class SystemAccountManager implements AccountManager {
 
 	public Account findByUserIdAndSystemName(String userId, String systemName)
 			throws UserPersistException {
-		String fullDN = "uid=" + userId + DEFAULT_DN_PREFIX;
-		String filter = "systemName=" + systemName;
+		String fullDN = userId;// + DEFAULT_DN_PREFIX;
+		String filter = "(systemName=" + systemName + ")";
 
+		logger.debug("find by user id and sys name's full dn = {}", fullDN);
+		logger.debug("filter = {}", filter);
 		List<Account> accounts = this.getAccountsByDNAndFilter(fullDN, filter);
 
 		if (accounts != null && accounts.size() > 0) {
@@ -73,16 +76,22 @@ public class SystemAccountManager implements AccountManager {
 
 	public void update(Account account) throws UserPersistException {
 		LdapContext context = null;
-
 		try {
 			context = this.getLdapContext();
 			Attributes attributes = AccountHelper
 					.convertAccountToAttributes(account);
-			context.bind(account.getUserFullPath(), null, attributes);
+			String dn = "username=" + account.getUserName() + ","
+					+ account.getUserFullPath();
+			NamingEnumeration<SearchResult> ne = context.search(account.getUserFullPath(),
+						   "username=" + account.getUserName(),
+						   SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+			if (ne.hasMore()) {
+				context.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
+			} else {
+				context.bind(dn, null, attributes);
+			}
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
-		} finally {
-			LdapUtils.closeContext(context);
 		}
 	}
 
@@ -114,5 +123,11 @@ public class SystemAccountManager implements AccountManager {
 		} finally {
 			LdapUtils.closeContext(context);
 		}
+	}
+
+	@Override
+	public void remove(String systemName) throws UserPersistException {
+		// TODO Auto-generated method stub
+		
 	}
 }
