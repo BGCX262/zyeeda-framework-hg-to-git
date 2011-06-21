@@ -277,13 +277,9 @@ public class UserService extends ResourceService {
 					new TypeReference<List<Account>>() {
 					});
 			for (Account account : userList) {
-//				account.setUserFullPath(id);
-				Account newAccount = objAccountManager.findByUserIdAndSystemName(id, account.getSystemName());
-				newAccount.setUserName(account.getUserName());
-				newAccount.setPassword(account.getPassword());
-				newAccount.setVisible(account.getVisible());
-				newAccount.setUserFullPath(id);
-				objAccountManager.update(newAccount);
+				account.setUserFullPath(id);
+				objAccountManager.remove(account.getSystemName());
+				objAccountManager.update(account);
 			}
 //			logger.debug("UserList size is {}", userList.size());
 		} catch (JsonParseException e) {
@@ -295,7 +291,19 @@ public class UserService extends ResourceService {
 		}
 		return userList;
 	}
-	//findByUserIdAndSystemName
+//	objAccountManager.remove(account.getSystemName());
+//	Account newAccount = objAccountManager.findByUserIdAndSystemName(id, account.getSystemName());
+//	newAccount.setUserName(account.getUserName());
+//	newAccount.setPassword(account.getPassword());
+//	newAccount.setVisible(account.getVisible());
+//	objAccountManager.update(newAccount);
+//	account.setUserFullPath(id);
+//	objAccountManager.remove(account.getSystemName());//.findByUserIdAndSystemName(id, account.getSystemName());
+////	newAccount.setUserName(account.getUserName());
+////	newAccount.setPassword(account.getPassword());
+////	newAccount.setVisible(account.getVisible());
+////	newAccount.setUserFullPath(id);
+
 	@GET
 	@Path("/accounts/{id}")
 	@Produces("application/json")
@@ -307,6 +315,12 @@ public class UserService extends ResourceService {
 		avo.setAccounts(list);
 		return avo;
 	}
+	
+//	public void removeSysConfigure(String systemName) throws UserPersistException{
+//		LdapService ldapSvc = this.getLdapService();
+//		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+//		objAccountManager.remove(systemName);
+//	}
 	
 	/*
 	@POST
@@ -325,15 +339,4 @@ public class UserService extends ResourceService {
 		}
 	}
 	*/
-
-//	public static void judgeConfigureSystem(){
-//		
-//	}
-	
-//	public static void mockSignIn(@FormParam("") Account objAccount){
-//		objAccount = new Account();
-//		if(objAccount != null){
-//			
-//		}
-//	}
 }

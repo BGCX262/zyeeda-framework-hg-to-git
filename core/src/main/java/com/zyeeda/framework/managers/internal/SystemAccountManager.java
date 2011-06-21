@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.LdapTemplate;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.UserPersistException;
@@ -78,10 +79,8 @@ public class SystemAccountManager implements AccountManager {
 		LdapContext context = null;
 		try {
 			context = this.getLdapContext();
-			Attributes attributes = AccountHelper
-					.convertAccountToAttributes(account);
-			String dn = "username=" + account.getUserName() + ","
-					+ account.getUserFullPath();
+			Attributes attributes = AccountHelper.convertAccountToAttributes(account);
+			String dn = "username=" + account.getUserName() + "," + account.getUserFullPath();
 			NamingEnumeration<SearchResult> ne = context.search(account.getUserFullPath(),
 						   "username=" + account.getUserName(),
 						   SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
@@ -125,9 +124,19 @@ public class SystemAccountManager implements AccountManager {
 		}
 	}
 
-	@Override
+	/*
+	 * Delete a context by systemName
+	 */
 	public void remove(String systemName) throws UserPersistException {
-		// TODO Auto-generated method stub
-		
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate.unbind(systemName, false);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}	
+	
+	private LdapTemplate getLdapTemplate() throws NamingException {
+		return new LdapTemplate(this.ldapSvc.getLdapContext());
 	}
 }
