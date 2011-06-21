@@ -1,5 +1,8 @@
 package com.zyeeda.framework.ws;
 
+import static com.zyeeda.framework.ws.DocumentServiceHelper.document2Vo;
+import static com.zyeeda.framework.ws.DocumentServiceHelper.documentList2Vo;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLConnection;
@@ -18,6 +21,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -33,9 +37,6 @@ import com.zyeeda.framework.managers.internal.MongoDbDocumentManager;
 import com.zyeeda.framework.viewmodels.DocumentVo;
 import com.zyeeda.framework.viewmodels.DocumentsVo;
 import com.zyeeda.framework.ws.base.ResourceService;
-
-import static com.zyeeda.framework.ws.DocumentServiceHelper.document2Vo;
-import static com.zyeeda.framework.ws.DocumentServiceHelper.documentList2Vo;
 
 @Path("/docs")
 public class DocumentService extends ResourceService {
@@ -55,13 +56,14 @@ public class DocumentService extends ResourceService {
 	@Path("/")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces("text/json")
-	public DocumentVo upload(MultipartBody body, @QueryParam("foreignId") String foreignId) throws DocumentException {
+	public DocumentVo upload(MultipartBody body, @QueryParam("foreignId") String foreignId, @Context UriInfo ui) throws DocumentException {
 		
 		logger.debug("foreign id = {}", foreignId);
 
 		DocumentManager docMgr = new MongoDbDocumentManager(this.getMongoDbService());
 
 		Document doc = new Document();
+		doc.setTemp(true);
 		
 		String currentUser = this.getSecurityService().getCurrentUser();
 		doc.setOwner(currentUser); // 拥有人
@@ -207,7 +209,7 @@ public class DocumentService extends ResourceService {
 	@GET
 	@Path("/")
 	@Produces(MediaType.APPLICATION_JSON)
-	public DocumentsVo listByForeignId(@QueryParam("foreignId") String foreignId) {
+	public DocumentsVo listByForeignId(@QueryParam("foreignId") String foreignId, @Context UriInfo ui) {
 		logger.debug("foreign id = {}", foreignId);
 		DocumentManager docMgr = new MongoDbDocumentManager(this.getMongoDbService());
 		List<Document> docs = docMgr.findByForeignId(foreignId);
@@ -309,7 +311,6 @@ public class DocumentService extends ResourceService {
 
 	
 
-	// TODO
 	// 如果没有ID给出提示
 	@DELETE
 	@Path("/allRemove")

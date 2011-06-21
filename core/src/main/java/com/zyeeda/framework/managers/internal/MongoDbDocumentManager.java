@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
@@ -110,7 +111,9 @@ public class MongoDbDocumentManager implements DocumentManager {
 		DBObject query = new BasicDBObject();
 		query.put("foreignId", oldForeignId);
 		DBObject update = new BasicDBObject(
-				"$set", new BasicDBObject("foreignId", newForeignId));
+				"$set", new BasicDBObjectBuilder()
+				.add("foreignId", newForeignId)
+				.add("isTemp", false).get());
 		
 		DBCollection collection = this.getFilesCollection();
 		collection.updateMulti(query, update);
@@ -129,6 +132,14 @@ public class MongoDbDocumentManager implements DocumentManager {
 		}
 		
 		return docs;
+	}
+	
+	@Override
+	public void cleanTemp() {
+		DBObject query = new BasicDBObject();
+		query.put("isTemp", true);
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		fs.remove(query);
 	}
 	
 	

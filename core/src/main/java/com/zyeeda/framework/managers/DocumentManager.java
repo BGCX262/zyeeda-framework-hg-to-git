@@ -21,6 +21,8 @@ public interface DocumentManager {
 	
 	public List<Document> findByForeignId(String foreignId);
 	
+	public void cleanTemp();
+	
 	
 	
 	
