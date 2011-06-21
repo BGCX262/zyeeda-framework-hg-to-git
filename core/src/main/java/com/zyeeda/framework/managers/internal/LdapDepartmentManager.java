@@ -34,7 +34,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
-		
 	}
 	
 	@Override
@@ -45,7 +44,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
-		
 	}
 	
 	@Override
@@ -128,6 +126,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 	}
 	
+	
+	
 	@Override
 	public List<Department> findByName(String name) throws UserPersistException {
 		return this.findByName("", name);
@@ -166,6 +166,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());
 	}
+	
+	
+	
 	
 	/*
 	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)

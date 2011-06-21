@@ -270,7 +270,7 @@ public class DepartmentService extends ResourceService {
 		
 		for (UserVo userVo: userVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
-			orgNodeVo.setId(userVo.getId());
+			orgNodeVo.setId(userVo.getCheckName());
 			orgNodeVo.setCheckName(userVo.getCheckName());
 			orgNodeVo.setIo(userVo.getId());
 			for(String id:userId){
@@ -290,13 +290,22 @@ public class DepartmentService extends ResourceService {
 	
 	public static DepartmentVo fillDepartmentPropertiesToVoByRole(Department dept, String roleId) {
 		DepartmentVo deptVo = new DepartmentVo();
-		
+
 		deptVo.setId(dept.getId());
 		deptVo.setType("io");
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children/" + roleId );
+		if (StringUtils.isBlank(dept.getParent())) {
+			deptVo.setDeptFullPath("o=" + dept.getId());
+		} else {
+			deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
+		}
+		if (StringUtils.isBlank(deptVo.getDeptFullPath())) {
+			deptVo.setIo("/rest/depts/root/children");
+		} else {
+			deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children/"+roleId);
+		}
 		deptVo.setKind("dept");
 		
 		return deptVo;
@@ -315,5 +324,12 @@ public class DepartmentService extends ResourceService {
 		}
 		return deptVoList;
 	}
+	
+//	
+//	@GET
+//	@Path("/{id}/P")
+//	@Produces("application/json")
+	
+	
 	
 }

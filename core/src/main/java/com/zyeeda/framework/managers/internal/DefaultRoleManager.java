@@ -1,4 +1,5 @@
 package com.zyeeda.framework.managers.internal;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.TypedQuery;
@@ -25,6 +26,15 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		query.setParameter("subject", subject);
 		List<Role> roleList = query.getResultList();
 		return roleList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Role> getRoleDistinct(String hql){
+		List<Role> list = new ArrayList<Role>();
+		TypedQuery<Role> createNativeQuery = (TypedQuery<Role>) this.em().createNativeQuery(hql, Role.class);
+		TypedQuery<Role> query = createNativeQuery;
+		 list = query.getResultList();
+		return list;
 	}
 
 	

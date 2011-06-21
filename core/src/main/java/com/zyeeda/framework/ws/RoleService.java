@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -55,8 +56,10 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		String hql = "select distinct r.F_DEPTEMENT_ID, r.F_DEPTEPMENT from sys_role r";
+		List<Role> list = roleMgr.getRoleDistinct(hql);
 		logger.debug("this get all roles is success!");
-		return roleMgr.findAll();
+		return list;
 	}
 	
 	@DELETE

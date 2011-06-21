@@ -40,7 +40,7 @@ public class Role extends SimpleDomainEntity {
 	private String scopeType;
 	private String scopeId;
 	private String deptepment;
-	private String deptementId;
+	
 
 	@ElementCollection
 	@CollectionTable(name = "SYS_SUBJECT", joinColumns = @JoinColumn(name = "F_ROLE_ID"))
@@ -101,15 +101,6 @@ public class Role extends SimpleDomainEntity {
 		this.deptepment = deptepment;
 	}
 
-	@Basic
-	@Column(name = "F_DEPTEMENT_ID")
-	public String getDeptementId() {
-		return deptementId;
-	}
-
-	public void setDeptementId(String deptementId) {
-		this.deptementId = deptementId;
-	}
 
 	/*
 	 * @Basic
