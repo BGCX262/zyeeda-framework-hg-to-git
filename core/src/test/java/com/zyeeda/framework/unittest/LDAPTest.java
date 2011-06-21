@@ -50,8 +50,10 @@ public class LDAPTest {
 //	    ctx.setRequestControls(new Control[] {
 //	             new SortControl(sortKey, Control.NONCRITICAL) });
 		// Perform the search
+		SearchControls sc = new SearchControls();
+		sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
 		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=Test5)",
-				new SearchControls());
+				sc);
 System.out.println(LdapEncryptUtils.md5Encode(DigestUtils.md5Hex("123456")));
 		// Iterate over a batch of search results sent by the server
 		while (results != null && results.hasMore()) {
@@ -210,7 +212,6 @@ System.out.println(LdapEncryptUtils.md5Encode(DigestUtils.md5Hex("123456")));
 //		save();
 		ldapPageView();
 		//{SSHA}p/di1QhaV/9Npn7umA+cGZkrBAmgKedkwtLqlQ==
-		System.out.println(DigestUtils.sha("123456"));
 	}
 
 }
