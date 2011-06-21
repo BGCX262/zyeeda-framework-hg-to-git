@@ -56,7 +56,7 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String hql = "select distinct r.F_DEPTEMENT_ID, r.F_DEPTEPMENT from sys_role r";
+		String hql = "select distinct r.deptepment, r.deptepmentId from sys_role r";
 		List<Role> list = roleMgr.getRoleDistinct(hql);
 		logger.debug("this get all roles is success!");
 		return list;
