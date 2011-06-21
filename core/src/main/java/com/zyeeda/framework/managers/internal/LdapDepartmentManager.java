@@ -82,7 +82,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "";
-			if (StringUtils.isBlank(dn)) {
+			if ("root".equals(dn)) {
+				dn = "";
 				filter = "o=*";
 			} else {
 				filter = "ou=*";
@@ -95,11 +96,23 @@ public class LdapDepartmentManager implements DepartmentManager {
 				Department department = marshal(attr);
 				department.setParent(dn);
 				department.setDeptFullPath(dn);
-				department.setParent(dn);
 				deptList.add(department);
 			}
 			
 			return deptList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
+	
+	public Integer getChildrenCountById(String dn, String filter) throws UserPersistException {
+		List<Attributes> attrList = null;
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			attrList = ldapTemplate.getResultList(dn,
+												  filter,
+												  SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+			return attrList.size();
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
@@ -165,6 +178,54 @@ public class LdapDepartmentManager implements DepartmentManager {
 	
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());
+	}
+
+	@Override
+	public List<Department> getRootAndSecondLevelDepartment()
+												throws UserPersistException {
+		List<Department> deptList = null;
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrsList = ldapTemplate.getResultList("",
+									   								"(o=广州局)",
+									   								SearchControlsFactory.getDefaultSearchControls());
+			
+			attrsList.addAll(ldapTemplate.getResultList("o=广州局",
+									   					"(ou=*)",
+									   					SearchControlsFactory.getDefaultSearchControls()));
+			deptList = new ArrayList<Department>(attrsList.size());
+			for (Attributes attrs : attrsList) {
+				Department dept = LdapDepartmentManager.marshal(attrs);
+				deptList.add(dept);
+			}
+			return deptList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
+
+	@Override
+	public List<Department> getDepartmentListByUserId(String userId)
+										throws UserPersistException {
+		List<Department> deptList = null;
+		try {
+			
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String deptFullPath = StringUtils.substring(userId,
+												 userId.indexOf(",") + 1,
+												 userId.length());
+			List<Attributes> attrsList = ldapTemplate.getResultList(deptFullPath,
+									   							   "(|(o=*)(ou=*))",
+									   							   SearchControlsFactory.getDefaultSearchControls());
+			deptList = new ArrayList<Department>(attrsList.size());
+			for (Attributes attrs : attrsList) {
+				Department dept = LdapDepartmentManager.marshal(attrs);
+				deptList.add(dept);
+			}
+			return deptList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
 	}
 	
 	/*

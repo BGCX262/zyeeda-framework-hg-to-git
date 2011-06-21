@@ -1,10 +1,10 @@
 package com.zyeeda.framework.managers.internal;
 
 import java.io.UnsupportedEncodingException;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -12,8 +12,8 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.realm.ldap.LdapUtils;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
@@ -30,11 +30,10 @@ public class LdapUserManager implements UserManager {
 
 	private LdapService ldapSvc;
 
-
 	public LdapUserManager(LdapService ldapSvc) {
-		 this.ldapSvc = ldapSvc;
+		this.ldapSvc = ldapSvc;
 	}
-	
+
 	@Override
 	public void persist(User user) throws UserPersistException {
 		try {
@@ -85,6 +84,19 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		}
 	}
+	
+	public Integer getChildrenCountById(String id, String filter) throws UserPersistException {
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrsList = ldapTemplate.getResultList(id,
+															 		filter,
+															 		SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+		
+			return attrsList.size();
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
 
 	@Override
 	public List<User> findByDepartmentId(String id) throws UserPersistException {
@@ -97,7 +109,11 @@ public class LdapUserManager implements UserManager {
 			userList = new ArrayList<User>(attrsList.size());
 			for (Attributes attrs : attrsList) {
 				User user = LdapUserManager.marshal(attrs);
-				user.setDeptFullPath("uid=" + user.getId() + "," + id);
+				if (StringUtils.isNotBlank(id)) {
+					user.setDeptFullPath("uid=" + user.getId() + "," + id);
+				} else {
+					user.setDeptFullPath("uid=" + user.getId());
+				}
 				userList.add(user);
 			}
 			return userList;
@@ -128,7 +144,7 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
-		} 
+		}
 	}
 
 	public void updatePassword(String id, String password) throws UserPersistException {
@@ -236,7 +252,7 @@ public class LdapUserManager implements UserManager {
 //        return bytes;
 //	}
 	
-	private static Attributes unmarshal(User user) throws UnsupportedEncodingException {
+	public static Attributes unmarshal(User user) throws UnsupportedEncodingException {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");
@@ -291,13 +307,11 @@ public class LdapUserManager implements UserManager {
 		return attrs;
 	}
 	
-	private static User marshal(Attributes attrs) throws NamingException,
+	public static User marshal(Attributes attrs) throws NamingException,
 														 ParseException {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
-		user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
-		user.setPassword(user.getPassword().substring(5, user.getPassword().length()));
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());
 		}

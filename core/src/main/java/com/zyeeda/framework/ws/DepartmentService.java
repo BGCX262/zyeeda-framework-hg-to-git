@@ -1,9 +1,7 @@
 package com.zyeeda.framework.ws;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -20,11 +18,8 @@ import javax.ws.rs.core.Context;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
-import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.UserPersistException;
-import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.DepartmentVo;
@@ -62,10 +57,25 @@ public class DepartmentService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	@Produces("application/json")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+			 			 @FormParam("cascade") String cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		deptMgr.remove(id);
+		LdapUserManager userManager = new LdapUserManager(ldapSvc);
+		if (cascade != null) {
+			deptMgr.remove(id);
+			return "{\"success\": \"true\"}";
+		} else {
+			Integer deptCount = deptMgr.getChildrenCountById(id, "(objectclass=*)");
+			Integer userCount = userManager.getChildrenCountById(id, "(objectclass=*)");
+			if (userCount > 0 || deptCount > 0) {
+				return "{\"success\": \"false\"}";
+			} else {
+				deptMgr.remove(id);
+				return "{\"success\": \"true\"}";
+			}
+		}
 	}
 	
 	@PUT
@@ -178,8 +188,16 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
-		deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children");
+		if (StringUtils.isBlank(dept.getParent())) {
+			deptVo.setDeptFullPath("o=" + dept.getId());
+		} else {
+			deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
+		}
+		if (StringUtils.isBlank(deptVo.getDeptFullPath())) {
+			deptVo.setIo("/rest/depts/root/children");
+		} else {
+			deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children");
+		}
 		deptVo.setKind("dept");
 		
 		return deptVo;
@@ -207,103 +225,30 @@ public class DepartmentService extends ResourceService {
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;
-	}	
-	
-	
+	}
 	
 	@GET
-	@Path("/{id}/children/{roleId}")
+	@PathParam("root_and_second_level_dept")
 	@Produces("application/json")
-	public List<OrganizationNodeVo> getChildrenNodesByDepartmentIdAndRoleId(@Context HttpServletRequest request, 
-																			@PathParam("id") String id,
-																			@PathParam("roleId") String roleId)
-																	   throws UserPersistException {
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
-		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		Role role = roleMgr.find(id);
-		Set<String> roleByUser = new HashSet<String>();
-		if(role != null) {
-			roleByUser = role.getSubjects();
-		}
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<DepartmentVo> deptVoList = null;
-		List<UserVo> userVoList = null;
-		String type = request.getParameter("type");
+		deptList = deptMgr.getRootAndSecondLevelDepartment();
 		
-		if (StringUtils.isNotBlank(type) && "task".equals(type)) {
-			deptVoList = DepartmentService.fillDepartmentListPropertiesToVoByRoleId(deptMgr.getChildrenById(id), type, roleId);
-		} else {
-			deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id));
-		}
-		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
-		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVoCheckUser(deptVoList, userVoList, roleByUser);
-		
-		return orgList;
+		return deptList;
 	}
 	
-	private List<OrganizationNodeVo> mergeDepartmentVoAndUserVoCheckUser(List<DepartmentVo> deptVoList, 
-																		 List<UserVo> userVoList,
-																		 Set<String> userId) {
-		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
-		for (DepartmentVo deptVo: deptVoList) {
-			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
-			orgNodeVo.setId(deptVo.getId());
-			orgNodeVo.setCheckName(deptVo.getCheckName());
-			orgNodeVo.setIo(deptVo.getIo());
-			orgNodeVo.setLabel(deptVo.getLabel());
-			orgNodeVo.setType(deptVo.getType());
-			orgNodeVo.setFullPath(deptVo.getId());
-			orgNodeVo.setKind(deptVo.getKind());		
-			orgNodeVoList.add(orgNodeVo);
-		}
+	@GET
+	@Path("eliminating_team/{id}")
+	@Produces("application/json")
+	public List<Department> getDepartmentListByUserId(@PathParam("id") String userId) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getDepartmentListByUserId(userId);
 		
-		for (UserVo userVo: userVoList) {
-			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
-			orgNodeVo.setId(userVo.getId());
-			orgNodeVo.setCheckName(userVo.getCheckName());
-			orgNodeVo.setIo(userVo.getId());
-			for(String id:userId){
-				if(id.equals(userVo.getId())){
-					orgNodeVo.setCheckedAuth(true);
-				}
-			}
-			orgNodeVo.setLabel(userVo.getLabel());
-			orgNodeVo.setType("task");
-			orgNodeVo.setLeaf(userVo.isLeaf());
-			orgNodeVo.setFullPath("uid=" + userVo.getId() + "," + userVo.getDeptFullPath());
-			orgNodeVo.setKind(userVo.getKind());			
-			orgNodeVoList.add(orgNodeVo);
-		}
-		return orgNodeVoList;
+		return deptList;
 	}
 	
-	public static DepartmentVo fillDepartmentPropertiesToVoByRole(Department dept, String roleId) {
-		DepartmentVo deptVo = new DepartmentVo();
-		
-		deptVo.setId(dept.getId());
-		deptVo.setType("io");
-		deptVo.setLabel(dept.getName());
-		deptVo.setCheckName(dept.getId());
-		deptVo.setLeaf(false);
-		
-		deptVo.setIo("/rest/depts/" + dept.getId() + "/children/" + roleId );
-		deptVo.setKind("dept");
-		
-		return deptVo;
-	}
-	
-	public static List<DepartmentVo> fillDepartmentListPropertiesToVoByRoleId(List<Department> deptList,
-																			  String type,
-																			  String roleId) {
-		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
-		DepartmentVo deptVo = null;
-		for (Department dept : deptList) {
-			deptVo = DepartmentService.fillDepartmentPropertiesToVoByRole(dept, roleId);
-			deptVo.setIo(deptVo.getIo() + "?type=task");
-			deptVo.setType(type);
-			deptVoList.add(deptVo);
-		}
-		return deptVoList;
-	}
 }

@@ -254,11 +254,9 @@ public class RoleService extends ResourceService{
 		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
 		for(Role role : roleList){
 			for(String user:role.getSubjects()){
-				
 				UserNameVo userVo = new UserNameVo();
 				userVo.setUserName(user);
 				roleWithUserVo.getUserName().add(userVo);
-				
 			}
 			//subjectList.addAll(role.getSubjects());
 		}

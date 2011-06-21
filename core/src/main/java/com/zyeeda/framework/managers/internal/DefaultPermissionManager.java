@@ -118,16 +118,16 @@ public class DefaultPermissionManager implements PermissionManager {
 				if (StringUtils.isNotBlank(auth) && auth != null) {
 					Node node = (Node) exp.evaluate(src, XPathConstants.NODE);
 					Element elementNode = (Element) node;
-					Element elementParent = (Element) elementNode
-							.getParentNode();
+					Element elementParent = null;
 					if (elementNode != null) {
+						elementParent = (Element) elementNode.getParentNode();
 						permission.setId(elementParent.getAttribute("id"));
 						permission.setName(elementParent.getAttribute("name"));
 						permission.setValue(elementParent.getAttribute("value"));
 						permission.setOrderBy(elementParent.getAttribute("order"));
-					}
-					if (StringUtils.isBlank(elementParent.getAttribute("value"))) {
-						permission = null;
+						if (StringUtils.isBlank(elementParent.getAttribute("value"))) {
+							permission = null;
+						}
 					}
 				} else {
 					permission = null;
