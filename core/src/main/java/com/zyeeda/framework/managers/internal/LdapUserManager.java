@@ -252,7 +252,7 @@ public class LdapUserManager implements UserManager {
 //        return bytes;
 //	}
 	
-	private static Attributes unmarshal(User user) throws UnsupportedEncodingException {
+	public static Attributes unmarshal(User user) throws UnsupportedEncodingException {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");
@@ -307,15 +307,11 @@ public class LdapUserManager implements UserManager {
 		return attrs;
 	}
 	
-	private static User marshal(Attributes attrs) throws NamingException,
+	public static User marshal(Attributes attrs) throws NamingException,
 														 ParseException {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
-		if (attrs.get("userPassword") != null) {
-			user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
-			user.setPassword(user.getPassword().substring(5, user.getPassword().length()));
-		}
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());
 		}

@@ -139,6 +139,9 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
+		System.out.println("-----------oldPwd:" + u.getPassword());
+		System.out.println("-----------oldPwd:" + oldPassword);
+		System.out.println("-----------oldPwd:" + LdapEncryptUtils.md5Encode(oldPassword));
 		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
 			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
 				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));

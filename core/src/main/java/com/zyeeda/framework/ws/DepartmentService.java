@@ -58,7 +58,7 @@ public class DepartmentService extends ResourceService {
 	@Path("/{id}")
 	@Produces("application/json")
 	public String remove(@PathParam("id") String id,
-			 			 @PathParam("cascade") Boolean cascade)
+			 			 @FormParam("cascade") String cascade)
 					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
@@ -225,6 +225,30 @@ public class DepartmentService extends ResourceService {
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;
+	}
+	
+	@GET
+	@PathParam("root_and_second_level_dept")
+	@Produces("application/json")
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getRootAndSecondLevelDepartment();
+		
+		return deptList;
+	}
+	
+	@GET
+	@Path("eliminating_team/{id}")
+	@Produces("application/json")
+	public List<Department> getDepartmentListByUserId(@PathParam("id") String userId) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getDepartmentListByUserId(userId);
+		
+		return deptList;
 	}
 	
 }
