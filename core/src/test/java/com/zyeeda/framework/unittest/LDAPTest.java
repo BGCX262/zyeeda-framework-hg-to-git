@@ -9,6 +9,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
@@ -162,6 +163,31 @@ System.out.println(entry.getNameInNamespace());
 		ctx.bind(dn, null, attrs);
 	}
 	
+	public static void getAllUser() throws NamingException {
+		LdapContext ctx = getLdapContext();
+		SearchControls sc = new SearchControls();
+		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=*)",
+				sc);
+		ModificationItem[] mods = new ModificationItem[1];
+		SearchResult rs = null;
+		while (results.hasMore()) {
+			rs = results.next();
+			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
+				System.out.println(rs.getAttributes());
+//				System.out.println(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", ""));
+//				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+//	   				   new BasicAttribute("deptName", 
+//	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
+//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
+//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
+//
+//				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+//																	, mods);
+			}
+		}
+	}
+	
 	public static void main(String[] args) throws NamingException, IOException {
 //		String root = "dc=ehv,dc=csg,dc=cn"; // root
 //
@@ -178,7 +204,7 @@ System.out.println(entry.getNameInNamespace());
 //			String sortKey = "uid";
 //		    ctx.setRequestControls(new Control[] {
 //		             new SortControl(sortKey, Control.NONCRITICAL) });
-//		    
+//		     
 //		    ctx.setRequestControls(new Control[]{
 //			         new PagedResultsControl(5, Control.CRITICAL) });
 //System.out.println("------------" + ctx.getRequestControls().length);
@@ -210,7 +236,8 @@ System.out.println(entry.getNameInNamespace());
 //		save();
 //		saveUserRefObject();
 //		save();
-		ldapPageView();
+//		ldapPageView();
+		getAllUser();
 		//{SSHA}p/di1QhaV/9Npn7umA+cGZkrBAmgKedkwtLqlQ==
 	}
 
