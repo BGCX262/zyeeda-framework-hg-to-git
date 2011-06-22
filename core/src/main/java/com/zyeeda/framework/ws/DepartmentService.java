@@ -20,9 +20,9 @@ import javax.ws.rs.core.Context;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
-import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
-import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
@@ -262,7 +262,7 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("root_and_second_level_dept")
 	@Produces("application/json")
-	public List<DepartmentVo> getRootAndSecondLevelDepartment()
+	public List<DepartmentVo> getRootAndSecondLevelDepartment() throws UserPersistException {
 									throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
@@ -272,16 +272,39 @@ public class DepartmentService extends ResourceService {
 		return deptVoList;
 	}
 
-	
+	/**
+	 * 消缺班组
+	 * @param userId
+	 * @return
+	 * @throws UserPersistException
+	 */
 	@GET
-	@Path("eliminating_team/{id}")
+	@Path("eliminating_team")
 	@Produces("application/json")
-	public List<Department> getDepartmentListByUserId(@PathParam("id") String userId) throws UserPersistException {
+	public List<Department> getDepartmentListByUserId() throws UserPersistException {
 		String user = this.getSecurityService().getCurrentUser();
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		deptList = deptMgr.getDepartmentListByUserId(userId);
+		UserManager userManager = new LdapUserManager(this.getLdapService());
+		String currentUser = this.getSecurityService().getCurrentUser();
+		List<User> userList = userManager.findByName(currentUser);
+System.out.println("----------------" + userList);
+		User user = null;
+		if (userList != null && userList.size() > 0) {
+			user = userList.get(0);
+			if (user != null && StringUtils.isNotBlank(user.getDeptFullPath())) {
+				String deptFullPath = StringUtils.substring(user.getDeptFullPath(),
+															user.getDeptFullPath().indexOf(",") + 1,
+															user.getDeptFullPath().length());
+				if (deptFullPath.indexOf(",") != -1) {
+					deptFullPath = StringUtils.substring(deptFullPath, 
+														 deptFullPath.indexOf(",") + 1,
+														 deptFullPath.length());
+				}
+				deptList = deptMgr.getDepartmentListByUserId(deptFullPath);
+			}
+		}
 		
 		return deptList;
 	}
