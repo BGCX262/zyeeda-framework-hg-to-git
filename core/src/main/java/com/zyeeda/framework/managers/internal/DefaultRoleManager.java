@@ -15,7 +15,7 @@ import com.zyeeda.framework.viewmodels.RoleVo;
 
 public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		implements RoleManager {
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(DefaultRoleManager.class);
 
 	public DefaultRoleManager(PersistenceService persistenceSvc) {
 		super(persistenceSvc);

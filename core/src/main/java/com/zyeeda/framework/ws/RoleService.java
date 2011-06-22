@@ -286,7 +286,6 @@ public class RoleService extends ResourceService{
 				userVo.setUserName(user);
 				roleWithUserVo.getUserName().add(userVo);
 			}
-			//subjectList.addAll(role.getSubjects());
 		}
 		return roleWithUserVo;
 	}
