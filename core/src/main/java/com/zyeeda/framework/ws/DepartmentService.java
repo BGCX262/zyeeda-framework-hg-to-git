@@ -262,14 +262,16 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("root_and_second_level_dept")
 	@Produces("application/json")
-	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
+	public List<DepartmentVo> getRootAndSecondLevelDepartment()
+									throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getRootAndSecondLevelDepartment();
-		
-		return deptList;
+		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
+		return deptVoList;
 	}
+
 	
 	@GET
 	@Path("eliminating_team/{id}")
