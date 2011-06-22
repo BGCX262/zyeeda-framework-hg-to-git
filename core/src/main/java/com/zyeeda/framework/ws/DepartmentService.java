@@ -277,6 +277,7 @@ public class DepartmentService extends ResourceService {
 	@Path("eliminating_team/{id}")
 	@Produces("application/json")
 	public List<Department> getDepartmentListByUserId(@PathParam("id") String userId) throws UserPersistException {
+		String user = this.getSecurityService().getCurrentUser();
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);

@@ -1,9 +1,11 @@
 package com.zyeeda.framework.managers.internal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +14,7 @@ import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.base.DomainEntityManager;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.viewmodels.RoleVo;
+import com.zyeeda.framework.viewmodels.UserVo;
 
 public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		implements RoleManager {
@@ -39,29 +42,49 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		return list;
 	}
 	
+	public List<RoleVo> deptToVo(List<Role> listRole) {
+		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
+		for(Role role : listRole) {
+			RoleVo roleVo = new RoleVo();
+				roleVo.setId(role.getDeptepmentId());
+				roleVo.setCheckName(role.getDeptepment());
+				roleVo.setLabel(role.getDeptepment());
+				roleVo.setIo("/rest/dept/"+role.getDeptepmentId());
+				roleVo.setLeaf(false);
+				roleVo.setKind("role");
+				roleVo.setType("io");
+				listRoleVo.add(roleVo);
+		}
+		return listRoleVo;
+	}
+
 	public List<RoleVo> roleToVo(List<Role> listRole) {
 		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
 		for(Role role : listRole) {
 			RoleVo roleVo = new RoleVo();
-			if(role.getDeptepment() == null && role.getDeptepmentId() == null){
 				roleVo.setCheckName(role.getName());
 				roleVo.setLabel(role.getName());
 				roleVo.setId(role.getId());
 				roleVo.setLeaf(true);
 				roleVo.setType("tesk");
-				roleVo.setKind("user");
-			} else {
-				roleVo.setId(role.getDeptepmentId());
-				roleVo.setCheckName(role.getDeptepment());
-				roleVo.setLabel(role.getDeptepment());
-				roleVo.setIo("/rest/line_location/"+role.getDeptepmentId());
-				roleVo.setLeaf(false);
-				roleVo.setType("io");
-			}
-			listRoleVo.add(roleVo);
+				roleVo.setKind("department");
+				roleVo.setIo("/rest/dept/" + role.getId());
+				listRoleVo.add(roleVo);
 		}
 		return listRoleVo;
 	}
-
 	
+	public List<UserVo> getUserVoByRole(Role role) {
+		Set<String> user = role.getSubjects();
+		List<UserVo>  list = new ArrayList<UserVo>();
+		for(String userName:user) {
+			UserVo userVo = new UserVo();
+			userVo.setCheckName(userName);
+			userVo.setLabel(userName);
+			userVo.setType("Tesk");
+			userVo.setLeaf(false);
+			list.add(userVo);
+		}
+		return list;
+	}
 }

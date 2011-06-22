@@ -1,10 +1,8 @@
 package com.zyeeda.framework.ws;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -17,12 +15,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.PermissionManager;
@@ -33,6 +29,7 @@ import com.zyeeda.framework.viewmodels.PermissionVo;
 import com.zyeeda.framework.viewmodels.RoleVo;
 import com.zyeeda.framework.viewmodels.RoleWithUserVo;
 import com.zyeeda.framework.viewmodels.UserNameVo;
+import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/roles")
 public class RoleService extends ResourceService{
@@ -63,32 +60,6 @@ public class RoleService extends ResourceService{
 	}
 	
 
-	@GET
-	@Path("/get_all_roles_vo")
-	@Produces("application/json")
-	public List<RoleVo> getRolesVo() {
-		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
-		List<Role> listRole = new ArrayList<Role>();
-	    listRole = roleMgr.getRoleDistinct(hql);
-		logger.debug("this get all roles is success!", listRole.size());
-		List<RoleVo> roleVo = roleMgr.roleToVo(listRole);
-		logger.debug("this get all roles is success!");
-		return roleVo;
-	}
-	
-	@GET
-	@Path("/dept/{deptId}")
-	@Produces("applicatioin/json")
-	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
-		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		List<Role> list = new ArrayList<Role>();
-		Search search = new Search();
-		search.addFilterEqual("deptepmentId", deptId);
-		list = roleMgr.search(search);
-		List<RoleVo> roleVo = roleMgr.roleToVo(list);
-		return roleVo;
-	}
 	
 	@DELETE
 	@Path("/")
@@ -187,14 +158,14 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
-	@Path("/{id}/subUser")
+	@Path("/{id}/sub_user")
 	@Produces("application/json")
 	public List<String> getUserByRoleId(@PathParam("id") String id){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		Set<String> user = role.getSubjects();
 		List<String>  list = new ArrayList<String>();
-		for(String userId:user){
+		for(String userId:user) {
 			list.add(userId);
 		}
 		return list;
@@ -270,7 +241,6 @@ public class RoleService extends ResourceService{
 		    permission = permissionMgr.getPermissionByPath(auth);
 			roleWithUserVo.getPermission().add(permission);
 		}
-		//this.getPersistenceService().getCurrentSession().flush();
 		return roleWithUserVo;
 	}
 	
@@ -291,6 +261,44 @@ public class RoleService extends ResourceService{
 			}
 		}
 		return roleWithUserVo;
+	}
+	
+	
+	@POST
+	@Path("/dept/{id}")
+	@Produces("application/json")
+	public List<UserVo> getUserVo(@PathParam("id") String id) {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		Role role = roleMgr.find(id);
+		List<UserVo> listUserVo = roleMgr.getUserVoByRole(role);
+		return listUserVo;
+	}
+	
+
+	@GET
+	@Path("/get_all_roles_vo")
+	@Produces("application/json")
+	public List<RoleVo> getRolesVo() {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
+		List<Role> listRole = new ArrayList<Role>();
+	    listRole = roleMgr.getRoleDistinct(hql);
+		logger.debug("this get all roles is success!", listRole.size());
+		List<RoleVo> roleVo = roleMgr.deptToVo(listRole);
+		return roleVo;
+	}
+	
+	@GET
+	@Path("/dept/{deptId}")
+	@Produces("applicatioin/json")
+	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		List<Role> list = new ArrayList<Role>();
+		Search search = new Search();
+		search.addFilterEqual("deptepmentId", deptId);
+		list = roleMgr.search(search);
+		List<RoleVo> roleVo = roleMgr.roleToVo(list);
+		return roleVo;
 	}
 	
 }
