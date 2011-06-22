@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.TypedQuery;
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -31,6 +30,7 @@ import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.viewmodels.PermissionVo;
+import com.zyeeda.framework.viewmodels.RoleVo;
 import com.zyeeda.framework.viewmodels.RoleWithUserVo;
 import com.zyeeda.framework.viewmodels.UserNameVo;
 import com.zyeeda.framework.ws.base.ResourceService;
@@ -56,10 +56,33 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String hql = "select distinct r.deptepment, r.deptepmentId from sys_role r";
-		List<Role> list = roleMgr.getRoleDistinct(hql);
+		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
+		List<Role> listRole = roleMgr.getRoleDistinct(hql);
 		logger.debug("this get all roles is success!");
-		return list;
+		return listRole;
+	}
+	
+
+	@GET
+	@Path("/get_all_roles_vo")
+	@Produces("application/json")
+	public List<RoleVo> getRolesVo() {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
+		List<Role> listRole = roleMgr.getRoleDistinct(hql);
+		List<RoleVo> roleVo = roleMgr.roleToVo(listRole);
+		logger.debug("this get all roles is success!");
+		return roleVo;
+	}
+	
+	@GET
+	@Path("/dept/{deptId}")
+	@Produces("applicatioin/json")
+	public List<Role>  getDeptById(@PathParam("deptId") String deptId){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		Search search = new Search();
+		search.addFilterEqual("deptepmentId", deptId);
+		return roleMgr.search(search);
 	}
 	
 	@DELETE
