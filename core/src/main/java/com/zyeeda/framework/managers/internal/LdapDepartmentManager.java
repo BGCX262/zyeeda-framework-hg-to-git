@@ -210,12 +210,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 										throws UserPersistException {
 		List<Department> deptList = null;
 		try {
-			
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			String deptFullPath = StringUtils.substring(userId,
-												 userId.indexOf(",") + 1,
-												 userId.length());
-			List<Attributes> attrsList = ldapTemplate.getResultList(deptFullPath,
+			List<Attributes> attrsList = ldapTemplate.getResultList(userId,
 									   							   "(|(o=*)(ou=*))",
 									   							   SearchControlsFactory.getDefaultSearchControls());
 			deptList = new ArrayList<Department>(attrsList.size());

@@ -386,7 +386,7 @@ public class LdapUserManager implements UserManager {
 			userList = new ArrayList<User>();
 			
 			for (Attributes attrs : attrsList) {
-				User user = LdapUserManager.marshal(attrs);
+				User user = LdapUserManager.marshal(attrs); 
 				userList.add(user);
 			}
 			return userList;
