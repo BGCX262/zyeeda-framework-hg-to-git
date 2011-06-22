@@ -235,6 +235,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "(|(o=*" + condition + "*)(ou=*" + condition + "*" + "))";
+			if ("*".equals(condition)) {
+				filter = "(|(o=*)(ou=*))";
+			}
 			List<Attributes> attrsList = ldapTemplate.getResultList("",
 																	filter,
 									   								SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));

@@ -51,9 +51,9 @@ public class LDAPTest {
 //	             new SortControl(sortKey, Control.NONCRITICAL) });
 		// Perform the search
 		SearchControls sc = new SearchControls();
-		sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-		String condition = "yangjie";
-		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=*yang*)",
+		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		String condition = "Test";
+		NamingEnumeration<SearchResult> results = ctx.search("", "(|(o=*广州*)(ou=*广州*))",
 				sc);
 		// Iterate over a batch of search results sent by the server
 		while (results != null && results.hasMore()) {
@@ -61,8 +61,8 @@ public class LDAPTest {
 			SearchResult entry = (SearchResult) results.next();
 			Attributes attributes = entry.getAttributes();
 //			System.out.println(new String((byte[])attributes.get("userpassword").get()));
-			System.out.println(attributes.get("userpassword").get());
-
+//			System.out.println(attributes.get("userpassword").get());
+System.out.println(entry.getNameInNamespace());
 			// Handle the entry's response controls (if any)
 			if (entry instanceof HasControls) {
 				// ((HasControls)entry).getControls();

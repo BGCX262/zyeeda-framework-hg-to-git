@@ -373,7 +373,10 @@ public class LdapUserManager implements UserManager {
 
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			String filter = "(|(uid=*" + condition + ")(cn=*" + condition + "*))";
+			String filter = "(|(uid=*" + condition + "*)(cn=*" + condition + "*))";
+			if ("*".equals(condition)) {
+				filter = "(|(uid=*)(cn=*))";
+			}
 			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
 																	filter,
 																    SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
