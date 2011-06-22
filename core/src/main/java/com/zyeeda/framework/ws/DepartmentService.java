@@ -18,6 +18,7 @@ import javax.ws.rs.core.Context;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
+import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
@@ -48,6 +49,7 @@ public class DepartmentService extends ResourceService {
 		} else {
 			dept.setParent(parent);
 			dept.setId("ou=" + dept.getName() + "," + dept.getParent());
+			dept.setDeptFullPath("ou=" + dept.getName() + "," + dept.getParent());
 			deptMgr.persist(dept);
 			
 			return deptMgr.findById(dept.getId());
@@ -109,6 +111,32 @@ public class DepartmentService extends ResourceService {
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
 		return DepartmentService.fillPropertiesToVo(deptMgr.findByName(name));
+	}
+	
+	@GET
+	@Path("/search")
+	@Produces("application/json")
+	public String search(@FormParam("name") String name) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		List<Department> deptList = deptMgr.findByName(name);
+		StringBuffer buffer = new StringBuffer("{");
+		buffer.append("\"totalRecords\":").append(deptList.size())
+	      	  .append(",").append("\"startIndex\":").append(0)
+	      	  .append(",").append("\"pageSize\":").append(13)
+	      	  .append(",").append("\"records\":[");
+		for (Department department : deptList) {
+			buffer.append("{\"name\":").append(department.getId()).append(",")
+			      .append("\"parent\":").append(department.getParent()).append(",")
+			      .append("\"fullpath\":").append(department.getDeptFullPath()).append(",")
+			      .append("\"description\":").append(department.getDescription()).append("},");
+		}
+		if (buffer.lastIndexOf(",") != -1) {
+			buffer.deleteCharAt(buffer.lastIndexOf(","));
+		}
+		buffer.append("]}");
+		
+		return buffer.toString();
 	}
 	
 	@GET

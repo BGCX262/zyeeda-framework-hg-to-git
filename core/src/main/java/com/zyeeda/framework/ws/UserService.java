@@ -121,6 +121,35 @@ public class UserService extends ResourceService {
 	}
 	
 	@GET
+	@Path("/search")
+	@Produces("application/json")
+	public String search(@FormParam("name") String name) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<User> userList = userMgr.findByName(name);
+		StringBuffer buffer = new StringBuffer("{");
+		buffer.append("\"totalRecords\":").append(userList.size())
+	      	  .append(",").append("\"startIndex\":").append(0)
+	      	  .append(",").append("\"pageSize\":").append(13)
+	      	  .append(",").append("\"records\":[");
+		for (User user : userList) {
+			buffer.append("{\"id\":").append(user.getId()).append(",")
+			      .append("\"username\":").append(user.getUsername()).append(",")
+			      .append("\"mobile\":").append(user.getMobile()).append(",")
+			      .append("\"email\":").append(user.getEmail()).append(",")
+			      .append("\"status\":").append(user.getStatus()).append(",")
+			      .append("\"parent\":").append(user.getDepartmentName()).append(",")
+			      .append("\"fullpath\":").append(user.getDeptFullPath()).append("},");
+		}
+		if (buffer.lastIndexOf(",") != -1) {
+			buffer.deleteCharAt(buffer.lastIndexOf(","));
+		}
+		buffer.append("]}");
+		
+		return buffer.toString();
+	}
+	
+	@GET
 	@Path("/userList/{deptId}")
 	@Produces("application/json")
 	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws UserPersistException {
