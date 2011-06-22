@@ -3,6 +3,7 @@ package com.zyeeda.framework.ws;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,18 +163,21 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}/update_password")
 	@Produces("application/json")
-	public User updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
-			@FormParam("newPassword") String newPassword)  throws UserPersistException, UnsupportedEncodingException {
+	public User updatePassword(@PathParam("id") String id,
+							   @FormParam("oldPassword") String oldPassword,
+							   @FormParam("newPassword") String newPassword)
+						  throws UserPersistException,
+						  		 UnsupportedEncodingException,
+						  		 NoSuchAlgorithmException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		System.out.println("-----------oldPwd:" + u.getPassword());
-		System.out.println("-----------oldPwd:" + oldPassword);
-		System.out.println("-----------oldPwd:" + LdapEncryptUtils.md5Encode(oldPassword));
-		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
-			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
-				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));
+		String ldapPw = u.getPassword();
+		String inputPw = oldPassword;
+		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
+			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
+				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
 			throw new RuntimeException("旧密码输入错误");

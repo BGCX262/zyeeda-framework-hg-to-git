@@ -174,7 +174,8 @@ System.out.println(entry.getNameInNamespace());
 		while (results.hasMore()) {
 			rs = results.next();
 			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
-				System.out.println(rs.getAttributes());
+				System.out.println(rs.getAttributes().get("uid"));
+				System.out.println(new String((byte[])rs.getAttributes().get("userpassword").get()));
 //				System.out.println(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", ""));
 //				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 //	   				   new BasicAttribute("deptName", 
