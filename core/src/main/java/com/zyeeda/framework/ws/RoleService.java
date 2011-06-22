@@ -80,11 +80,14 @@ public class RoleService extends ResourceService{
 	@GET
 	@Path("/dept/{deptId}")
 	@Produces("applicatioin/json")
-	public List<Role>  getDeptById(@PathParam("deptId") String deptId){
+	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		List<Role> list = new ArrayList<Role>();
 		Search search = new Search();
 		search.addFilterEqual("deptepmentId", deptId);
-		return roleMgr.search(search);
+		list = roleMgr.search(search);
+		List<RoleVo> roleVo = roleMgr.roleToVo(list);
+		return roleVo;
 	}
 	
 	@DELETE
