@@ -61,10 +61,23 @@ public class UserService extends ResourceService {
 	
 	@DELETE
 	@Path("/{id}")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+						 @PathParam("cascade") Boolean cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		userMgr.remove(id);
+		if (cascade != null) {
+			userMgr.remove(id);
+			return "{success: 'true'}";
+		} else {
+			Integer count = userMgr.getChildrenCountById(id, "(objectclass=*)");
+			if (count > 0) {
+				return "{\"success\": \"false\"}";
+			} else {
+				userMgr.remove(id);
+				return "{\"success\": \"true\"}";
+			}
+		}
 	}
 	
 	@PUT
@@ -108,6 +121,35 @@ public class UserService extends ResourceService {
 	}
 	
 	@GET
+	@Path("/search")
+	@Produces("application/json")
+	public String search(@FormParam("name") String name) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<User> userList = userMgr.search(name);
+		StringBuffer buffer = new StringBuffer("{");
+		buffer.append("\"totalRecords\":").append(userList.size())
+	      	  .append(",").append("\"startIndex\":").append(0)
+	      	  .append(",").append("\"pageSize\":").append(13)
+	      	  .append(",").append("\"records\":[");
+		for (User user : userList) {
+			buffer.append("{\"id\":").append("\"").append(user.getId()).append("\"").append(",")
+			      .append("\"username\":").append("\"").append(user.getUsername()).append("\"").append(",")
+			      .append("\"mobile\":").append("\"").append(user.getMobile() == null ? "" : user.getMobile()).append("\"").append(",")
+			      .append("\"email\":").append("\"").append(user.getEmail() == null ? "" : user.getEmail()).append("\"").append(",")
+			      .append("\"status\":").append("\"").append(user.getStatus() == null ? "" : user.getStatus()).append("\"").append(",")
+			      .append("\"parent\":").append("\"").append(user.getDepartmentName() == null ? "" : user.getDepartmentName()).append("\"").append(",")
+			      .append("\"fullpath\":").append("\"").append(user.getDeptFullPath() == null ? "" : user.getDeptFullPath()).append("\"").append("},");
+		}
+		if (buffer.lastIndexOf(",") != -1 && userList.size() > 0) {
+			buffer.deleteCharAt(buffer.lastIndexOf(","));
+		}
+		buffer.append("]}");
+		
+		return buffer.toString();
+	}
+	
+	@GET
 	@Path("/userList/{deptId}")
 	@Produces("application/json")
 	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws UserPersistException {
@@ -126,6 +168,9 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
+		System.out.println("-----------oldPwd:" + u.getPassword());
+		System.out.println("-----------oldPwd:" + oldPassword);
+		System.out.println("-----------oldPwd:" + LdapEncryptUtils.md5Encode(oldPassword));
 		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
 			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
 				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));

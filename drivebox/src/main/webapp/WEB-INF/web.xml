@@ -140,6 +140,8 @@
     <servlet-mapping>
         <servlet-name>CXFServlet</servlet-name>
         <url-pattern>/rest/*</url-pattern>
+        <url-pattern>/rs/*</url-pattern>
+        <url-pattern>/osiv/rs/*</url-pattern>
         <!-- <url-pattern>/sync/*</url-pattern> -->
     </servlet-mapping>
 

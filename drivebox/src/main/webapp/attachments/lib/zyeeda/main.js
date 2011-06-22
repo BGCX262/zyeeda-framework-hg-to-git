@@ -1,9 +1,9 @@
 ZUI.call(function(Z) {
     Z.cfg = {
         uploader : {
-            totalCountUrl : '/drivebox/rest/docs/count',
-            uploadUrl : '/drivebox/rest/docs',
-            listUrl : '/drivebox/rest/docs'
+            totalCountUrl : '/drivebox/rs/docs/count',
+            uploadUrl : '/drivebox/rs/docs',
+            listUrl : '/drivebox/rs/docs'
         }
     };
 

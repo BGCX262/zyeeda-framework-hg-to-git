@@ -25,6 +25,8 @@ import com.zyeeda.framework.viewmodels.PermissionVo;
 public class DefaultPermissionManager implements PermissionManager {
 
 	
+	
+
 	private final static String PERMISSION_FILE = "permission.xml";
 
 	public List<PermissionVo> findSubPermissionById(String id)
@@ -102,6 +104,7 @@ public class DefaultPermissionManager implements PermissionManager {
 	public PermissionVo getParentPermissionByPath(String auth)
 			throws XPathExpressionException, IOException {
 		InputStream is = null;
+		System.out.println("*****************22*" + auth);
 		InputSource src = null;
 		XPathExpression exp = null;
 		PermissionVo permission = new PermissionVo();

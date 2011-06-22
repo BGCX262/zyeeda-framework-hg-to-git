@@ -84,6 +84,19 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		}
 	}
+	
+	public Integer getChildrenCountById(String id, String filter) throws UserPersistException {
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrsList = ldapTemplate.getResultList(id,
+															 		filter,
+															 		SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+		
+			return attrsList.size();
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
 
 	@Override
 	public List<User> findByDepartmentId(String id) throws UserPersistException {
@@ -242,7 +255,7 @@ public class LdapUserManager implements UserManager {
 //        return bytes;
 //	}
 	
-	private static Attributes unmarshal(User user) throws UnsupportedEncodingException {
+	public static Attributes unmarshal(User user) throws UnsupportedEncodingException {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");
@@ -297,15 +310,11 @@ public class LdapUserManager implements UserManager {
 		return attrs;
 	}
 	
-	private static User marshal(Attributes attrs) throws NamingException,
+	public static User marshal(Attributes attrs) throws NamingException,
 														 ParseException {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
-		if (attrs.get("userPassword").get() != null) {
-			user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
-		}
-		user.setPassword(user.getPassword().substring(5, user.getPassword().length()));
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());
 		}
@@ -359,6 +368,33 @@ public class LdapUserManager implements UserManager {
 	
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());
+	}
+
+	@Override
+	public List<User> search(String condition) throws UserPersistException {
+		List<User> userList = null;
+
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String filter = "(|(uid=*" + condition + "*)(cn=*" + condition + "*))";
+			if ("*".equals(condition)) {
+				filter = "(|(uid=*)(cn=*))";
+			}
+			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
+																	filter,
+																    SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+			userList = new ArrayList<User>();
+			
+			for (Attributes attrs : attrsList) {
+				User user = LdapUserManager.marshal(attrs);
+				userList.add(user);
+			}
+			return userList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
+		}
 	}
 	
 }
