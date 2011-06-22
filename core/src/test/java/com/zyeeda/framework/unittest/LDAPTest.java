@@ -52,9 +52,9 @@ public class LDAPTest {
 		// Perform the search
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=Test5)",
+		String condition = "yangjie";
+		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=*yang*)",
 				sc);
-System.out.println(LdapEncryptUtils.md5Encode(DigestUtils.md5Hex("123456")));
 		// Iterate over a batch of search results sent by the server
 		while (results != null && results.hasMore()) {
 			// Display an entry

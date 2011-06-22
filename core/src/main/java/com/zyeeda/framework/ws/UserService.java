@@ -126,22 +126,22 @@ public class UserService extends ResourceService {
 	public String search(@FormParam("name") String name) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<User> userList = userMgr.findByName(name);
+		List<User> userList = userMgr.search(name);
 		StringBuffer buffer = new StringBuffer("{");
 		buffer.append("\"totalRecords\":").append(userList.size())
 	      	  .append(",").append("\"startIndex\":").append(0)
 	      	  .append(",").append("\"pageSize\":").append(13)
 	      	  .append(",").append("\"records\":[");
 		for (User user : userList) {
-			buffer.append("{\"id\":").append(user.getId()).append(",")
-			      .append("\"username\":").append(user.getUsername()).append(",")
-			      .append("\"mobile\":").append(user.getMobile()).append(",")
-			      .append("\"email\":").append(user.getEmail()).append(",")
-			      .append("\"status\":").append(user.getStatus()).append(",")
-			      .append("\"parent\":").append(user.getDepartmentName()).append(",")
-			      .append("\"fullpath\":").append(user.getDeptFullPath()).append("},");
+			buffer.append("{\"id\":").append("\"").append(user.getId()).append("\"").append(",")
+			      .append("\"username\":").append("\"").append(user.getUsername()).append("\"").append(",")
+			      .append("\"mobile\":").append("\"").append(user.getMobile() == null ? "" : user.getMobile()).append("\"").append(",")
+			      .append("\"email\":").append("\"").append(user.getEmail() == null ? "" : user.getEmail()).append("\"").append(",")
+			      .append("\"status\":").append("\"").append(user.getStatus() == null ? "" : user.getStatus()).append("\"").append(",")
+			      .append("\"parent\":").append("\"").append(user.getDepartmentName() == null ? "" : user.getDepartmentName()).append("\"").append(",")
+			      .append("\"fullpath\":").append("\"").append(user.getDeptFullPath() == null ? "" : user.getDeptFullPath()).append("\"").append("},");
 		}
-		if (buffer.lastIndexOf(",") != -1) {
+		if (buffer.lastIndexOf(",") != -1 && userList.size() > 0) {
 			buffer.deleteCharAt(buffer.lastIndexOf(","));
 		}
 		buffer.append("]}");

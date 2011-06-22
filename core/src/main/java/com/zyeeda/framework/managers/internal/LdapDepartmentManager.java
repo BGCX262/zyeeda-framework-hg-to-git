@@ -227,6 +227,30 @@ public class LdapDepartmentManager implements DepartmentManager {
 			throw new UserPersistException(e);
 		}
 	}
+
+	@Override
+	public List<Department> search(String condition)
+							throws UserPersistException {
+		List<Department> deptList = null;
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String filter = "(|(o=*" + condition + "*)(ou=*" + condition + "*" + "))";
+			List<Attributes> attrsList = ldapTemplate.getResultList("",
+																	filter,
+									   								SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+			deptList = new ArrayList<Department>(attrsList.size());
+			for (Attributes attrs : attrsList) {
+//				String childId = String.format("%s,o=%s", entry.getName(), "广州局");
+				Department dept = LdapDepartmentManager.marshal(attrs);
+//				dept.setId(childId);
+				
+				deptList.add(dept);
+			}
+			return deptList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
 	
 	/*
 	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)

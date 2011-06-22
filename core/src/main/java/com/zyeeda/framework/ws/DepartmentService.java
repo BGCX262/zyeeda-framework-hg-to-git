@@ -18,7 +18,6 @@ import javax.ws.rs.core.Context;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
-import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
@@ -119,19 +118,19 @@ public class DepartmentService extends ResourceService {
 	public String search(@FormParam("name") String name) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		List<Department> deptList = deptMgr.findByName(name);
+		List<Department> deptList = deptMgr.search(name);
 		StringBuffer buffer = new StringBuffer("{");
 		buffer.append("\"totalRecords\":").append(deptList.size())
 	      	  .append(",").append("\"startIndex\":").append(0)
 	      	  .append(",").append("\"pageSize\":").append(13)
 	      	  .append(",").append("\"records\":[");
 		for (Department department : deptList) {
-			buffer.append("{\"name\":").append(department.getId()).append(",")
-			      .append("\"parent\":").append(department.getParent()).append(",")
-			      .append("\"fullpath\":").append(department.getDeptFullPath()).append(",")
-			      .append("\"description\":").append(department.getDescription()).append("},");
+			buffer.append("{\"name\":").append("\"").append(department.getId()).append("\"").append(",")
+			      .append("\"parent\":").append("\"").append(department.getParent() == null ? "" : department.getParent()).append("\"").append(",")
+			      .append("\"fullpath\":").append("\"").append(department.getDeptFullPath() == null ? "" : department.getDeptFullPath()).append("\"").append(",")
+			      .append("\"description\":").append("\"").append(department.getDescription() == null ? "" : department.getDescription()).append("\"").append("},");
 		}
-		if (buffer.lastIndexOf(",") != -1) {
+		if (buffer.lastIndexOf(",") != -1 && deptList.size() > 0) {
 			buffer.deleteCharAt(buffer.lastIndexOf(","));
 		}
 		buffer.append("]}");
@@ -256,7 +255,7 @@ public class DepartmentService extends ResourceService {
 	}
 	
 	@GET
-	@PathParam("root_and_second_level_dept")
+	@Path("root_and_second_level_dept")
 	@Produces("application/json")
 	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
 		List<Department> deptList = null;

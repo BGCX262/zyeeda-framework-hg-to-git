@@ -366,5 +366,29 @@ public class LdapUserManager implements UserManager {
 	private LdapTemplate getLdapTemplate() throws NamingException {
 		return new LdapTemplate(this.ldapSvc.getLdapContext());
 	}
+
+	@Override
+	public List<User> search(String condition) throws UserPersistException {
+		List<User> userList = null;
+
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String filter = "(|(uid=*" + condition + ")(cn=*" + condition + "*))";
+			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
+																	filter,
+																    SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+			userList = new ArrayList<User>();
+			
+			for (Attributes attrs : attrsList) {
+				User user = LdapUserManager.marshal(attrs);
+				userList.add(user);
+			}
+			return userList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
+		}
+	}
 	
 }

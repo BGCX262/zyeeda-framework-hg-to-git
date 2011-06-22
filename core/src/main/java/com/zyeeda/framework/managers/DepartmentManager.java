@@ -20,5 +20,7 @@ public interface DepartmentManager {
 	
 	public List<Department> getDepartmentListByUserId(String userId) throws UserPersistException;
 	
+	public List<Department> search(String condition) throws UserPersistException;
+	
 	public List<Department> findByName(String name) throws UserPersistException;
 }
