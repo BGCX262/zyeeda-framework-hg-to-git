@@ -18,6 +18,8 @@ public interface UserManager {
 	
 	public List<User> findByName(String name) throws UserPersistException;
 	
+	public List<User> search(String condition) throws UserPersistException;
+	
 	public void updatePassword(String id, String password) throws UserPersistException;
 	
 	public void enable(String... ids) throws UserPersistException;

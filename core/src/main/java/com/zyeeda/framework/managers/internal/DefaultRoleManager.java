@@ -28,6 +28,7 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		List<Role> roleList = query.getResultList();
 		return roleList;
 	}
+
 	
 	@SuppressWarnings("unchecked")
 	public List<Role> getRoleDistinct(String hql){

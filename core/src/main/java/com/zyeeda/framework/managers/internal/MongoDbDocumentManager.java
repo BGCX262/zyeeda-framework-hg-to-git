@@ -1,5 +1,8 @@
 package com.zyeeda.framework.managers.internal;
 
+import static com.zyeeda.framework.managers.internal.MongoDbDocumentManagerHelper.document2GridFSFile;
+import static com.zyeeda.framework.managers.internal.MongoDbDocumentManagerHelper.gridFSDBFile2Document;
+
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -54,7 +57,8 @@ public class MongoDbDocumentManager implements DocumentManager {
 	
 	@Override
 	public void persist(Document document) {
-		GridFSFile file = this.document2GridFSFile(document);
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		GridFSFile file = document2GridFSFile(fs, document);
 		logger.info("saving uplaoded file {} ...", document.getName());
 		file.save();
 		logger.info("file {} saved", document.getName());
@@ -70,7 +74,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
 		GridFSDBFile file = fs.findOne(query);
 		
-		return this.gridFSDBFile2Document(file, includeContent);
+		return gridFSDBFile2Document(file, includeContent);
 	}
 	
 	@Override
@@ -84,7 +88,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
 		GridFSDBFile file = fs.findOne(query);
 		
-		return this.gridFSDBFile2Document(file);
+		return gridFSDBFile2Document(file);
 	}
 	
 	@Override
@@ -106,91 +110,41 @@ public class MongoDbDocumentManager implements DocumentManager {
 	public void replaceForeignId(String oldForeignId, String newForeignId) {
 		DBObject query = new BasicDBObject();
 		query.put("foreignId", oldForeignId);
-		DBObject update = BasicDBObjectBuilder.start(
-				"$set", BasicDBObjectBuilder.start("foreignId", newForeignId).get()
-		).get();
+		DBObject update = new BasicDBObject(
+				"$set", new BasicDBObjectBuilder()
+				.add("foreignId", newForeignId)
+				.add("isTemp", false).get());
 		
 		DBCollection collection = this.getFilesCollection();
 		collection.updateMulti(query, update);
 	}
-
-	private GridFSFile document2GridFSFile(Document document) {
+	
+	@Override
+	public List<Document> findByForeignId(String foreignId) {
+		DBObject query = new BasicDBObject();
+		query.put("foreignId", foreignId);
 		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
-		GridFSFile file = fs.createFile(document.getContent());
+		List<GridFSDBFile> files = fs.find(query);
 		
-		file.put("filename", document.getName()); // 数据库自带filename
-		file.put("description", document.getDescription());
-		file.put("creator", document.getCreator());
-		file.put("uploadDate", document.getCreatedTime()); // 数据库自带uploadDate
-		file.put("lastModifier", document.getLastModifier());
-		file.put("lastModifiedTime", document.getLastModifiedTime());
-		
-		file.put("foreignId", document.getForeignId());
-		file.put("weight", document.getWeight());
-		file.put("owner", document.getOwner());
-		file.put("keyword", document.getKeyword());
-		
-		file.put("fileType", document.getFileType()); // 数据库自带fileType
-		file.put("contentType", document.getContentType()); // 数据库自带contentType
-		file.put("subType", document.getSubType());
-		file.put("primaryType", document.getPrimaryType());
-		
-		if (logger.isDebugEnabled()) {
-			StringBuilder sb = new StringBuilder();
-			sb.append("filename = " + document.getName() + "\n");
-			sb.append("\tdescription = " + document.getDescription() + "\n");
-			sb.append("\tcreator = " + document.getCreator() + "\n");
-			sb.append("\tuploadDate = " + document.getCreatedTime() + "\n");
-			sb.append("\tlastModifier = " + document.getLastModifier() + "\n");
-			sb.append("\tlastModifiedTime = " + document.getLastModifiedTime() + "\n");
-			
-			sb.append("\tforeignId = " + document.getForeignId() + "\n");
-			sb.append("\tweight = " + document.getWeight() + "\n");
-			sb.append("\towner = " + document.getOwner() + "\n");
-			sb.append("\tkeyword = " + document.getKeyword() + "\n");
-			
-			sb.append("\tfileType = " + document.getFileType() + "\n");
-			sb.append("\tcontentType = " +document.getContentType() + "\n");
-			sb.append("\tprimaryType = " + document.getPrimaryType() + "\n");
-			sb.append("\tsubType = " + document.getSubType() + "\n");
-			
-			logger.debug(sb.toString());
+		List<Document> docs = new ArrayList<Document>(files.size());
+		for (GridFSDBFile file : files) {
+			docs.add(gridFSDBFile2Document(file, false));
 		}
 		
-		return file;
+		return docs;
 	}
 	
-	private Document gridFSDBFile2Document(GridFSDBFile file, boolean includeContent) {
-		Document document = new Document();
-		
-		document.setId(file.getId().toString());
-		document.setName(file.getFilename());
-		document.setDescription((String) file.get("description"));
-		document.setCreator((String) file.get("creator"));
-		document.setCreatedTime((Date) file.get("createdTime"));
-		document.setLastModifier((String) file.get("lastModifier"));
-		document.setLastModifiedTime((Date) file.get("lastModifiedTime"));
-		document.setForeignId((String) file.get("foreignId"));
-		document.setWeight((Integer) file.get("weight"));
-		document.setOwner((String) file.get("owner"));
-		document.setFileSize(file.getLength());
-		document.setFileType((String) file.get("fileType"));
-		document.setKeyword((String) file.get("keyword"));
-		document.setContent(file.getInputStream());
-		
-		document.setSubType((String) file.get("subType"));
-		document.setPrimaryType((String) file.get("primaryType"));
-		
-		if (includeContent) {
-			document.setContentType(file.getContentType());
-		}
-		
-		return document;
+	@Override
+	public void cleanTemp() {
+		DBObject query = new BasicDBObject();
+		query.put("isTemp", true);
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		fs.remove(query);
 	}
 	
-	private Document gridFSDBFile2Document(GridFSDBFile file) {
-		return this.gridFSDBFile2Document(file, true);
-	}
+	
+
+	
 
 	private List<Document> find(Map<String, Object> map,
 			Map<String, Object> map1, String foreignId, int skip, int limit)

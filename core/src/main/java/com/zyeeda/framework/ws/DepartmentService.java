@@ -53,6 +53,7 @@ public class DepartmentService extends ResourceService {
 		} else {
 			dept.setParent(parent);
 			dept.setId("ou=" + dept.getName() + "," + dept.getParent());
+			dept.setDeptFullPath("ou=" + dept.getName() + "," + dept.getParent());
 			deptMgr.persist(dept);
 			
 			return deptMgr.findById(dept.getId());
@@ -62,10 +63,25 @@ public class DepartmentService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	@Produces("application/json")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+			 			 @FormParam("cascade") String cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		deptMgr.remove(id);
+		LdapUserManager userManager = new LdapUserManager(ldapSvc);
+		if (cascade != null) {
+			deptMgr.remove(id);
+			return "{\"success\": \"true\"}";
+		} else {
+			Integer deptCount = deptMgr.getChildrenCountById(id, "(objectclass=*)");
+			Integer userCount = userManager.getChildrenCountById(id, "(objectclass=*)");
+			if (userCount > 0 || deptCount > 0) {
+				return "{\"success\": \"false\"}";
+			} else {
+				deptMgr.remove(id);
+				return "{\"success\": \"true\"}";
+			}
+		}
 	}
 	
 	@PUT
@@ -99,6 +115,32 @@ public class DepartmentService extends ResourceService {
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		
 		return DepartmentService.fillPropertiesToVo(deptMgr.findByName(name));
+	}
+	
+	@GET
+	@Path("/search")
+	@Produces("application/json")
+	public String search(@FormParam("name") String name) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		List<Department> deptList = deptMgr.search(name);
+		StringBuffer buffer = new StringBuffer("{");
+		buffer.append("\"totalRecords\":").append(deptList.size())
+	      	  .append(",").append("\"startIndex\":").append(0)
+	      	  .append(",").append("\"pageSize\":").append(13)
+	      	  .append(",").append("\"records\":[");
+		for (Department department : deptList) {
+			buffer.append("{\"name\":").append("\"").append(department.getId()).append("\"").append(",")
+			      .append("\"parent\":").append("\"").append(department.getParent() == null ? "" : department.getParent()).append("\"").append(",")
+			      .append("\"fullpath\":").append("\"").append(department.getDeptFullPath() == null ? "" : department.getDeptFullPath()).append("\"").append(",")
+			      .append("\"description\":").append("\"").append(department.getDescription() == null ? "" : department.getDescription()).append("\"").append("},");
+		}
+		if (buffer.lastIndexOf(",") != -1 && deptList.size() > 0) {
+			buffer.deleteCharAt(buffer.lastIndexOf(","));
+		}
+		buffer.append("]}");
+		
+		return buffer.toString();
 	}
 	
 	@GET
@@ -215,6 +257,30 @@ public class DepartmentService extends ResourceService {
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;
+	}
+	
+	@GET
+	@Path("root_and_second_level_dept")
+	@Produces("application/json")
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getRootAndSecondLevelDepartment();
+		
+		return deptList;
+	}
+	
+	@GET
+	@Path("eliminating_team/{id}")
+	@Produces("application/json")
+	public List<Department> getDepartmentListByUserId(@PathParam("id") String userId) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getDepartmentListByUserId(userId);
+		
+		return deptList;
 	}
 	
 	
