@@ -1,6 +1,7 @@
 package com.zyeeda.framework.ws;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.ServletContext;
@@ -247,18 +248,28 @@ public class RoleService extends ResourceService{
 	@GET 
 	@Path("/get_roles_subuser")
 	@Produces("application/json")
-	public List<UserNameVo>  getAllSubUser(){
+	public Set<UserVo>  getAllSubUser(){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String userName = this.getSecurityService().getCurrentUser();
 		List<Role> roleList = roleMgr.getRoleBySubject(userName);
+		
 		//List<String> subjectList = new ArrayList<String>();
-		List<UserNameVo> userNameVoList = new ArrayList<UserNameVo>();
+		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
-			for(String user:role.getSubjects()){
-				UserNameVo userVo = new UserNameVo();
-				userVo.setUserName(user);
-				userNameVoList.add(userVo);
-			}
+		//	if("当班值-值长".equals(role.getName())){
+				for(String user:role.getSubjects()){
+					UserVo userVo = new UserVo();
+					userVo.setCheckName(user);
+					userVo.setLabel(user);
+					userVo.setType("task");
+					userVo.setLeaf(true);
+					for(UserVo userNameVo : userNameVoList ){
+						if(!(userNameVo.getCheckName().equals(user))){
+							userNameVoList.add(userVo);
+						}
+					}
+				}
+		//	}
 		}
 		return userNameVoList;
 	}

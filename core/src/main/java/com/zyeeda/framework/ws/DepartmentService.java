@@ -216,8 +216,6 @@ public class DepartmentService extends ResourceService {
 	
 	public static DepartmentVo fillPropertiesToVo(Department dept) {
 		DepartmentVo deptVo = new DepartmentVo();
-		
-		deptVo.setId(dept.getId());
 		deptVo.setType("io");
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
@@ -269,7 +267,7 @@ public class DepartmentService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getRootAndSecondLevelDepartment();
-//		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
+	//List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
 		return deptList;
 	}
 	
@@ -282,6 +280,41 @@ public class DepartmentService extends ResourceService {
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getChildrenById("o=广州局");
 		return deptList;
+	}
+	
+	@GET
+	@Path("second_level_dept")
+	@Produces("application/json")
+	public List<DepartmentVo> getSecondLevelDepartmentAndRole() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById("o=广州局");
+		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVoAndRoles(deptList);
+		return deptVoList;
+	}
+	public static List<DepartmentVo> fillPropertiesToVoAndRoles(List<Department> deptList) {
+		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
+		DepartmentVo deptVo = null; 
+		for (Department dept : deptList) {
+			deptVo = DepartmentService.fillPropertiesToVo(dept);
+			deptVoList.add(deptVo);
+		}
+		return deptVoList;
+	}
+	
+	public static DepartmentVo fillPropertiesToVoAndRole(Department dept) {
+		DepartmentVo deptVo = new DepartmentVo();
+		deptVo.setType("io");
+		deptVo.setLabel(dept.getName());
+		deptVo.setCheckName(dept.getId());
+		deptVo.setLeaf(true);
+	
+		if (StringUtils.isBlank(deptVo.getDeptFullPath())) {
+			deptVo.setIo("/rest/roles/dept" + deptVo.getDeptFullPath());
+		}
+		deptVo.setKind("dept");
+		return deptVo;
 	}
 
 	/**
@@ -372,8 +405,8 @@ public class DepartmentService extends ResourceService {
 		
 		for (UserVo userVo: userVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
-			orgNodeVo.setId(userVo.getCheckName());
-			orgNodeVo.setCheckName(userVo.getCheckName());
+			orgNodeVo.setId(userVo.getId());
+			orgNodeVo.setCheckName(userVo.getId());
 			orgNodeVo.setIo(userVo.getId());
 			for(String id:userId){
 				if(id.equals(userVo.getId())){
@@ -427,11 +460,17 @@ public class DepartmentService extends ResourceService {
 		return deptVoList;
 	}
 	
-//	
-//	@GET
-//	@Path("/{id}/P")
-//	@Produces("application/json")
-	
+	@GET
+	@Path("/get_children/{id}")
+	@Produces("application/json")
+	public List<Department> getChindren(@PathParam("id") String id) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById(id);
+		return deptList;
+	}
+
 	
 	
 }

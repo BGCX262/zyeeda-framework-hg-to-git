@@ -55,9 +55,7 @@ public class AuthService extends ResourceService {
 				authVO.setLabel("<a>" + permission.getName() + "</a>");
 				authVO.setType("task");
 				authVO.setTag(permission.getValue());
-				// authVO.setValue(permission.getValue());
 				for (String roleAuth : auth) {
-					// System.out.print(roleAuth.trim().equals(permission.getValue().trim()));
 					if (roleAuth.trim().equals(permission.getValue().trim())) {
 						authVO.setCheckedAuth(true);
 						break;
