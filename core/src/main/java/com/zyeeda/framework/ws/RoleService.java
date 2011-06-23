@@ -277,8 +277,8 @@ public class RoleService extends ResourceService{
 	}
 	
 	
-	@POST
-	@Path("/dept/{id}")
+	@GET
+	@Path("/depts/{id}")
 	@Produces("application/json")
 	public List<UserVo> getUserVo(@PathParam("id") String id) {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -303,7 +303,7 @@ public class RoleService extends ResourceService{
 	
 	@GET
 	@Path("/dept/{deptId}")
-	@Produces("applicatioin/json")
+	@Produces("application/json")
 	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		List<Role> list = new ArrayList<Role>();

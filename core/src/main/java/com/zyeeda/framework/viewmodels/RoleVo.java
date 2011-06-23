@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "roleVo")
 public class RoleVo {
-private String id;
+	private String id;
 	
 	private String type;
 	

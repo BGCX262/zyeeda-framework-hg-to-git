@@ -65,10 +65,10 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 				roleVo.setCheckName(role.getName());
 				roleVo.setLabel(role.getName());
 				roleVo.setId(role.getId());
-				roleVo.setLeaf(true);
-				roleVo.setType("tesk");
+				roleVo.setLeaf(false);
+				roleVo.setType("io");
 				roleVo.setKind("department");
-				roleVo.setIo("/rest/dept/" + role.getId());
+				roleVo.setIo("/rest/roles/depts/" + role.getId());
 				listRoleVo.add(roleVo);
 		}
 		return listRoleVo;
@@ -81,8 +81,8 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 			UserVo userVo = new UserVo();
 			userVo.setCheckName(userName);
 			userVo.setLabel(userName);
-			userVo.setType("Tesk");
-			userVo.setLeaf(false);
+			userVo.setType("node");
+			userVo.setLeaf(true);
 			list.add(userVo);
 		}
 		return list;

@@ -307,6 +307,7 @@ public class DepartmentService extends ResourceService {
 		DepartmentVo deptVo = new DepartmentVo();
 		deptVo.setType("io");
 		deptVo.setLabel(dept.getName());
+		deptVo.setId(dept.getDeptFullPath());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
 		if (StringUtils.isNotBlank(dept.getDeptFullPath())) {
