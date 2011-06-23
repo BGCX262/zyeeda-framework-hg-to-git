@@ -32,9 +32,9 @@ public class LDAPTest {
 		String root = "dc=ehv,dc=csg,dc=cn";
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, "ldap://localhost:389/" + root);
+		env.put(Context.PROVIDER_URL, "ldap://192.168.1.14:10389/" + root);
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
+		env.put(Context.SECURITY_PRINCIPAL, "uid=admin,dc=ehv,dc=csg,dc=cn");
 		env.put(Context.SECURITY_CREDENTIALS, "admin");
 		LdapContext ctx = new InitialLdapContext(env, null);
 		return ctx;
@@ -169,7 +169,7 @@ System.out.println(entry.getNameInNamespace());
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=*)",
 				sc);
-		ModificationItem[] mods = new ModificationItem[1];
+		ModificationItem[] mods = new ModificationItem[2];
 		SearchResult rs = null;
 		while (results.hasMore()) {
 			rs = results.next();
@@ -180,7 +180,9 @@ System.out.println(entry.getNameInNamespace());
 	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
 	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
 	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
-
+				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("deptFullPath", 
+		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
 				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
 																	, mods);
 			}
@@ -194,6 +196,7 @@ System.out.println(entry.getNameInNamespace());
 //		save();
 //		ldapPageView();
 //		getAllUser();
+		updateUserDeptFullPath();
 	}
 
 }

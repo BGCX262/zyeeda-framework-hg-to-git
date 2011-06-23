@@ -279,6 +279,17 @@ public class DepartmentService extends ResourceService {
 		return deptList;
 	}
 	
+	@GET
+	@Path("/children/{id}")
+	@Produces("application/json")
+	public List<Department> getChindren(@PathParam("id") String id) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById(id);
+		return deptList;
+	}
+	
 	/**
 	 * 消缺班组
 	 * @param userId
