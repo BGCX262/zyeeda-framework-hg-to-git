@@ -55,10 +55,10 @@ public class LdapEncryptUtils {
 		md.update(salt);
 
 		// 按SSHA把当前用户密码进行计算
-		byte[] inputpwbyte = md.digest();
+		byte[] inputPwByte = md.digest();
 
 		// 返回校验结果
-		return MessageDigest.isEqual(shaCode, inputpwbyte);
+		return MessageDigest.isEqual(shaCode, inputPwByte);
 	}
 	
 	public static void main(String[] args) throws UnsupportedEncodingException {

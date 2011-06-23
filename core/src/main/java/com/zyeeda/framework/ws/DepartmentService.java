@@ -264,13 +264,24 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("root_and_second_level_dept")
 	@Produces("application/json")
-	public List<DepartmentVo> getRootAndSecondLevelDepartment() throws UserPersistException {
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getRootAndSecondLevelDepartment();
-		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
-		return deptVoList;
+//		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
+		return deptList;
+	}
+	
+	@GET
+	@Path("second_level_dept")
+	@Produces("application/json")
+	public List<Department> getSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById("o=广州局");
+		return deptList;
 	}
 
 	/**
