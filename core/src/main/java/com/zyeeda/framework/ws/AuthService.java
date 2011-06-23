@@ -47,9 +47,9 @@ public class AuthService extends ResourceService {
 	public List<AuthVO> getAuthList(List<PermissionVo> list, String roleId,
 			List<String> auth) {
 		List<AuthVO> authList = new ArrayList<AuthVO>();
-		if (list.size() > 0) {
-			for (int i = 0; i < list.size(); i++) {
-				PermissionVo permission = (PermissionVo) list.get(i);
+		
+			for (PermissionVo permission : list) {
+				//PermissionVo permission = (PermissionVo) list.get(i);
 				AuthVO authVO = new AuthVO(); 
 				authVO.setId(permission.getId());
 				authVO.setLabel("<a>" + permission.getName() + "</a>");
@@ -57,6 +57,7 @@ public class AuthService extends ResourceService {
 				authVO.setTag(permission.getValue());
 				for (String roleAuth : auth) {
 					if (roleAuth.trim().equals(permission.getValue().trim())) {
+						System.out.println("*************************" + roleAuth);
 						authVO.setChecked(true);
 						break;
 					} else {
@@ -72,7 +73,7 @@ public class AuthService extends ResourceService {
 				}
 				authList.add(authVO);
 			}
-		}
+		
 		return authList;
 	}
 

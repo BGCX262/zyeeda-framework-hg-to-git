@@ -200,6 +200,7 @@ public class DefaultPermissionManager implements PermissionManager {
 			throws XPathExpressionException, IOException {
 		Set<String> allAuth = new HashSet<String>();
 		for (String auth : authList) {
+			allAuth.add(auth);
 			getParentPermissionListAuthByPath(auth, allAuth);
 		}
 		String utils = StringUtils.join(allAuth, ";");

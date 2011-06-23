@@ -270,7 +270,6 @@ public class RoleService extends ResourceService{
 						continue;
 					}
 					for(UserVo userNameVo : userNameVoList){
-						System.out.println(userNameVo + "******************" + user);
 						if(!(userNameVo.getCheckName().equals(user))){
 							userNameVoList.add(userVo);
 							break;
