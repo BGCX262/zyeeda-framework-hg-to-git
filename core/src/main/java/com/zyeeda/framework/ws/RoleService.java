@@ -212,16 +212,16 @@ public class RoleService extends ResourceService{
 
 	
 	@POST
-	@Path("/{id}/removeUser")
+	@Path("/{id}/remove_user")
 	@Produces("application/json")
 	public RoleWithUserVo removeUser(@PathParam("id") String id, @QueryParam("subject") String subject) throws XPathExpressionException, IOException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		String[] subjects = subject.split(";");
 		boolean result = false;
-		for(String subjectsSub:subjects){
-			for(String auth:role.getSubjects()){
-				if(auth.equals(subjectsSub)){
+		for(String subjectsSub:subjects) {
+			for(String auth:role.getSubjects()) {
+				if(auth.equals(subjectsSub)) {
 					result = true;
 					logger.debug("this role's subject remove is success" );
 					break;
@@ -259,7 +259,7 @@ public class RoleService extends ResourceService{
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
 		//	if("当班值-值长".equals(role.getName())){
-				for(String user:role.getSubjects()){
+				for(String user : role.getSubjects()){
 					UserVo userVo = new UserVo();
 					userVo.setCheckName(user);
 					userVo.setLabel(user);
@@ -272,6 +272,7 @@ public class RoleService extends ResourceService{
 					for(UserVo userNameVo : userNameVoList){
 						if(!(userNameVo.getCheckName().equals(user))){
 							userNameVoList.add(userVo);
+							break;
 						}
 					}
 				}

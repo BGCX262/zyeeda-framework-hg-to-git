@@ -365,7 +365,7 @@ public class DepartmentService extends ResourceService {
 																	   throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		Role role = roleMgr.find(id);
+		Role role = roleMgr.find(roleId);
 		Set<String> roleByUser = new HashSet<String>();
 		if(role != null) {
 			roleByUser = role.getSubjects();
@@ -391,6 +391,7 @@ public class DepartmentService extends ResourceService {
 																		 List<UserVo> userVoList,
 																		 Set<String> userId) {
 		List<OrganizationNodeVo> orgNodeVoList = new ArrayList<OrganizationNodeVo>();
+		System.out.println("*******************************");
 		for (DepartmentVo deptVo: deptVoList) {
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
 			orgNodeVo.setId(deptVo.getId());
@@ -409,10 +410,12 @@ public class DepartmentService extends ResourceService {
 			orgNodeVo.setCheckName(userVo.getCheckName());
 			orgNodeVo.setIo(userVo.getId());
 			for(String id:userId){
+				System.out.println(id+"***************"+userVo.getId()+"******"+userVo.getCheckName());
 				if(id.equals(userVo.getId())){
 					orgNodeVo.setChecked(true);
 				}
 			}
+			System.out.println("*******************************");
 			orgNodeVo.setLabel(userVo.getLabel());
 			orgNodeVo.setType("task");
 			orgNodeVo.setLeaf(userVo.isLeaf());
