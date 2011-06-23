@@ -263,7 +263,11 @@ public class RoleService extends ResourceService{
 					userVo.setLabel(user);
 					userVo.setType("task");
 					userVo.setLeaf(true);
-					for(UserVo userNameVo : userNameVoList ){
+					if(userNameVoList.size() == 0) {
+						userNameVoList.add(userVo);
+						continue;
+					}
+					for(UserVo userNameVo : userNameVoList){
 						if(!(userNameVo.getCheckName().equals(user))){
 							userNameVoList.add(userVo);
 						}
