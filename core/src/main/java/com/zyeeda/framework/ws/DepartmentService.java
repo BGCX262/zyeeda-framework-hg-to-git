@@ -20,8 +20,10 @@ import javax.ws.rs.core.Context;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
+import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
@@ -263,7 +265,6 @@ public class DepartmentService extends ResourceService {
 	@Path("root_and_second_level_dept")
 	@Produces("application/json")
 	public List<DepartmentVo> getRootAndSecondLevelDepartment() throws UserPersistException {
-									throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
@@ -282,14 +283,12 @@ public class DepartmentService extends ResourceService {
 	@Path("eliminating_team")
 	@Produces("application/json")
 	public List<Department> getDepartmentListByUserId() throws UserPersistException {
-		String user = this.getSecurityService().getCurrentUser();
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		UserManager userManager = new LdapUserManager(this.getLdapService());
 		String currentUser = this.getSecurityService().getCurrentUser();
 		List<User> userList = userManager.findByName(currentUser);
-System.out.println("----------------" + userList);
 		User user = null;
 		if (userList != null && userList.size() > 0) {
 			user = userList.get(0);

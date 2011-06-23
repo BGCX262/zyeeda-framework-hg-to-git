@@ -244,23 +244,23 @@ public class RoleService extends ResourceService{
 		return roleWithUserVo;
 	}
 	
-	@POST
-	@Path("/get_roes_subuser")
+	@GET 
+	@Path("/get_roles_subuser")
 	@Produces("application/json")
-	public RoleWithUserVo  getAllSubUser(){
+	public List<UserNameVo>  getAllSubUser(){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String userName = this.getSecurityService().getCurrentUser();
 		List<Role> roleList = roleMgr.getRoleBySubject(userName);
 		//List<String> subjectList = new ArrayList<String>();
-		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
+		List<UserNameVo> userNameVoList = new ArrayList<UserNameVo>();
 		for(Role role : roleList){
 			for(String user:role.getSubjects()){
 				UserNameVo userVo = new UserNameVo();
 				userVo.setUserName(user);
-				roleWithUserVo.getUserName().add(userVo);
+				userNameVoList.add(userVo);
 			}
 		}
-		return roleWithUserVo;
+		return userNameVoList;
 	}
 	
 	
