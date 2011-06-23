@@ -57,10 +57,10 @@ public class AuthService extends ResourceService {
 				authVO.setTag(permission.getValue());
 				for (String roleAuth : auth) {
 					if (roleAuth.trim().equals(permission.getValue().trim())) {
-						authVO.setCheckedAuth(true);
+						authVO.setChecked(true);
 						break;
 					} else {
-						authVO.setCheckedAuth(false);
+						authVO.setChecked(false);
 					}
 				}
 				if ("false".equals(permission.getIsHaveIO().toString())) {

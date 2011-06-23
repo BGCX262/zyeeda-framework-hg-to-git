@@ -191,7 +191,7 @@ public class RoleService extends ResourceService{
 	}
 	
 	@POST
-	@Path("/{id}/removeAuth")
+	@Path("/{id}/remove_auth")
 	@Produces("application/json")
 	public Role removeAuth(@PathParam("id") String id, @QueryParam("permission") String permission) throws XPathExpressionException, IOException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -214,7 +214,7 @@ public class RoleService extends ResourceService{
 	@POST
 	@Path("/{id}/remove_user")
 	@Produces("application/json")
-	public RoleWithUserVo removeUser(@PathParam("id") String id, @QueryParam("subject") String subject) throws XPathExpressionException, IOException{
+	public boolean removeUser(@PathParam("id") String id, @QueryParam("subject") String subject) throws XPathExpressionException, IOException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		String[] subjects = subject.split(";");
@@ -232,19 +232,19 @@ public class RoleService extends ResourceService{
 			}
 		}
 		this.getPersistenceService().getCurrentSession().flush();
-		PermissionManager permissionMgr = new DefaultPermissionManager();
-		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
-		for(String userName:role.getSubjects()){
-			UserNameVo userVo = new UserNameVo();
-			userVo.setUserName(userName);
-			roleWithUserVo.getUserName().add(userVo);
-		}
-		for(String auth:role.getPermissionList()){
-			PermissionVo permission = new PermissionVo();
-		    permission = permissionMgr.getPermissionByPath(auth);
-			roleWithUserVo.getPermission().add(permission);
-		}
-		return roleWithUserVo;
+//		PermissionManager permissionMgr = new DefaultPermissionManager();
+//		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
+//		for(String userName:role.getSubjects()){
+//			UserNameVo userVo = new UserNameVo();
+//			userVo.setUserName(userName);
+//			roleWithUserVo.getUserName().add(userVo);
+//		}
+//		for(String auth:role.getPermissionList()){
+//			PermissionVo permission = new PermissionVo();
+//		    permission = permissionMgr.getPermissionByPath(auth);
+//			roleWithUserVo.getPermission().add(permission);
+//		}
+		return result;
 	}
 	
 	@GET 
@@ -270,6 +270,7 @@ public class RoleService extends ResourceService{
 						continue;
 					}
 					for(UserVo userNameVo : userNameVoList){
+						System.out.println(userNameVo + "******************" + user);
 						if(!(userNameVo.getCheckName().equals(user))){
 							userNameVoList.add(userVo);
 							break;
