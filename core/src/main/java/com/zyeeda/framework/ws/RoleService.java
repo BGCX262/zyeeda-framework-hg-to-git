@@ -114,7 +114,7 @@ public class RoleService extends ResourceService{
 	@POST
 	@Path("/")
 	@Produces("application/json")
-	public List<Role> creatRole(@FormParam("") Role role) {
+	public Role creatRole(@FormParam("") Role role) {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String name = role.getName();
 		Search search = new Search();
@@ -126,7 +126,7 @@ public class RoleService extends ResourceService{
 			roleMgr.persist(role);
 			this.getPersistenceService().getCurrentSession().flush();
 		}
-		return roleMgr.findAll();
+		return roleMgr.find(role.getId());
 	}
 
 	@PUT
