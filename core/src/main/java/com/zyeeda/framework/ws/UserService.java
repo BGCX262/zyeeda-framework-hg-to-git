@@ -7,6 +7,10 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -17,6 +21,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.codehaus.jackson.JsonParseException;
@@ -28,7 +33,9 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
+import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
@@ -264,6 +271,12 @@ public class UserService extends ResourceService {
 //		return objAccount;
 //	}	
 	
+	/**
+	 * 配置系统信息
+	 * 将旧的数据删除，保存新的数据。
+	 * Json list
+	 * return  userList
+	 */
 	@POST
 	@Path("/accounts/{id}")
 	@Produces("application/json")
@@ -276,9 +289,20 @@ public class UserService extends ResourceService {
 			userList = mapper.readValue(userListJson,
 					new TypeReference<List<Account>>() {
 					});
+			List<Account> tempAccountList = new ArrayList<Account>();
+			LdapContext ctx  = ldapSvc.getLdapContext();
+			NamingEnumeration<SearchResult> ns = ctx.search(id, "objectclass=*", SearchControlsFactory.getDefaultSearchControls());
+			while (ns.hasMore()) {
+				Account  ac = AccountHelper.convertAttributesToAccount(ns.next().getAttributes());
+				tempAccountList.add(ac);
+			}
+			for (Account account : tempAccountList) {
+				account.setUserFullPath(id);
+				objAccountManager.remove("username=" + account.getUserName() + "," + id);
+			}
 			for (Account account : userList) {
 				account.setUserFullPath(id);
-				objAccountManager.remove(account.getSystemName());
+//				objAccountManager.remove("username=" + account.getUserName() + "," + id);
 				objAccountManager.update(account);
 			}
 //			logger.debug("UserList size is {}", userList.size());
@@ -287,6 +311,8 @@ public class UserService extends ResourceService {
 		} catch (JsonMappingException e) {
 			logger.error(e.getMessage(), e);
 		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (NamingException e) {
 			logger.error(e.getMessage(), e);
 		}
 		return userList;
@@ -304,6 +330,9 @@ public class UserService extends ResourceService {
 ////	newAccount.setVisible(account.getVisible());
 ////	newAccount.setUserFullPath(id);
 
+	/**
+	 * get account list
+	 */
 	@GET
 	@Path("/accounts/{id}")
 	@Produces("application/json")
@@ -339,4 +368,13 @@ public class UserService extends ResourceService {
 		}
 	}
 	*/
+	
+	@GET
+	@Path("/accounts/mock")
+	@Produces("application/json")
+	public Account mockSignIn(@QueryParam("uid") String uid,@QueryParam("systemName") String systemName) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);	
+		return objAccountManager.findByUserIdAndSystemName(uid, systemName);
+	}
 }

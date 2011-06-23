@@ -9,7 +9,6 @@ import java.util.List;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
@@ -75,25 +74,36 @@ public class SystemAccountManager implements AccountManager {
 		return null;
 	}
 
+//	public void update(Account account) throws UserPersistException {
+//		LdapContext context = null;
+//		try {
+//			context = this.getLdapContext();
+//			Attributes attributes = AccountHelper.convertAccountToAttributes(account);
+//			String dn = "username=" + account.getUserName() + "," + account.getUserFullPath();
+//			NamingEnumeration<SearchResult> ne = context.search(account.getUserFullPath(), "username=" + account.getUserName(),
+//						   SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+//			System.out.println("------------" + ne.hasMore());
+//			if (ne.hasMore()) {
+//				context.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
+//			} else {
+//				context.bind(dn, null, attributes);
+//			}
+//		} catch (NamingException e) {
+//			throw new UserPersistException(e);
+//		}
+//	}
+	
 	public void update(Account account) throws UserPersistException {
-		LdapContext context = null;
+		Attributes attributes = AccountHelper.convertAccountToAttributes(account);
+		String dn = "username=" + account.getUserName() + "," + account.getUserFullPath();
 		try {
-			context = this.getLdapContext();
-			Attributes attributes = AccountHelper.convertAccountToAttributes(account);
-			String dn = "username=" + account.getUserName() + "," + account.getUserFullPath();
-			NamingEnumeration<SearchResult> ne = context.search(account.getUserFullPath(),
-						   "username=" + account.getUserName(),
-						   SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
-			if (ne.hasMore()) {
-				context.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
-			} else {
-				context.bind(dn, null, attributes);
-			}
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate.bind(dn, attributes);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
 	}
-
+	
 	private LdapContext getLdapContext() throws NamingException {
 		return this.ldapSvc.getLdapContext();
 	}
