@@ -297,7 +297,7 @@ public class DepartmentService extends ResourceService {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
 		DepartmentVo deptVo = null; 
 		for (Department dept : deptList) {
-			deptVo = DepartmentService.fillPropertiesToVo(dept);
+			deptVo = DepartmentService.fillPropertiesToVoAndRole(dept);
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;

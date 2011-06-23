@@ -42,7 +42,7 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
-	@Path("/{id}/getRole")
+	@Path("/{id}/get_role")
 	@Produces("application/json")
 	public Role getOneRolesById(@PathParam("id") String id) {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -110,8 +110,6 @@ public class RoleService extends ResourceService{
 		this.getPersistenceService().getCurrentSession().flush();
 		return roleMgr.findAll();
 	}
-	
-	
 	
 	@POST
 	@Path("/")
