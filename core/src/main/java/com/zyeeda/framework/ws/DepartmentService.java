@@ -268,6 +268,17 @@ public class DepartmentService extends ResourceService {
 		return deptList;
 	}
 	
+	@GET
+	@Path("second_level_dept")
+	@Produces("application/json")
+	public List<Department> getSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById("o=广州局");
+		return deptList;
+	}
+	
 	/**
 	 * 消缺班组
 	 * @param userId
@@ -284,7 +295,6 @@ public class DepartmentService extends ResourceService {
 		UserManager userManager = new LdapUserManager(this.getLdapService());
 		String currentUser = this.getSecurityService().getCurrentUser();
 		List<User> userList = userManager.findByName(currentUser);
-System.out.println("----------------" + userList);
 		User user = null;
 		if (userList != null && userList.size() > 0) {
 			user = userList.get(0);
