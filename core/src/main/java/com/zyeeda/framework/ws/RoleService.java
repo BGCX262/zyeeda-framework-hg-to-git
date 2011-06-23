@@ -65,15 +65,20 @@ public class RoleService extends ResourceService{
 	@DELETE
 	@Path("/")
 	@Produces("application/json")
-	public List<Role>  getRoles(@QueryParam("ids") String ids ){
+	public boolean  getRoles(@QueryParam("ids") String ids ){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		if(roleMgr != null){
-			String[] id=ids.split(";");
-			for(String sigleId:id){
-				roleMgr.removeById(sigleId);
+		boolean bool = true;
+		try {
+			if(roleMgr != null){
+				String[] id=ids.split(";");
+				for(String sigleId:id){
+					roleMgr.removeById(sigleId);
+				}
 			}
+		} catch (Exception e) {
+			bool = false;
 		}
-		return roleMgr.findAll();
+		return bool;
 	}
 	
 	@GET
@@ -101,14 +106,13 @@ public class RoleService extends ResourceService{
 	@POST
 	@Path("/{id}/edite")
 	@Produces("application/json")
-	public List<Role> editeRole(@PathParam("id") String id, @FormParam("") Role role){
+	public Role editeRole(@PathParam("id") String id, @FormParam("") Role role){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role newRole=roleMgr.find(id);
 		newRole.setName(role.getName());
 		newRole.setDescription(role.getDescription());
-		//newRole.setPermissions(role.getPermissions());
 		this.getPersistenceService().getCurrentSession().flush();
-		return roleMgr.findAll();
+		return roleMgr.find(id);
 	}
 	
 	@POST
@@ -125,8 +129,8 @@ public class RoleService extends ResourceService{
 		}else{
 			roleMgr.persist(role);
 			this.getPersistenceService().getCurrentSession().flush();
+			return roleMgr.find(role.getId());
 		}
-		return roleMgr.find(role.getId());
 	}
 
 	@PUT
