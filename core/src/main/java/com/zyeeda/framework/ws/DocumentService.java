@@ -92,8 +92,13 @@ public class DocumentService extends ResourceService {
 					doc.setContent(is);
 				} else if ("Filename".equals(key)) {
 					String value = IOUtils.toString(attach.getDataHandler().getInputStream(), "UTF-8");
-					logger.debug("multipart: fileName = {}", value);
 					doc.setName(value);
+					String fileType = StringUtils.substringAfterLast(value, ".");
+					doc.setFileType(fileType);
+					if (logger.isDebugEnabled()) {
+						logger.debug("multipart: fileName = {}", value);
+						logger.debug("file type = {}", value);
+					}
 				}
 			}
 			
