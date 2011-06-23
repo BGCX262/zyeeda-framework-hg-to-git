@@ -43,6 +43,7 @@ public class MenuService extends ResourceService {
 		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
+		System.out.println("*******************" + user);
 		roles = roleMgr.getRoleBySubject(user);	
 		if(roles.size() == 1) {
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());

@@ -308,7 +308,7 @@ public class LdapTemplate{
         }
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings("unchecked")
 	public void deleteRecursively(LdapContext entry) 
     								throws NamingException {
 		NamingEnumeration<Binding> ne = entry.listBindings("");

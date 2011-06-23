@@ -17,6 +17,7 @@ public class MongoDbDocumentManagerHelper {
 	public static GridFSFile document2GridFSFile(GridFS fs, Document document) {
 		GridFSFile file = fs.createFile(document.getContent());
 		
+		file.put("isTemp", document.isTemp());
 		file.put("filename", document.getName()); // 数据库自带filename
 		file.put("description", document.getDescription());
 		file.put("creator", document.getCreator());
@@ -63,25 +64,27 @@ public class MongoDbDocumentManagerHelper {
 		Document document = new Document();
 		
 		document.setId(file.getId().toString());
+		
 		document.setName(file.getFilename());
 		document.setDescription((String) file.get("description"));
 		document.setCreator((String) file.get("creator"));
-		document.setCreatedTime((Date) file.get("createdTime"));
+		document.setCreatedTime((Date) file.getUploadDate());
 		document.setLastModifier((String) file.get("lastModifier"));
 		document.setLastModifiedTime((Date) file.get("lastModifiedTime"));
+		
 		document.setForeignId((String) file.get("foreignId"));
 		document.setWeight((Integer) file.get("weight"));
 		document.setOwner((String) file.get("owner"));
-		document.setFileSize(file.getLength());
-		document.setFileType((String) file.get("fileType"));
 		document.setKeyword((String) file.get("keyword"));
-		document.setContent(file.getInputStream());
 		
-		document.setSubType((String) file.get("subType"));
+		document.setFileType((String) file.get("fileType"));
+		document.setContentType(file.getContentType());
 		document.setPrimaryType((String) file.get("primaryType"));
+		document.setSubType((String) file.get("subType"));
 		
+		document.setFileSize(file.getLength());
 		if (includeContent) {
-			document.setContentType(file.getContentType());
+			document.setContent(file.getInputStream());
 		}
 		
 		return document;

@@ -16,5 +16,11 @@ public interface DepartmentManager {
 	
 	public List<Department> getChildrenById(String id) throws UserPersistException;
 	
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException;
+	
+	public List<Department> getDepartmentListByUserId(String userId) throws UserPersistException;
+	
+	public List<Department> search(String condition) throws UserPersistException;
+	
 	public List<Department> findByName(String name) throws UserPersistException;
 }

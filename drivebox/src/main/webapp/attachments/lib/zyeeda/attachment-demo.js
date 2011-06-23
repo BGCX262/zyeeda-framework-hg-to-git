@@ -2,7 +2,7 @@ ZYEEDA.namespace('com.zyeeda.zui.framework.demo').AttachmentDemo = function() {
 
     return {
         main : function(Z) {
-            var attach = new Z.Attachment({
+            var attach = new Z.AttachmentManager({
                 totalCountUrl : Z.cfg.uploader.totalCountUrl,
                 uploadUrl : Z.cfg.uploader.uploadUrl,
                 listUrl : Z.cfg.uploader.listUrl,

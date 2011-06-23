@@ -58,12 +58,14 @@ public class ResourceService {
 		return this.reg.getService(IocUtils.getServiceId(QuartzSchedulerServiceProvider.class), SchedulerService.class);
 	}
 	
+	protected KnowledgeService getKnowledgeService(){
+		return this.reg.getService(KnowledgeService.class);
+	}
+	
 	protected MongoDbService getMongoDbService() {
 		return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
 	}
 	
-	protected KnowledgeService getKnowledgeService(){
-		return this.reg.getService(KnowledgeService.class);
-	}
+	
 	
 }

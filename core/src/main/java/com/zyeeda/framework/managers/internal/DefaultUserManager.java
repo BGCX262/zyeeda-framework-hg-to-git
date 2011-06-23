@@ -77,4 +77,10 @@ public class DefaultUserManager extends DomainEntityManager<User, String>
 		super.em().createQuery("update com.zyeeda.framework.entities.User o set o.status = ?1 where o.id in(?2)")
 				                     .setParameter(1, visible).setParameter(2, buffer.toString()).executeUpdate();
 	}
+
+	@Override
+	public List<User> search(String condition) throws UserPersistException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
