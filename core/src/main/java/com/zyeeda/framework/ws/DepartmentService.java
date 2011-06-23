@@ -283,7 +283,7 @@ public class DepartmentService extends ResourceService {
 	}
 	
 	@GET
-	@Path("second_level_dept")
+	@Path("second_level_dept_role")
 	@Produces("application/json")
 	public List<DepartmentVo> getSecondLevelDepartmentAndRole() throws UserPersistException {
 		List<Department> deptList = null;
