@@ -95,7 +95,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 			for (Attributes attr : attrList) {
 				Department department = marshal(attr);
 				department.setParent(dn);
-				department.setDeptFullPath(dn);
+				department.setDeptFullPath("ou=" + department.getId() + "," + dn);
 				deptList.add(department);
 			}
 			
