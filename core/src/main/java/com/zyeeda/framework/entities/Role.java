@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.FetchType;
 import javax.persistence.Column;
 import javax.persistence.Basic;
 import javax.persistence.JoinColumn;
@@ -52,8 +51,8 @@ public class Role extends SimpleDomainEntity {
 		this.subjects = subjects;
 	}
 
-	@Basic(fetch = FetchType.LAZY)
-	@Column(name = "F_PERMISSIONS", length = 4000)
+	@javax.persistence.Lob
+	@javax.persistence.Column(name = "F_PERMISSIONS")
 	public String getPermissions() {
 		return this.permissions;
 	}

@@ -1,7 +1,5 @@
 package com.zyeeda.framework.viewmodels;
 
-import java.util.Date;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "document")
@@ -14,7 +12,7 @@ public class DocumentVo {
 	private long fileSize;
 	private String fileType;
 	private String creator;
-	private Date createdTime;
+	private String createdTime;
 	
 	private String updateUrl;
 	private String viewUrl;
@@ -56,10 +54,10 @@ public class DocumentVo {
 		this.creator = creator;
 	}
 	
-	public Date getCreatedTime() {
+	public String getCreatedTime() {
 		return createdTime;
 	}
-	public void setCreatedTime(Date createdTime) {
+	public void setCreatedTime(String createdTime) {
 		this.createdTime = createdTime;
 	}
 	

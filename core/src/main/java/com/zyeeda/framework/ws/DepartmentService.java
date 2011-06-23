@@ -57,10 +57,25 @@ public class DepartmentService extends ResourceService {
 	@DELETE
 	@Path("/{id}")
 	@Produces("application/json")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+			 			 @FormParam("cascade") String cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		deptMgr.remove(id);
+		LdapUserManager userManager = new LdapUserManager(ldapSvc);
+		if (cascade != null) {
+			deptMgr.remove(id);
+			return "{\"success\": \"true\"}";
+		} else {
+			Integer deptCount = deptMgr.getChildrenCountById(id, "(objectclass=*)");
+			Integer userCount = userManager.getChildrenCountById(id, "(objectclass=*)");
+			if (userCount > 0 || deptCount > 0) {
+				return "{\"success\": \"false\"}";
+			} else {
+				deptMgr.remove(id);
+				return "{\"success\": \"true\"}";
+			}
+		}
 	}
 	
 	@PUT
@@ -173,8 +188,16 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
-		deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children");
+		if (StringUtils.isBlank(dept.getParent())) {
+			deptVo.setDeptFullPath("o=" + dept.getId());
+		} else {
+			deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
+		}
+		if (StringUtils.isBlank(deptVo.getDeptFullPath())) {
+			deptVo.setIo("/rest/depts/root/children");
+		} else {
+			deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children");
+		}
 		deptVo.setKind("dept");
 		
 		return deptVo;
@@ -202,6 +225,30 @@ public class DepartmentService extends ResourceService {
 			deptVoList.add(deptVo);
 		}
 		return deptVoList;
+	}
+	
+	@GET
+	@PathParam("root_and_second_level_dept")
+	@Produces("application/json")
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getRootAndSecondLevelDepartment();
+		
+		return deptList;
+	}
+	
+	@GET
+	@Path("eliminating_team/{id}")
+	@Produces("application/json")
+	public List<Department> getDepartmentListByUserId(@PathParam("id") String userId) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getDepartmentListByUserId(userId);
+		
+		return deptList;
 	}
 	
 }

@@ -35,6 +35,8 @@ public class Document extends RevisionDomainEntity {
     private String keyword;
     // 类别
     private String category;
+    // 是否为临时文件
+    private boolean temp;
     
     // 文件内容
     private InputStream content;
@@ -126,6 +128,13 @@ public class Document extends RevisionDomainEntity {
 	public void setContent(InputStream content) {
 		this.content = content;
 	}
-    
+	
+	public boolean isTemp() {
+		return temp;
+	}
+
+	public void setTemp(boolean temp) {
+		this.temp = temp;
+	}
     
 }

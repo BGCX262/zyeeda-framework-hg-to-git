@@ -84,6 +84,19 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		}
 	}
+	
+	public Integer getChildrenCountById(String id, String filter) throws UserPersistException {
+		try {
+			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrsList = ldapTemplate.getResultList(id,
+															 		filter,
+															 		SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+		
+			return attrsList.size();
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
 
 	@Override
 	public List<User> findByDepartmentId(String id) throws UserPersistException {
@@ -96,7 +109,11 @@ public class LdapUserManager implements UserManager {
 			userList = new ArrayList<User>(attrsList.size());
 			for (Attributes attrs : attrsList) {
 				User user = LdapUserManager.marshal(attrs);
-				user.setDeptFullPath("uid=" + user.getId() + "," + id);
+				if (StringUtils.isNotBlank(id)) {
+					user.setDeptFullPath("uid=" + user.getId() + "," + id);
+				} else {
+					user.setDeptFullPath("uid=" + user.getId());
+				}
 				userList.add(user);
 			}
 			return userList;
@@ -235,7 +252,7 @@ public class LdapUserManager implements UserManager {
 //        return bytes;
 //	}
 	
-	private static Attributes unmarshal(User user) throws UnsupportedEncodingException {
+	public static Attributes unmarshal(User user) throws UnsupportedEncodingException {
 		Attributes attrs = new BasicAttributes();
 
 		attrs.put("objectClass", "top");
@@ -290,13 +307,11 @@ public class LdapUserManager implements UserManager {
 		return attrs;
 	}
 	
-	private static User marshal(Attributes attrs) throws NamingException,
+	public static User marshal(Attributes attrs) throws NamingException,
 														 ParseException {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
-		user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
-//		user.setPassword(user.getPassword().substring(5, user.getPassword().length()));
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());
 		}

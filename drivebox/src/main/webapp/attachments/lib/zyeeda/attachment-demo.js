@@ -1,12 +1,15 @@
-ZYEEDA.namespace('framework.zui.demo').AttachmentDemo = function() {
+ZYEEDA.namespace('com.zyeeda.zui.framework.demo').AttachmentDemo = function() {
 
-};
+    return {
+        main : function(Z) {
+            var attach = new Z.AttachmentManager({
+                totalCountUrl : Z.cfg.uploader.totalCountUrl,
+                uploadUrl : Z.cfg.uploader.uploadUrl,
+                listUrl : Z.cfg.uploader.listUrl,
+                foreignId : 'tangrui'
+            });
+            attach.render('#attachment');
+        }
+    }
 
-ZYEEDA.framework.zui.demo.AttachmentDemo.prototype.main = function(Z) {
-    var attach = new Z.Attachment({
-        foreignId : 'tangrui',
-        totalCountUrl : 'rest/docs/count',
-        uploadUrl : '../../../../../../rest/docs/'
-    });
-    attach.render('#attachment');
-}
+}();

@@ -63,6 +63,10 @@ public class ResourceService {
 	}
 	
 	protected KnowledgeService getKnowledgeService(){
-		return  this.reg.getService(KnowledgeService.class);
+		return this.reg.getService(KnowledgeService.class);
+	}
+	
+	protected MongoDbService getMongoDbService() {
+		return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
 	}
 }

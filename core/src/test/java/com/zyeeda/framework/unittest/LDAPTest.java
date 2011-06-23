@@ -1,6 +1,7 @@
 package com.zyeeda.framework.unittest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Hashtable;
 
 import javax.naming.Context;
@@ -20,6 +21,8 @@ import javax.naming.ldap.SortControl;
 import javax.naming.ldap.SortResponseControl;
 
 import org.apache.commons.codec.digest.DigestUtils;
+
+import com.zyeeda.framework.utils.LdapEncryptUtils;
 
 public class LDAPTest {
 	public LDAPTest() {}
@@ -44,18 +47,19 @@ public class LDAPTest {
 		ctx.setRequestControls(new Control[] { new PagedResultsControl(
 				pageSize, Control.CRITICAL) });
 		String sortKey = "uid";
-	    ctx.setRequestControls(new Control[] {
-	             new SortControl(sortKey, Control.NONCRITICAL) });
-	    System.out.println("------------" + ctx.getRequestControls());
+//	    ctx.setRequestControls(new Control[] {
+//	             new SortControl(sortKey, Control.NONCRITICAL) });
 		// Perform the search
-		NamingEnumeration<SearchResult> results = ctx.search("", "(objectclass=*)",
+		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=Test5)",
 				new SearchControls());
-
+System.out.println(LdapEncryptUtils.md5Encode(DigestUtils.md5Hex("123456")));
 		// Iterate over a batch of search results sent by the server
 		while (results != null && results.hasMore()) {
 			// Display an entry
 			SearchResult entry = (SearchResult) results.next();
-System.out.println(entry.getName());
+			Attributes attributes = entry.getAttributes();
+//			System.out.println(new String((byte[])attributes.get("userpassword").get()));
+			System.out.println(attributes.get("userpassword").get());
 
 			// Handle the entry's response controls (if any)
 			if (entry instanceof HasControls) {
@@ -120,9 +124,9 @@ System.out.println(entry.getName());
 		}
 	}
 	
-	public static void save() throws NamingException {
+	public static void save() throws NamingException, UnsupportedEncodingException {
 		LdapContext ctx = getLdapContext();
-		String dn = "uid=Test2,o=广州局";
+		String dn = "uid=Test5,o=广州局";
 		Attributes attrs = new BasicAttributes();
 		
 		attrs.put("objectClass", "top");
@@ -131,9 +135,28 @@ System.out.println(entry.getName());
 		attrs.put("objectClass", "inetOrgPerson");
 		attrs.put("objectClass", "employee");
 
+		attrs.put("cn", "Tes5");
+		attrs.put("sn", "Tes5");
+		attrs.put("userPassword", "123456");
+		ctx.bind(dn, null, attrs);
+	}
+	
+	public static void saveUserRefObject() throws NamingException {
+		LdapContext ctx = getLdapContext();
+		String dn = "username=y,uid=Test2,o=广州局";
+		Attributes attrs = new BasicAttributes();
+		
+		attrs.put("objectClass", "top");
+		attrs.put("objectClass", "person");
+		attrs.put("objectClass", "organizationalPerson");
+		attrs.put("objectClass", "inetOrgPerson");
+		attrs.put("objectClass", "userReferenceSystem");
+
 		attrs.put("cn", "Tes2");
 		attrs.put("sn", "Tes2");
-		attrs.put("userPassword", DigestUtils.md5Hex("123456"));
+		attrs.put("username", "test");
+		attrs.put("password", DigestUtils.sha256("123456"));
+		attrs.put("systemName", "test");
 		ctx.bind(dn, null, attrs);
 	}
 	
@@ -183,7 +206,11 @@ System.out.println(entry.getName());
 //		}
 //		System.exit(0);
 //		save();
-		sort();
+//		saveUserRefObject();
+//		save();
+		ldapPageView();
+		//{SSHA}p/di1QhaV/9Npn7umA+cGZkrBAmgKedkwtLqlQ==
+		System.out.println(DigestUtils.sha("123456"));
 	}
 
 }

@@ -82,10 +82,23 @@ public class UserService extends ResourceService {
 	
 	@DELETE
 	@Path("/{id}")
-	public void remove(@PathParam("id") String id) throws UserPersistException {
+	public String remove(@PathParam("id") String id,
+						 @PathParam("cascade") Boolean cascade)
+					throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		userMgr.remove(id);
+		if (cascade != null) {
+			userMgr.remove(id);
+			return "{success: 'true'}";
+		} else {
+			Integer count = userMgr.getChildrenCountById(id, "(objectclass=*)");
+			if (count > 0) {
+				return "{\"success\": \"false\"}";
+			} else {
+				userMgr.remove(id);
+				return "{\"success\": \"true\"}";
+			}
+		}
 	}
 	
 	@PUT
@@ -147,6 +160,9 @@ public class UserService extends ResourceService {
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
+		System.out.println("-----------oldPwd:" + u.getPassword());
+		System.out.println("-----------oldPwd:" + oldPassword);
+		System.out.println("-----------oldPwd:" + LdapEncryptUtils.md5Encode(oldPassword));
 		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
 			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
 				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));
