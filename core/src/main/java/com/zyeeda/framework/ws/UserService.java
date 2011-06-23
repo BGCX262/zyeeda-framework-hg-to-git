@@ -239,16 +239,14 @@ public class UserService extends ResourceService {
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
-
 		userVo.setId(user.getId());
 		userVo.setType("io");
-		userVo.setLabel( user.getId() );
+		userVo.setLabel(user.getId() );
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
 		userVo.setKind("user");
-
 		return userVo;
 	}
 	
