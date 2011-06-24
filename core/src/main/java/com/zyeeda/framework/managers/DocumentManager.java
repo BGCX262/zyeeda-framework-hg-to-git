@@ -1,6 +1,5 @@
 package com.zyeeda.framework.managers;
 
-import java.net.UnknownHostException;
 import java.util.List;
 
 import com.zyeeda.framework.entities.Document;
@@ -21,16 +20,18 @@ public interface DocumentManager {
 	
 	public List<Document> findByForeignId(String foreignId);
 	
-	public void cleanTemp();
+	public long countByIsTemp();
+	
+	public void eraseTemp();
+	
+	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes);
 	
 	
 	
 	
 	
 	
-	
-	
-	
+	/*
 	public int findNumber(String owner,String foreignId,String[] keyword) throws DocumentException;
 	
 	public int findNumber(String foreignId, String[] keyword) throws DocumentException;
@@ -60,4 +61,5 @@ public interface DocumentManager {
 
 	public void allremoveById(String[] id) throws DocumentException;
 
+	*/
 }
