@@ -1,5 +1,6 @@
 package com.zyeeda.framework.ws;
 
+import java.util.Collections;
 import java.util.List;
 
 
@@ -17,6 +18,7 @@ import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Dictionary;
 import com.zyeeda.framework.managers.DictionaryManager;
 import com.zyeeda.framework.managers.internal.DefaultDictionaryManager;
+import com.zyeeda.framework.utils.MenuListComparator;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/dicts")
