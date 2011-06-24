@@ -1,17 +1,16 @@
 package com.zyeeda.framework.viewmodels;
 
 import java.util.ArrayList;
-
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.zyeeda.framework.viewmodels.PermissionVo;
 
 
 @XmlRootElement(name = "roleWithUserVo")
 public class RoleWithUserVo {
-	private List<UserNameVo> userName = new ArrayList<UserNameVo>();
+	private Set<UserNameVo> userName = new HashSet<UserNameVo>();
 	
 	private List<PermissionVo> permission = new ArrayList<PermissionVo>();
 	
@@ -23,13 +22,14 @@ public class RoleWithUserVo {
 		this.permission = permission;
 	}
 
-	public List<UserNameVo> getUserName() {
+	public Set<UserNameVo> getUserName() {
 		return userName;
 	}
 
-	public void setUserName(List<UserNameVo> userName) {
+	public void setUserName(Set<UserNameVo> userName) {
 		this.userName = userName;
 	}
+
 
 
 	

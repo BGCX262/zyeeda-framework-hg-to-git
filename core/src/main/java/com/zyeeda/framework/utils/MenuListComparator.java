@@ -1,11 +1,9 @@
 package com.zyeeda.framework.utils;
 
 import java.util.Comparator;
-
-
 import com.zyeeda.framework.viewmodels.MenuVo;
 
-public class MenuListComparator implements Comparator {
+public class MenuListComparator implements Comparator<Object> {
 	
 
 	@Override
@@ -20,6 +18,5 @@ public class MenuListComparator implements Comparator {
 		}
 		return flag;
 	}
-
 	
 }

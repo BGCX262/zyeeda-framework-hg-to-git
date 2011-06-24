@@ -9,7 +9,6 @@ public class PermissionVo {
 	private int path = 0;
 	private String orderBy;
 	
-	
 
 	public String getOrderBy() {
 		return orderBy;

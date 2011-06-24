@@ -24,6 +24,15 @@ public class OrganizationNodeVo implements Serializable{
 	private String fullPath;
 	private Boolean checkedAuth;
 	
+	private Boolean checked;
+
+	public Boolean getChecked() {
+		return checked;
+	}
+
+	public void setChecked(Boolean checked) {
+		this.checked = checked;
+	}
 
 	/*标识是用户还是部门*/
 	private String kind;

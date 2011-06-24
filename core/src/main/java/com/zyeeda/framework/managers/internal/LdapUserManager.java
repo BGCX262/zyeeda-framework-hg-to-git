@@ -22,7 +22,6 @@ import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.DatetimeUtils;
-import com.zyeeda.framework.utils.LdapEncryptUtils;
 
 public class LdapUserManager implements UserManager {
 
@@ -269,9 +268,9 @@ public class LdapUserManager implements UserManager {
 		attrs.put("uid", user.getId());
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", LdapEncryptUtils.md5Encode(user.getPassword()));
+			attrs.put("userPassword", user.getPassword());
 		} else {
-			attrs.put("userPassword", LdapEncryptUtils.md5Encode(LDAP_DEFAULT_PASSWORD));
+			attrs.put("userPassword", LDAP_DEFAULT_PASSWORD);
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -315,6 +314,9 @@ public class LdapUserManager implements UserManager {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
+		if (attrs.get("userPassword") != null) {
+			user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
+		}
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());
 		}

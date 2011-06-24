@@ -47,22 +47,20 @@ public class AuthService extends ResourceService {
 	public List<AuthVO> getAuthList(List<PermissionVo> list, String roleId,
 			List<String> auth) {
 		List<AuthVO> authList = new ArrayList<AuthVO>();
-		if (list.size() > 0) {
-			for (int i = 0; i < list.size(); i++) {
-				PermissionVo permission = (PermissionVo) list.get(i);
+		
+			for (PermissionVo permission : list) {
+				//PermissionVo permission = (PermissionVo) list.get(i);
 				AuthVO authVO = new AuthVO(); 
 				authVO.setId(permission.getId());
 				authVO.setLabel("<a>" + permission.getName() + "</a>");
 				authVO.setType("task");
 				authVO.setTag(permission.getValue());
-				// authVO.setValue(permission.getValue());
 				for (String roleAuth : auth) {
-					// System.out.print(roleAuth.trim().equals(permission.getValue().trim()));
 					if (roleAuth.trim().equals(permission.getValue().trim())) {
-						authVO.setCheckedAuth(true);
+						authVO.setChecked(true);
 						break;
 					} else {
-						authVO.setCheckedAuth(false);
+						authVO.setChecked(false);
 					}
 				}
 				if ("false".equals(permission.getIsHaveIO().toString())) {
@@ -74,8 +72,25 @@ public class AuthService extends ResourceService {
 				}
 				authList.add(authVO);
 			}
-		}
+		
 		return authList;
+	}
+	
+	
+	@GET
+	@Path("/{id}/{role_id}")
+	@Produces("application/json")
+	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id,
+			@PathParam("role_id") String roleId)
+			throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
+		Role role = roleMgr.find(roleId);
+		List<AuthVO> authVO = getAuthList(list, roleId, role
+				.getPermissionList());
+		return authVO;
 	}
 
 }
