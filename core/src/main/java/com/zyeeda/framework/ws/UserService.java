@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -24,6 +26,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import org.apache.tapestry5.ioc.internal.services.RegistryShutdownHubImpl;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -31,6 +35,10 @@ import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zyeeda.framework.account.AccountService;
+import com.zyeeda.framework.account.internal.SystemAccountServiceProvider;
+import com.zyeeda.framework.config.ConfigurationService;
+import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.helpers.AccountHelper;
@@ -413,13 +421,33 @@ public class UserService extends ResourceService {
 		}
 	}
 	*/
-	
+//	
+	//@Path("/mock")
 	@GET
-	@Path("/accounts/mock")
+	@Path("/systemUsers/{uid}/{systemName}")
 	@Produces("application/json")
-	public Account mockSignIn(@QueryParam("uid") String uid,@QueryParam("systemName") String systemName) throws UserPersistException{
+	public Account mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
+		logger.debug("uid = {} and systemName = {}", uid, systemName);
 		LdapService ldapSvc = this.getLdapService();
-		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);	
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		RegistryShutdownHub regShutdownHub = new RegistryShutdownHubImpl(logger);
+		Collection<ServletContext> contexts = new ArrayList<ServletContext>();
+		contexts.add(this.getServletContext());
+		ConfigurationService configService = new DefaultConfigurationServiceProvider(contexts, regShutdownHub);
+		AccountService aService = new SystemAccountServiceProvider(configService, regShutdownHub);
+		List<Account> list = objAccountManager.findByUserId(uid);
+		
+		Map map = aService.getMockSignInConfig("oa.sign.in.url.test");
+		logger.debug("map url is {}", map.get("oa.sign.in.url.test"));
+		
 		return objAccountManager.findByUserIdAndSystemName(uid, systemName);
 	}
+	
+	@GET
+	@Path("/tests/{uid}/{systemName}")
+	public String testMethod(@PathParam("uid") String uid,@PathParam("systemName") String systemName) {
+
+		return "uid = "+uid + " systemName = "+systemName;
+	}
+	
 }

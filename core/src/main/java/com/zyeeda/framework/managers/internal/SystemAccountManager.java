@@ -115,6 +115,7 @@ public class SystemAccountManager implements AccountManager {
 
 		try {
 			context = this.getLdapContext();
+System.out.println("*********************" + dn);
 			NamingEnumeration<SearchResult> nes = context.search(dn, filter,
 					SearchControlsFactory
 							.getSearchControls(SearchControls.ONELEVEL_SCOPE));
