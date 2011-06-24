@@ -57,7 +57,6 @@ public class AuthService extends ResourceService {
 				authVO.setTag(permission.getValue());
 				for (String roleAuth : auth) {
 					if (roleAuth.trim().equals(permission.getValue().trim())) {
-						System.out.println("*************************" + roleAuth);
 						authVO.setChecked(true);
 						break;
 					} else {
@@ -75,6 +74,23 @@ public class AuthService extends ResourceService {
 			}
 		
 		return authList;
+	}
+	
+	
+	@GET
+	@Path("/{id}/{role_id}")
+	@Produces("application/json")
+	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id,
+			@PathParam("role_id") String roleId)
+			throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
+		Role role = roleMgr.find(roleId);
+		List<AuthVO> authVO = getAuthList(list, roleId, role
+				.getPermissionList());
+		return authVO;
 	}
 
 }
