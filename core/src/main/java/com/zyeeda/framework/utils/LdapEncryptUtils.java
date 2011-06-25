@@ -61,8 +61,8 @@ public class LdapEncryptUtils {
 		return MessageDigest.isEqual(shaCode, inputPwByte);
 	}
 	
-	public static void main(String[] args) throws UnsupportedEncodingException {
+	public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		//e10adc3949ba59abbe56e057f20f883e
-		System.out.println(md5Encode("12345"));
+		System.out.println(verifySHA("{SSHA}F0+mJuFlXPlDLnCgEif/FyZgQsGFdzSqRPLRVA==", "111111"));
 	}
 }
