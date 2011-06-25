@@ -57,7 +57,6 @@ public class DepartmentService extends ResourceService {
 			dept.setId("ou=" + dept.getName() + "," + dept.getParent());
 			dept.setDeptFullPath("ou=" + dept.getName() + "," + dept.getParent());
 			deptMgr.persist(dept);
-			
 			return deptMgr.findById(dept.getId());
 		}
 	}
@@ -474,17 +473,15 @@ public class DepartmentService extends ResourceService {
 		return deptVoList;
 	}
 	
-	@GET
-	@Path("/get_children/{id}")
-	@Produces("application/json")
-	public List<Department> getChindren(@PathParam("id") String id) throws UserPersistException {
-		List<Department> deptList = null;
-		LdapService ldapSvc = this.getLdapService();
-		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-		deptList = deptMgr.getChildrenById(id);
-		return deptList;
-	}
-
-	
+//	@GET
+//	@Path("/get_children/{id}")
+//	@Produces("application/json")
+//	public List<Department> getChindren(@PathParam("id") String id) throws UserPersistException {
+//		List<Department> deptList = null;
+//		LdapService ldapSvc = this.getLdapService();
+//		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+//		deptList = deptMgr.getChildrenById(id);
+//		return deptList;
+//	}
 	
 }
