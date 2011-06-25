@@ -39,6 +39,7 @@ public class DefaultPermissionManager implements PermissionManager {
 			PermissionVo permissionVo = getPermissionByPath(permission.getValue());
 			permissionMap.put(permission.getId(), permissionVo);
 			List<PermissionVo> authList = this.findSubPermissionById(authId);
+			System.out.println("*****************" + authList.size());
 			if(authList.size() == 0) {
 				continue;
 			}
