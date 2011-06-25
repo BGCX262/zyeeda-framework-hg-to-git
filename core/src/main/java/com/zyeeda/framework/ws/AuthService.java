@@ -71,9 +71,9 @@ public class AuthService extends ResourceService {
 					authVO.setLeaf(true);
 				}
 				authList.add(authVO);
-				if(permission.getPermissionList().size() > 0) {
-					this.getAuthList(list, roleId, auth);
-				}
+//				if(permission.getPermissionList().size() > 0) {
+//					this.getAuthList(list, roleId, auth);
+//				}
 			}
 		return authList;
 	}

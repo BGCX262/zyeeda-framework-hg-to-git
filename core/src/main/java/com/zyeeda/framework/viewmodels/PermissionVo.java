@@ -11,16 +11,7 @@ public class PermissionVo {
 	private Boolean isHaveIO;
 	private int path = 0;
 	private String orderBy;
-	private List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 	
-
-	public List<PermissionVo> getPermissionList() {
-		return permissionList;
-	}
-
-	public void setPermissionList(List<PermissionVo> permissionList) {
-		this.permissionList = permissionList;
-	}
 
 	public String getOrderBy() {
 		return orderBy;

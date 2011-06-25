@@ -16,6 +16,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -30,35 +32,36 @@ public class DefaultPermissionManager implements PermissionManager {
 
 	private final static String PERMISSION_FILE = "permission.xml";
 
-	
-	public void getAllPermssion(List<PermissionVo> permissions) throws XPathExpressionException, IOException {
+	public void getAllPermssion(List<PermissionVo> permissions)
+			throws XPathExpressionException, IOException {
 		Map<String, PermissionVo> permissionMap = new LinkedHashMap<String, PermissionVo>();
 		List<PermissionVo> list = new ArrayList<PermissionVo>();
-		for(PermissionVo permission : permissions) {
+		for (PermissionVo permission : permissions) {
 			String authId = permission.getId();
-			PermissionVo permissionVo = getPermissionByPath(permission.getValue());
+			PermissionVo permissionVo = getPermissionByPath(permission
+					.getValue());
 			permissionMap.put(permission.getId(), permissionVo);
 			List<PermissionVo> authList = this.findSubPermissionById(authId);
-			System.out.println("*****************" + authList.size());
-			if(authList.size() == 0) {
+			if (authList.size() == 0) {
 				continue;
 			}
-			permissionVo.getPermissionList().addAll(authList);
+			//permissionVo.getPermissionList().addAll(authList);
 			list.add(permission);
 			this.getAllPermssion(authList);
 		}
 	}
-	
-	public List<PermissionVo> getPermissionToTree(String id) throws XPathExpressionException, IOException{
+
+	public List<PermissionVo> getPermissionToTree(String id)
+			throws XPathExpressionException, IOException {
 		List<PermissionVo> listPermission = new ArrayList<PermissionVo>();
 		listPermission = this.findSubRoamPermissionById(id);
 		this.getAllPermssion(listPermission);
 		return listPermission;
 	}
-	
+
 	public List<PermissionVo> findSubRoamPermissionById(String id)
 			throws XPathExpressionException, IOException {
-		
+
 		List<PermissionVo> authList = new ArrayList<PermissionVo>();
 		InputStream is = null;
 		InputSource src = null;
@@ -75,7 +78,7 @@ public class DefaultPermissionManager implements PermissionManager {
 			authList = new ArrayList<PermissionVo>();
 			for (int i = 0; i < list.getLength(); i++) {
 				Element element = (Element) list.item(i);
-				if(element == null){
+				if (element == null) {
 					return null;
 				}
 				NodeList children = element.getChildNodes();
@@ -146,6 +149,40 @@ public class DefaultPermissionManager implements PermissionManager {
 		return authList;
 	}
 
+	public PermissionVo getRaomPermissionByPath(String auth)
+			throws XPathExpressionException, IOException {
+		InputStream is = null;
+		InputSource src = null;
+		XPathExpression exp = null;
+		PermissionVo permission = new PermissionVo();
+		if (auth != null) {
+			try {
+				XPathFactory fac = XPathFactory.newInstance();
+				XPath xpath = fac.newXPath();
+				exp = xpath.compile("//p[@value='" + auth + "']");
+				is = this.getClass().getClassLoader().getResourceAsStream(
+						ROAM_PERMISSION_FILE);
+				src = new InputSource(is);
+				Node node = (Node) exp.evaluate(src, XPathConstants.NODE);
+				Element elementNode = (Element) node;
+				if (elementNode != null) {
+					if (elementNode.getAttribute("value") == null) {
+						return null;
+					}
+					permission.setId(elementNode.getAttribute("id"));
+					permission.setName(elementNode.getAttribute("name"));
+					permission.setValue(elementNode.getAttribute("value"));
+					permission.setOrderBy(elementNode.getAttribute("order"));
+				} else {
+					return null;
+				}
+			} finally {
+				is.close();
+			}
+		}
+		return permission;
+	}
+
 	public PermissionVo getPermissionByPath(String auth)
 			throws XPathExpressionException, IOException {
 		InputStream is = null;
@@ -163,6 +200,9 @@ public class DefaultPermissionManager implements PermissionManager {
 				Node node = (Node) exp.evaluate(src, XPathConstants.NODE);
 				Element elementNode = (Element) node;
 				if (elementNode != null) {
+					if (elementNode.getAttribute("value") == null) {
+						return null;
+					}
 					permission.setId(elementNode.getAttribute("id"));
 					permission.setName(elementNode.getAttribute("name"));
 					permission.setValue(elementNode.getAttribute("value"));
@@ -282,4 +322,16 @@ public class DefaultPermissionManager implements PermissionManager {
 
 		return authList;
 	}
+
+	public List<PermissionVo> getPermissionBy(String flowState) {
+		Session session = SecurityUtils.getSubject().getSession();
+		List<String> listPermission = (List<String>) session
+				.getAttribute("auth");
+		for (String auth : listPermission) {
+			// if()
+
+		}
+		return null;
+	}
+
 }

@@ -1,7 +1,6 @@
 package com.zyeeda.framework.ws;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -17,11 +16,15 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.MenuManager;
+import com.zyeeda.framework.managers.PermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultMenuManager;
+import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.viewmodels.MenuVo;
+import com.zyeeda.framework.viewmodels.PermissionVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/menu")
@@ -41,6 +44,7 @@ public class MenuService extends ResourceService {
 		MenuManager menuMgr = new DefaultMenuManager();
 		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
+		//PermissionManager permissionMgr = new DefaultPermissionManager();
 		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
@@ -48,6 +52,12 @@ public class MenuService extends ResourceService {
 		Set<String> authList = roleMgr.getListAuth(roles);
 		Session session = SecurityUtils.getSubject().getSession();
 		session.setAttribute("auth", authList);
+//		List<PermissionVo> permissionVoList = new ArrayList<PermissionVo>();
+//		for(String auth : authList) {
+//			PermissionVo permission = permissionMgr.getPermissionByPath(auth);
+//			permissionVoList.add(permission);
+//		}
+//		session.setAttribute("auth", permissionVoList);
 		if(roles.size() == 1) {
 			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionList());
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
