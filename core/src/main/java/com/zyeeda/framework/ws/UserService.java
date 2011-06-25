@@ -182,6 +182,7 @@ public class UserService extends ResourceService {
 		
 		User u = userMgr.findById(id);
 		String ldapPw = u.getPassword();
+System.out.println("*************************" + u.getPassword());
 		String inputPw = oldPassword;
 		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
 			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
