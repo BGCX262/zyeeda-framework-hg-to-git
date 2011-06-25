@@ -279,11 +279,6 @@ public class MongoDbDocumentManager implements DocumentManager {
 		
 	}
 
-	@Override
-	public List<Document> findByForeignId(String foreignId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	/*@Override
 	public void updateDocument(Document document) throws DocumentException {

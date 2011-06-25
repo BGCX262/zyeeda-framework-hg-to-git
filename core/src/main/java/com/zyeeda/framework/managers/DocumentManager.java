@@ -24,16 +24,6 @@ public interface DocumentManager {
 	public void cleanTemp();
 	
 	
-	public List<Document> findByForeignId(String foreignId);
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	public int findNumber(String owner,String foreignId,String[] keyword) throws DocumentException;
 	
 	public int findNumber(String foreignId, String[] keyword) throws DocumentException;
