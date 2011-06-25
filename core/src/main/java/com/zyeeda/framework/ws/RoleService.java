@@ -192,6 +192,22 @@ public class RoleService extends ResourceService{
 	}
 	
 	@POST
+	@Path("/{id}/assign_raom_auth")
+	@Produces("application/json")
+	public Role assignroamRoleAuth(@PathParam("id") String id,
+			@FormParam("") Role role) throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		Role newrole = roleMgr.find(id);
+		String[] str = role.getPermissions().split(";");
+		List<String> authList = CollectionUtils.asList(str);
+		String authArray = permissionMgr.getParentPermissionListAuthByList(authList);
+		newrole.setRamoPermissions(authArray);
+		this.getPersistenceService().getCurrentSession().flush();
+		return newrole;
+	}
+	
+	@POST
 	@Path("/{id}/remove_auth")
 	@Produces("application/json")
 	public Role removeAuth(@PathParam("id") String id, @QueryParam("permission") String permission) throws XPathExpressionException, IOException{

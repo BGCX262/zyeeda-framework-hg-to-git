@@ -23,4 +23,7 @@ public interface PermissionManager {
 	
 	public PermissionVo getRaomPermissionByPath(String auth)
 	throws XPathExpressionException, IOException;
-}
+	
+	public List<PermissionVo> findSubRoamPermissionById(String id)
+	throws XPathExpressionException, IOException;
+	}

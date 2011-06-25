@@ -41,9 +41,19 @@ public class Role extends SimpleDomainEntity {
 	private String scopeId;
 	private String deptepment;
 	private String deptepmentId;
+	private String ramoPermissions;
 	
 
 	
+	@Basic
+	@Column(name = "F_SCOPE_TYPE", length=3000)
+	public String getRamoPermissions() {
+		return ramoPermissions;
+	}
+
+	public void setRamoPermissions(String ramoPermissions) {
+		this.ramoPermissions = ramoPermissions;
+	}
 
 	@ElementCollection
 	@CollectionTable(name = "SYS_SUBJECT", joinColumns = @JoinColumn(name = "F_ROLE_ID"))
@@ -69,6 +79,9 @@ public class Role extends SimpleDomainEntity {
 	@Transient
 	public List<String> getPermissionList() {
 		String permissions = this.getPermissions();
+		if(this.getRamoPermissions() != null) {
+			 permissions = this.getPermissions() + ";" + this.getRamoPermissions();
+		}
 		String[] permissionArray = StringUtils.split(permissions,
 				PERMISSION_SEPARATOR);
 		return CollectionUtils.asList(permissionArray);

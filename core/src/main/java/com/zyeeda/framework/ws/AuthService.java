@@ -81,17 +81,17 @@ public class AuthService extends ResourceService {
 	@GET
 	@Path("/{id}/raom_permission/{role_id}")
 	@Produces("application/json")
-	public List<PermissionVo> getRPermissionById(@PathParam("id") String id,
+	public List<AuthVO> getRPermissionById(@PathParam("id") String id,
 			@PathParam("role_id") String roleId)
 			throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		List<PermissionVo> list = permissionMgr.getPermissionToTree(id);
+		List<PermissionVo> list = permissionMgr.findSubRoamPermissionById(id);
 		Role role = roleMgr.find(roleId);
-		/*List<AuthVO> authVO = getAuthList(list, roleId, role
-				.getPermissionList());*/
-		return list;
+		List<AuthVO> authVO = getAuthList(list, roleId, role
+				.getPermissionList());
+		return authVO;
 	}
 	
 	
