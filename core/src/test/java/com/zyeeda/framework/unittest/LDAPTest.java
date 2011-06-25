@@ -25,8 +25,6 @@ import javax.naming.ldap.SortResponseControl;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import com.zyeeda.framework.utils.LdapEncryptUtils;
-
 public class LDAPTest {
 	public LDAPTest() {}
 	
@@ -198,8 +196,8 @@ System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").ge
 //		saveUserRefObject();
 //		ldapPageView();
 //		getAllUser();
-		updateUserDeptFullPath();
-//		ldapPageView();
+//		updateUserDeptFullPath();
+		ldapPageView();
 //		save();
 	}
 

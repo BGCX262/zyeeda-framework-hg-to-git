@@ -52,7 +52,9 @@ public class UserService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<User> userList = userMgr.findByName(user.getId());
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userMgr.findByName(user.getId(), sc);
 		if (userList != null && userList.size() > 0) {
 			throw new RuntimeException("账号不能重复");
 		} else {
