@@ -262,7 +262,12 @@ public class UserService extends ResourceService {
 		if (users != null && users.size() > 0) {
 			user = users.get(0);
 			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
-				users = userManager.findByDepartmentId(user.getDepartmentName(), sc);
+				String secondDept = user.getDepartmentName();
+				String[] spilt = StringUtils.split(secondDept);
+				if (spilt.length >=2) {
+					secondDept = spilt[spilt.length - 2] + "," + spilt[spilt.length - 1];
+				}
+				users = userManager.findByDepartmentId(secondDept, sc);
 			}
 		}
 		
