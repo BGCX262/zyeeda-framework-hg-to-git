@@ -83,7 +83,7 @@
                     <target>1.6</target>
                     <encoding>UTF-8</encoding>
                     <debug>true</debug>
-                    <failOnError>false</failOnError>
+                    <failOnError>true</failOnError>
                 </configuration>
             </plugin>
             <plugin>

@@ -8,7 +8,9 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
@@ -23,8 +25,6 @@ import javax.naming.ldap.SortResponseControl;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import com.zyeeda.framework.utils.LdapEncryptUtils;
-
 public class LDAPTest {
 	public LDAPTest() {}
 	
@@ -32,7 +32,7 @@ public class LDAPTest {
 		String root = "dc=ehv,dc=csg,dc=cn";
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, "ldap://localhost:389/" + root);
+		env.put(Context.PROVIDER_URL, "ldap://192.168.1.85:389/" + root);
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
 		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
 		env.put(Context.SECURITY_CREDENTIALS, "admin");
@@ -45,8 +45,8 @@ public class LDAPTest {
 		int pageSize = 5; // 5 entries per page
 		byte[] cookie = null;
 		int total = 0;
-		ctx.setRequestControls(new Control[] { new PagedResultsControl(
-				pageSize, Control.CRITICAL) });
+//		ctx.setRequestControls(new Control[] { new PagedResultsControl(
+//				pageSize, Control.CRITICAL) });
 		String sortKey = "uid";
 //	    ctx.setRequestControls(new Control[] {
 //	             new SortControl(sortKey, Control.NONCRITICAL) });
@@ -54,7 +54,7 @@ public class LDAPTest {
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		String condition = "Test";
-		NamingEnumeration<SearchResult> results = ctx.search("", "(|(o=*广州*)(ou=*广州*))",
+		NamingEnumeration<SearchResult> results = ctx.search("", "uid=Test5",
 				sc);
 		// Iterate over a batch of search results sent by the server
 		while (results != null && results.hasMore()) {
@@ -63,7 +63,7 @@ public class LDAPTest {
 			Attributes attributes = entry.getAttributes();
 //			System.out.println(new String((byte[])attributes.get("userpassword").get()));
 //			System.out.println(attributes.get("userpassword").get());
-System.out.println(entry.getNameInNamespace());
+			System.out.println(new String((byte[]) attributes.get("userpassword").get()));
 			// Handle the entry's response controls (if any)
 			if (entry instanceof HasControls) {
 				// ((HasControls)entry).getControls();
@@ -140,7 +140,7 @@ System.out.println(entry.getNameInNamespace());
 
 		attrs.put("cn", "Tes5");
 		attrs.put("sn", "Tes5");
-		attrs.put("userPassword", "123456");
+		attrs.put("userPassword", "111111");
 		ctx.bind(dn, null, attrs);
 	}
 	
@@ -163,82 +163,42 @@ System.out.println(entry.getNameInNamespace());
 		ctx.bind(dn, null, attrs);
 	}
 	
-	public static void getAllUser() throws NamingException {
+	public static void updateUserDeptFullPath() throws NamingException {
 		LdapContext ctx = getLdapContext();
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=*)",
 				sc);
-		ModificationItem[] mods = new ModificationItem[1];
+		ModificationItem[] mods = new ModificationItem[3];
 		SearchResult rs = null;
 		while (results.hasMore()) {
 			rs = results.next();
 			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
-				System.out.println(rs.getAttributes());
-//				System.out.println(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", ""));
-//				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-//	   				   new BasicAttribute("deptName", 
-//	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
-//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
-//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
-//
-//				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
-//																	, mods);
+System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
+				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+	   				   new BasicAttribute("deptName", 
+	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
+	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
+	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
+				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("deptFullPath", 
+		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
+				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+																	, mods);
 			}
 		}
 	}
 	
 	public static void main(String[] args) throws NamingException, IOException {
-//		String root = "dc=ehv,dc=csg,dc=cn"; // root
-//
-//		Hashtable<String, String> env = new Hashtable<String, String>();
-//		env.put(Context.INITIAL_CONTEXT_FACTORY,
-//				"com.sun.jndi.ldap.LdapCtxFactory");
-//		env.put(Context.PROVIDER_URL, "ldap://localhost:389/" + root);
-//		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-//		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
-//		env.put(Context.SECURITY_CREDENTIALS, "admin");
-//		LdapContext ctx = null;
-//		try {
-//			ctx = new InitialLdapContext(env, null);
-//			String sortKey = "uid";
-//		    ctx.setRequestControls(new Control[] {
-//		             new SortControl(sortKey, Control.NONCRITICAL) });
-//		     
-//		    ctx.setRequestControls(new Control[]{
-//			         new PagedResultsControl(5, Control.CRITICAL) });
-//System.out.println("------------" + ctx.getRequestControls().length);
-//			NamingEnumeration<SearchResult> ne = ctx.search("ou=People",
-//															"uid=*",
-//															SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
-//			int i = 0;
-//			while (ne.hasMore()) {
-////				System.out.println(ne.next().getAttributes());
-//				i ++;
-//			}
-//		System.out.println("认证成功");
-//		System.out.println(i);
-//		} catch (javax.naming.AuthenticationException e) {
-//			e.printStackTrace();
-//			System.out.println("认证失败");
-//		} catch (Exception e) {
-//			System.out.println("认证出错：");
-//			e.printStackTrace();
-//		}
-//
-//		if (ctx != null) {
-//			try {
-//				ctx.close();
-//			} catch (NamingException e) {
-//			}
-//		}
 //		System.exit(0);
-//		save();
 //		saveUserRefObject();
-//		save();
 //		ldapPageView();
-		getAllUser();
-		//{SSHA}p/di1QhaV/9Npn7umA+cGZkrBAmgKedkwtLqlQ==
+//		getAllUser();
+//		updateUserDeptFullPath();
+		ldapPageView();
+//		save();
 	}
 
 }

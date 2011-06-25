@@ -20,9 +20,9 @@ public class DocumentServiceHelper {
 		vo.setFileType(doc.getFileType());
 		vo.setFileSize(doc.getFileSize());
 		
-		vo.setDeleteUrl(String.format("/rs/docs/%s", doc.getId()));
-		vo.setDownloadUrl(String.format("/rs/docs/%s/download/%s", doc.getId(), doc.getName()));
-		vo.setViewUrl(String.format("/rs/docs/%s/view/%s", doc.getId(), doc.getName()));
+		vo.setDeleteUrl(String.format("/rest/docs/%s", doc.getId()));
+		vo.setDownloadUrl(String.format("/rest/docs/%s/download/%s", doc.getId(), doc.getName()));
+		vo.setViewUrl(String.format("/rest/docs/%s/view/%s", doc.getId(), doc.getName()));
 		
 		return vo;
 	}

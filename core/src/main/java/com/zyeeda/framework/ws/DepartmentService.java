@@ -13,6 +13,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.StringUtils;
@@ -259,13 +260,56 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("root_and_second_level_dept")
 	@Produces("application/json")
-	public List<DepartmentVo> getRootAndSecondLevelDepartment() throws UserPersistException {
+	public List<Department> getRootAndSecondLevelDepartment() throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getRootAndSecondLevelDepartment();
-		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
-		return deptVoList;
+//		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
+		return deptList;
+	}
+	
+	@GET
+	@Path("second_level_dept")
+	@Produces("application/json")
+	public List<Department> getSecondLevelDepartment() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById("o=广州局");
+		return deptList;
+	}
+	
+	@GET
+	@Path("/children/{id}")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChindren(@PathParam("id") String id) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById(id);
+		return this.mergeDepartmentVoAndUserVo(fillPropertiesToVo(deptList, "task"), new ArrayList<UserVo>());
+	}
+	
+//	@GET
+//	@Path("/search_by_condition")
+//	@Produces("application/json")
+	public List<Department> searchByCondition(String condition) 
+									     throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		List<Department> deptList = deptMgr.search(condition);
+		
+		return deptList;
+	}
+	
+	@GET
+	@Path("/site_dept")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getSiteDepartment(@QueryParam("condition") String condition)
+																	throws UserPersistException {
+		List<Department> deptList = this.searchByCondition(condition);
+		return this.mergeDepartmentVoAndUserVo(fillPropertiesToVo(deptList, "task"), new ArrayList<UserVo>());
 	}
 	
 	/**
@@ -284,20 +328,17 @@ public class DepartmentService extends ResourceService {
 		UserManager userManager = new LdapUserManager(this.getLdapService());
 		String currentUser = this.getSecurityService().getCurrentUser();
 		List<User> userList = userManager.findByName(currentUser);
-System.out.println("----------------" + userList);
 		User user = null;
 		if (userList != null && userList.size() > 0) {
 			user = userList.get(0);
-			if (user != null && StringUtils.isNotBlank(user.getDeptFullPath())) {
-				String deptFullPath = StringUtils.substring(user.getDeptFullPath(),
-															user.getDeptFullPath().indexOf(",") + 1,
-															user.getDeptFullPath().length());
-				if (deptFullPath.indexOf(",") != -1) {
-					deptFullPath = StringUtils.substring(deptFullPath, 
-														 deptFullPath.indexOf(",") + 1,
-														 deptFullPath.length());
+			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
+				String departmentName = user.getDepartmentName();
+				if (departmentName.indexOf(",") != -1) {
+					departmentName = StringUtils.substring(departmentName, 
+														   departmentName.indexOf(",") + 1,
+														   departmentName.length());
 				}
-				deptList = deptMgr.getDepartmentListByUserId(deptFullPath);
+				deptList = deptMgr.getDepartmentListByUserId(departmentName);
 			}
 		}
 		

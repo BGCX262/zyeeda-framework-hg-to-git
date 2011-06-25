@@ -22,7 +22,6 @@ import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.DatetimeUtils;
-import com.zyeeda.framework.utils.LdapEncryptUtils;
 
 public class LdapUserManager implements UserManager {
 
@@ -85,12 +84,16 @@ public class LdapUserManager implements UserManager {
 		}
 	}
 	
-	public Integer getChildrenCountById(String id, String filter) throws UserPersistException {
+	public Integer getChildrenCountById(String id,
+									    String filter)
+								   throws UserPersistException {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			SearchControls sc = SearchControlsFactory.getSearchControls(
+											SearchControls.ONELEVEL_SCOPE);
 			List<Attributes> attrsList = ldapTemplate.getResultList(id,
 															 		filter,
-															 		SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+															 		sc);
 		
 			return attrsList.size();
 		} catch (NamingException e) {
@@ -99,7 +102,17 @@ public class LdapUserManager implements UserManager {
 	}
 
 	@Override
-	public List<User> findByDepartmentId(String id) throws UserPersistException {
+	public List<User> findByDepartmentId(String id) 
+										 throws UserPersistException {
+		SearchControls sc = SearchControlsFactory.getDefaultSearchControls();
+		List<User> userList = this.findByDepartmentId(id, sc);
+		return userList;
+	}
+	
+	@Override
+	public List<User> findByDepartmentId(String id,
+										 SearchControls sc)
+									throws UserPersistException {
 		List<User> userList = null;
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
@@ -108,7 +121,7 @@ public class LdapUserManager implements UserManager {
 			}
 			List<Attributes> attrsList = ldapTemplate.getResultList(id,
 															 		"(uid=*)",
-															 		SearchControlsFactory.getSearchControls(SearchControls.ONELEVEL_SCOPE));
+															 		sc);
 			userList = new ArrayList<User>(attrsList.size());
 			for (Attributes attrs : attrsList) {
 				User user = LdapUserManager.marshal(attrs);
@@ -129,13 +142,23 @@ public class LdapUserManager implements UserManager {
 
 	@Override
 	public List<User> findByName(String name) throws UserPersistException {
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.ONELEVEL_SCOPE);
+		List<User> userList = this.findByName(name, sc);
+		return userList;
+	}
+
+	@Override
+	public List<User> findByName(String name, 
+							     SearchControls sc) 
+							 throws UserPersistException {
 		List<User> userList = null;
 
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
+			List<Attributes> attrsList = ldapTemplate.getResultList("",
 																    "(uid=" + name + ")",
-																    SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+																    sc);
 			userList = new ArrayList<User>();
 			
 			for (Attributes attrs : attrsList) {
@@ -149,7 +172,7 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		}
 	}
-
+	
 	public void updatePassword(String id, String password) throws UserPersistException {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
@@ -269,9 +292,9 @@ public class LdapUserManager implements UserManager {
 		attrs.put("uid", user.getId());
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
-			attrs.put("userPassword", LdapEncryptUtils.md5Encode(user.getPassword()));
+			attrs.put("userPassword", user.getPassword());
 		} else {
-			attrs.put("userPassword", LdapEncryptUtils.md5Encode(LDAP_DEFAULT_PASSWORD));
+			attrs.put("userPassword", LDAP_DEFAULT_PASSWORD);
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -315,6 +338,9 @@ public class LdapUserManager implements UserManager {
 		User user = new User();
 		user.setUsername((String) attrs.get("sn").get());
 		user.setId((String) attrs.get("uid").get());
+		if (attrs.get("userPassword") != null) {
+			user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
+		}
 		if (attrs.get("gender") != null) {
 			user.setGender((String) attrs.get("gender").get());
 		}

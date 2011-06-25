@@ -104,6 +104,11 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 	}
 	
+	@Override
+	public List<Department> findByName(String name) throws UserPersistException {
+		return this.findByName("", name);
+	}
+
 	public Integer getChildrenCountById(String dn, String filter) throws UserPersistException {
 		List<Attributes> attrList = null;
 		try {
@@ -128,9 +133,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 									   								SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
 			deptList = new ArrayList<Department>(attrsList.size());
 			for (Attributes attrs : attrsList) {
-//				String childId = String.format("%s,o=%s", entry.getName(), "广州局");
 				Department dept = LdapDepartmentManager.marshal(attrs);
-//				dept.setId(childId);
 				
 				deptList.add(dept);
 			}
@@ -142,11 +145,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 	
 	
 	
-	@Override
-	public List<Department> findByName(String name) throws UserPersistException {
-		return this.findByName("", name);
-	}
-
 	private static Attributes unmarshal(Department dept) {
 		Attributes attrs = new BasicAttributes();
 		
@@ -240,10 +238,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 									   								SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
 			deptList = new ArrayList<Department>(attrsList.size());
 			for (Attributes attrs : attrsList) {
-//				String childId = String.format("%s,o=%s", entry.getName(), "广州局");
 				Department dept = LdapDepartmentManager.marshal(attrs);
-//				dept.setId(childId);
-				
 				deptList.add(dept);
 			}
 			return deptList;

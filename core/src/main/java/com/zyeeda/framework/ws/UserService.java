@@ -3,9 +3,11 @@ package com.zyeeda.framework.ws;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.directory.SearchControls;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -18,8 +20,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
+import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.sync.UserSyncService;
@@ -46,7 +52,9 @@ public class UserService extends ResourceService {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<User> userList = userMgr.findByName(user.getId());
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userMgr.findByName(user.getId(), sc);
 		if (userList != null && userList.size() > 0) {
 			throw new RuntimeException("账号不能重复");
 		} else {
@@ -152,7 +160,8 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/userList/{deptId}")
 	@Produces("application/json")
-	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws UserPersistException {
+	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId)
+															throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
@@ -162,18 +171,21 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}/update_password")
 	@Produces("application/json")
-	public User updatePassword(@PathParam("id") String id, @FormParam("oldPassword") String oldPassword,
-			@FormParam("newPassword") String newPassword)  throws UserPersistException, UnsupportedEncodingException {
+	public User updatePassword(@PathParam("id") String id,
+							   @FormParam("oldPassword") String oldPassword,
+							   @FormParam("newPassword") String newPassword)
+						  throws UserPersistException,
+						  		 UnsupportedEncodingException,
+						  		 NoSuchAlgorithmException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		System.out.println("-----------oldPwd:" + u.getPassword());
-		System.out.println("-----------oldPwd:" + oldPassword);
-		System.out.println("-----------oldPwd:" + LdapEncryptUtils.md5Encode(oldPassword));
-		if (LdapEncryptUtils.md5Encode(oldPassword).equals(u.getPassword())) {
-			if (!LdapEncryptUtils.md5Encode(newPassword).equals(u.getPassword())) {
-				userMgr.updatePassword(id, LdapEncryptUtils.md5Encode(newPassword));
+		String ldapPw = u.getPassword();
+		String inputPw = oldPassword;
+		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
+			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
+				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
 			throw new RuntimeException("旧密码输入错误");
@@ -198,8 +210,9 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}/unenable")
 	@Produces("application/json")
-	public User disable(@PathParam("id") String id, @FormParam("status") Boolean visible)
-	 		throws UserPersistException {
+	public User disable(@PathParam("id") String id,
+						@FormParam("status") Boolean visible)
+	 		       throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -212,7 +225,9 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/{id}")
 	@Produces("application/json")
-	public void uploadPhoto(@Context HttpServletRequest request, @PathParam("id") String id) throws Throwable {
+	public void uploadPhoto(@Context HttpServletRequest request,
+							@PathParam("id") String id)
+					   throws Throwable {
 		InputStream in = request.getInputStream();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();  
 	    byte[] b = new byte[1024];  
@@ -231,6 +246,35 @@ public class UserService extends ResourceService {
 //		user.setPhoto(bytes);
 		
 		userMgr.update(user);
+	}
+	
+	/**
+	 * 当前用户所属二级部门下所有的人
+	 */
+	@GET
+	@Path("/current_user_in_dept_all_user")
+	@Produces("application/json")
+	public List<User> getCurrentUserInDepartmentAllUser() throws UserPersistException {
+		String currentUser = this.getSecurityService().getCurrentUser();
+		LdapService ldapSvc = this.getLdapService();
+		UserManager userManager = new LdapUserManager(ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> users = userManager.findByName(currentUser, sc);
+		User user = null;
+		if (users != null && users.size() > 0) {
+			user = users.get(0);
+			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
+				String secondDept = user.getDepartmentName();
+				String[] spilt = StringUtils.split(secondDept);
+				if (spilt.length >=2) {
+					secondDept = spilt[spilt.length - 2] + "," + spilt[spilt.length - 1];
+				}
+				users = userManager.findByDepartmentId(secondDept, sc);
+			}
+		}
+		
+		return users;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
