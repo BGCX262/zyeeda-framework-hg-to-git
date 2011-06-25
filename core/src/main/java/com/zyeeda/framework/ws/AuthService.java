@@ -71,26 +71,47 @@ public class AuthService extends ResourceService {
 					authVO.setLeaf(true);
 				}
 				authList.add(authVO);
+				if(permission.getPermissionList().size() > 0) {
+					this.getAuthList(list, roleId, auth);
+				}
 			}
-		
 		return authList;
 	}
 	
-	
 	@GET
-	@Path("/{id}/{role_id}")
+	@Path("/{id}/raom_permission/{role_id}")
 	@Produces("application/json")
-	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id,
+	public List<PermissionVo> getRPermissionById(@PathParam("id") String id,
 			@PathParam("role_id") String roleId)
 			throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
+		List<PermissionVo> list = permissionMgr.getPermissionToTree(id);
 		Role role = roleMgr.find(roleId);
-		List<AuthVO> authVO = getAuthList(list, roleId, role
-				.getPermissionList());
-		return authVO;
+		/*List<AuthVO> authVO = getAuthList(list, roleId, role
+				.getPermissionList());*/
+		return list;
 	}
+	
+	
+//	
+//	@GET
+//	@Path("/{id}/{role_id}")
+//	@Produces("application/json")
+//	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id,
+//			@PathParam("role_id") String roleId)
+//			throws XPathExpressionException, IOException {
+//		RoleManager roleMgr = new DefaultRoleManager(this
+//				.getPersistenceService());
+//		PermissionManager permissionMgr = new DefaultPermissionManager();
+//		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
+//		Role role = roleMgr.find(roleId);
+//		List<AuthVO> authVO = getAuthList(list, roleId, role
+//				.getPermissionList());
+//		return authVO;
+//	}
+	
+	
 
 }

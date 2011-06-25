@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
@@ -11,6 +12,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.zyeeda.framework.entities.Role;
@@ -35,14 +39,17 @@ public class MenuService extends ResourceService {
 	public List<MenuVo> getMenu()throws XPathExpressionException, IOException {
 		String user = this.getSecurityService().getCurrentUser();
 		MenuManager menuMgr = new DefaultMenuManager();
-
 		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);	
+		Set<String> authList = roleMgr.getListAuth(roles);
+		Session session = SecurityUtils.getSubject().getSession();
+		session.setAttribute("auth", authList);
 		if(roles.size() == 1) {
+			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionList());
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
 			return listMenu;
 		}
@@ -58,7 +65,7 @@ public class MenuService extends ResourceService {
 				}
 				
 			}
-		}		
+		}
 		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
 		return listMenu;
 	}

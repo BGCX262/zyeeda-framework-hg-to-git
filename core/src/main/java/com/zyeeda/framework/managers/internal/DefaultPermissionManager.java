@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.xpath.XPath;
@@ -28,9 +30,35 @@ public class DefaultPermissionManager implements PermissionManager {
 
 	private final static String PERMISSION_FILE = "permission.xml";
 
+	
+	public void getAllPermssion(List<PermissionVo> permissions) throws XPathExpressionException, IOException {
+		Map<String, PermissionVo> permissionMap = new LinkedHashMap<String, PermissionVo>();
+		List<PermissionVo> list = new ArrayList<PermissionVo>();
+		for(PermissionVo permission : permissions) {
+			String authId = permission.getId();
+			PermissionVo permissionVo = getPermissionByPath(permission.getValue());
+			permissionMap.put(permission.getId(), permissionVo);
+			List<PermissionVo> authList = this.findSubPermissionById(authId);
+			if(authList.size() == 0) {
+				continue;
+			}
+			permissionVo.getPermissionList().addAll(authList);
+			list.add(permission);
+			this.getAllPermssion(authList);
+		}
+	}
+	
+	public List<PermissionVo> getPermissionToTree(String id) throws XPathExpressionException, IOException{
+		List<PermissionVo> listPermission = new ArrayList<PermissionVo>();
+		listPermission = this.findSubRoamPermissionById(id);
+		this.getAllPermssion(listPermission);
+		return listPermission;
+	}
+	
 	public List<PermissionVo> findSubRoamPermissionById(String id)
 			throws XPathExpressionException, IOException {
-		List<PermissionVo> authList = null;
+		
+		List<PermissionVo> authList = new ArrayList<PermissionVo>();
 		InputStream is = null;
 		InputSource src = null;
 		XPathExpression exp = null;
@@ -46,6 +74,9 @@ public class DefaultPermissionManager implements PermissionManager {
 			authList = new ArrayList<PermissionVo>();
 			for (int i = 0; i < list.getLength(); i++) {
 				Element element = (Element) list.item(i);
+				if(element == null){
+					return null;
+				}
 				NodeList children = element.getChildNodes();
 				for (int j = 0; j < children.getLength(); j++) {
 					Node e = children.item(j);
@@ -192,7 +223,6 @@ public class DefaultPermissionManager implements PermissionManager {
 			allAuth.add(permission.getValue());
 			getParentPermissionListAuthByPath(permission.getValue(), allAuth);
 		}
-
 	}
 
 	public String getParentPermissionListAuthByList(List<String> authList)

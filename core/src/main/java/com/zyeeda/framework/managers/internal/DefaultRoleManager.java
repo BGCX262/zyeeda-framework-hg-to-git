@@ -1,11 +1,13 @@
 package com.zyeeda.framework.managers.internal;
 import java.util.ArrayList;
+
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.TypedQuery;
 
-import org.apache.commons.lang.StringUtils;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,14 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 
 	public DefaultRoleManager(PersistenceService persistenceSvc) {
 		super(persistenceSvc);
+	}
+	
+	public Set<String> getListAuth(List<Role> roles) {
+		Set<String> auths = new HashSet<String>();
+		for(Role role : roles) {
+			auths.addAll(role.getPermissionList());
+		}
+		return auths;
 	}
 
 	public  List<Role> getRoleBySubject(String subject){
