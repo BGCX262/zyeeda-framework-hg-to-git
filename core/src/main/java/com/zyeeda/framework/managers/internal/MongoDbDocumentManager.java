@@ -3,14 +3,9 @@ package com.zyeeda.framework.managers.internal;
 import static com.zyeeda.framework.managers.internal.MongoDbDocumentManagerHelper.document2GridFSFile;
 import static com.zyeeda.framework.managers.internal.MongoDbDocumentManagerHelper.gridFSDBFile2Document;
 
-import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +14,11 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoException;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSFile;
 import com.zyeeda.framework.entities.Document;
-import com.zyeeda.framework.managers.DocumentException;
 import com.zyeeda.framework.managers.DocumentManager;
 import com.zyeeda.framework.nosql.MongoDbService;
 
@@ -34,7 +26,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(MongoDbDocumentManager.class);
 	
-	private final static String COLLECTION_NAME = "docs";
+	//private final static String COLLECTION_NAME = "docs";
 	
 	private MongoDbService mongodbSvc;
 	
@@ -42,12 +34,14 @@ public class MongoDbDocumentManager implements DocumentManager {
 		this.mongodbSvc = mongodbSvc;
 	}
 	
+	/*
 	@Deprecated
 	private DBCollection getCollection() {
 		DB db = this.mongodbSvc.getDefaultDatabase();
 		DBCollection collection = db.getCollection(COLLECTION_NAME);
 		return collection;
 	}
+	*/
 	
 	private DBCollection getFilesCollection() {
 		DB db = this.mongodbSvc.getDefaultDatabase();
@@ -135,17 +129,36 @@ public class MongoDbDocumentManager implements DocumentManager {
 	}
 	
 	@Override
-	public void cleanTemp() {
+	public void eraseTemp() {
 		DBObject query = new BasicDBObject();
 		query.put("isTemp", true);
 		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
 		fs.remove(query);
 	}
 	
+	@Override
+	public long countByIsTemp() {
+		DBObject query = new BasicDBObject();
+		query.put("isTemp", true);
+		DBCollection c = this.getFilesCollection();
+		return c.count(query);
+	}
+	
+	@Override
+	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes) {
+		DBObject query = new BasicDBObjectBuilder().push("foreignId").add("$in", new String[] { foreignId, tempForeignId }).pop()
+			.push("fileType").add("$in", suffixes).get();
+		logger.debug("bson query = {}", query);
+		DBCollection c = this.getFilesCollection();
+		return c.count(query);
+	}
+	
+	
+	
 	
 
 	
-
+	/*
 	private List<Document> find(Map<String, Object> map,
 			Map<String, Object> map1, String foreignId, int skip, int limit)
 			throws DocumentException, MongoException {
@@ -278,6 +291,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 		// TODO Auto-generated method stub
 		
 	}
+	*/
 
 	/*@Override
 	public void updateDocument(Document document) throws DocumentException {

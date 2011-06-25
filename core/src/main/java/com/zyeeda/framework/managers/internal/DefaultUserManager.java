@@ -2,6 +2,8 @@ package com.zyeeda.framework.managers.internal;
 
 import java.util.List;
 
+import javax.naming.directory.SearchControls;
+
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
@@ -80,7 +82,18 @@ public class DefaultUserManager extends DomainEntityManager<User, String>
 
 	@Override
 	public List<User> search(String condition) throws UserPersistException {
-		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<User> findByDepartmentId(String id, SearchControls sc)
+			throws UserPersistException {
+		return null;
+	}
+
+	@Override
+	public List<User> findByName(String name, SearchControls sc)
+			throws UserPersistException {
 		return null;
 	}
 }

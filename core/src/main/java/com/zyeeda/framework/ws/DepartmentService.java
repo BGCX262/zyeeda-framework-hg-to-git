@@ -283,6 +283,17 @@ public class DepartmentService extends ResourceService {
 	}
 	
 	@GET
+	@Path("/children/{id}")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChindren(@PathParam("id") String id) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById(id);
+		return this.mergeDepartmentVoAndUserVo(fillPropertiesToVo(deptList, "task"), new ArrayList<UserVo>());
+	}
+
+	@GET
 	@Path("second_level_dept_role")
 	@Produces("application/json")
 	public List<DepartmentVo> getSecondLevelDepartmentAndRole() throws UserPersistException {

@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.directory.SearchControls;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -19,8 +20,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+import org.apache.commons.lang.StringUtils;
+
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
+import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.sync.UserSyncService;
@@ -153,7 +158,8 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/userList/{deptId}")
 	@Produces("application/json")
-	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId) throws UserPersistException {
+	public List<UserVo> getUserListByDepartmentId(@PathParam("deptId") String deptId)
+															throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
@@ -202,8 +208,9 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}/unenable")
 	@Produces("application/json")
-	public User disable(@PathParam("id") String id, @FormParam("status") Boolean visible)
-	 		throws UserPersistException {
+	public User disable(@PathParam("id") String id,
+						@FormParam("status") Boolean visible)
+	 		       throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -216,7 +223,9 @@ public class UserService extends ResourceService {
 	@POST
 	@Path("/{id}")
 	@Produces("application/json")
-	public void uploadPhoto(@Context HttpServletRequest request, @PathParam("id") String id) throws Throwable {
+	public void uploadPhoto(@Context HttpServletRequest request,
+							@PathParam("id") String id)
+					   throws Throwable {
 		InputStream in = request.getInputStream();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();  
 	    byte[] b = new byte[1024];  
@@ -235,6 +244,27 @@ public class UserService extends ResourceService {
 //		user.setPhoto(bytes);
 		
 		userMgr.update(user);
+	}
+	
+	@GET
+	@Path("/current_user_in_dept_all_user")
+	@Produces("application/json")
+	public List<User> getCurrentUserInDepartmentAllUser() throws UserPersistException {
+		String currentUser = this.getSecurityService().getCurrentUser();
+		LdapService ldapSvc = this.getLdapService();
+		UserManager userManager = new LdapUserManager(ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> users = userManager.findByName(currentUser, sc);
+		User user = null;
+		if (users != null && users.size() > 0) {
+			user = users.get(0);
+			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
+				users = userManager.findByDepartmentId(user.getDepartmentName(), sc);
+			}
+		}
+		
+		return users;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
