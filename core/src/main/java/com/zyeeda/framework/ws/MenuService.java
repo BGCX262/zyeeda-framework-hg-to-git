@@ -58,7 +58,9 @@ public class MenuService extends ResourceService {
 		//List<PermissionVo> permissionVoList = new ArrayList<PermissionVo>();
 		for(String auth : authList) {
 			PermissionVo permission = permissionMgr.getRaomPermissionByPath(auth);
-			roleWithUserVo.getListPermission().add(permission);
+			if(permission != null) {
+				roleWithUserVo.getListPermission().add(permission);
+			}
 		}
 		//session.setAttribute("auth", permissionVoList);
 		if(roles.size() == 1) {
