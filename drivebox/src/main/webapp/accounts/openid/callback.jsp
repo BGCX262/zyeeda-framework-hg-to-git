@@ -7,11 +7,9 @@
         function callback() {
         	var url = '<%= request.getParameter("_url")%>';
         	var method = '<%= request.getParameter("_method")%>';
-        	alert('[' + method + ']' + url);
+			parent.ZDA.contextLoginPanel.hide();
         }
         </script>
     </head>
-    <body onload='callback();'>
-        Hello World!
-    </body>
+    <body onload='callback();'></body>
 </html>
