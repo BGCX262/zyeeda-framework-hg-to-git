@@ -24,6 +24,9 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/auth")
 public class AuthService extends ResourceService {
 
+	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+
+	private final static String PERMISSION_FILE = "permission.xml";
 	public AuthService(@Context ServletContext ctx) {
 		super(ctx);
 	}
@@ -37,7 +40,7 @@ public class AuthService extends ResourceService {
 		RoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
+		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, PERMISSION_FILE);
 		Role role = roleMgr.find(roleId);
 		List<AuthVO> authVO = getAuthList(list, roleId, role
 				.getPermissionList());
@@ -47,22 +50,20 @@ public class AuthService extends ResourceService {
 	public List<AuthVO> getAuthList(List<PermissionVo> list, String roleId,
 			List<String> auth) {
 		List<AuthVO> authList = new ArrayList<AuthVO>();
-		if (list.size() > 0) {
-			for (int i = 0; i < list.size(); i++) {
-				PermissionVo permission = (PermissionVo) list.get(i);
+		
+			for (PermissionVo permission : list) {
+				//PermissionVo permission = (PermissionVo) list.get(i);
 				AuthVO authVO = new AuthVO(); 
 				authVO.setId(permission.getId());
 				authVO.setLabel("<a>" + permission.getName() + "</a>");
 				authVO.setType("task");
 				authVO.setTag(permission.getValue());
-				// authVO.setValue(permission.getValue());
 				for (String roleAuth : auth) {
-					// System.out.print(roleAuth.trim().equals(permission.getValue().trim()));
 					if (roleAuth.trim().equals(permission.getValue().trim())) {
-						authVO.setCheckedAuth(true);
+						authVO.setChecked(true);
 						break;
 					} else {
-						authVO.setCheckedAuth(false);
+						authVO.setChecked(false);
 					}
 				}
 				if ("false".equals(permission.getIsHaveIO().toString())) {
@@ -73,9 +74,98 @@ public class AuthService extends ResourceService {
 					authVO.setLeaf(true);
 				}
 				authList.add(authVO);
+//				if(permission.getPermissionList().size() > 0) {
+//					this.getAuthList(list, roleId, auth);
+//				}
 			}
-		}
 		return authList;
 	}
+	
+	@GET
+	@Path("/{id}/raom_permission/{role_id}")
+	@Produces("application/json")
+	public List<AuthVO> getRPermissionById(@PathParam("id") String id,
+			@PathParam("role_id") String roleId)
+			throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, ROAM_PERMISSION_FILE);
+		Role role = roleMgr.find(roleId);
+		List<AuthVO> authVO = getAuthList(list, roleId, role
+				.getPermissionList());
+		return authVO;
+	}
+	
+	@GET
+	@Path("/{id}/raom_all_permission/{role_id}")
+	@Produces("application/json")
+	public List<PermissionVo> getAllRomePermissionById(@PathParam("id") String id,
+			@PathParam("role_id") String roleId)
+			throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		List<PermissionVo> list = permissionMgr.getPermissionToTree(id);
+//		Role role = roleMgr.find(roleId);
+//		List<AuthVO> authVO = getAuthList(list, roleId, role
+//				.getPermissionList());
+		return list;
+	}
+	
+	public List<AuthVO> getRaomAuthList(List<PermissionVo> list, String roleId,
+			List<String> auth) {
+		List<AuthVO> authList = new ArrayList<AuthVO>();
+		
+			for (PermissionVo permission : list) {
+				//PermissionVo permission = (PermissionVo) list.get(i);
+				AuthVO authVO = new AuthVO(); 
+				authVO.setId(permission.getId());
+				authVO.setLabel("<a>" + permission.getName() + "</a>");
+				authVO.setType("task");
+				authVO.setTag(permission.getValue());
+				for (String roleAuth : auth) {
+					if (roleAuth.trim().equals(permission.getValue().trim())) {
+						authVO.setChecked(true);
+						break;
+					} else {
+						authVO.setChecked(false);
+					}
+				}
+				if ("false".equals(permission.getIsHaveIO().toString())) {
+					authVO.setIo("/rest/auth/" + permission.getId() + "/raom_permission/" + roleId);
+					authVO.setLeaf(false);
+				} else {
+					authVO.setLeaf(true);
+				}
+				authList.add(authVO);
+//				if(permission.getPermissionList().size() > 0) {
+//					this.getAuthList(list, roleId, auth);
+//				}
+			}
+		return authList;
+	}
+	
+	
+	
+	
+//	
+//	@GET
+//	@Path("/{id}/{role_id}")
+//	@Produces("application/json")
+//	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id,
+//			@PathParam("role_id") String roleId)
+//			throws XPathExpressionException, IOException {
+//		RoleManager roleMgr = new DefaultRoleManager(this
+//				.getPersistenceService());
+//		PermissionManager permissionMgr = new DefaultPermissionManager();
+//		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
+//		Role role = roleMgr.find(roleId);
+//		List<AuthVO> authVO = getAuthList(list, roleId, role
+//				.getPermissionList());
+//		return authVO;
+//	}
+	
+	
 
 }

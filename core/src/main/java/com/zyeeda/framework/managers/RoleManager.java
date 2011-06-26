@@ -5,6 +5,7 @@ import java.util.List;
 import com.googlecode.genericdao.dao.jpa.GenericDAO;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.viewmodels.RoleVo;
+import com.zyeeda.framework.viewmodels.UserVo;
 
 public interface RoleManager extends GenericDAO<Role, String> {
 
@@ -13,4 +14,9 @@ public interface RoleManager extends GenericDAO<Role, String> {
 		public List<Role> getRoleDistinct(String hql);
 		
 		public List<RoleVo> roleToVo(List<Role> listRole);
+		
+		public List<UserVo> getUserVoByRole(Role role);
+		
+		public List<RoleVo> deptToVo(List<Role> listRole);
+		
 }

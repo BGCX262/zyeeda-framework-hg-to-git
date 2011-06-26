@@ -10,57 +10,70 @@ public class AuthVO {
 	private boolean leaf;
 	private String io;
 	private String tag;
-	
-	private Boolean checkedAuth;
-//	public Boolean getChecked() {
-//		return checked;
-//	}
-//	public void setChecked(Boolean checked) {
-//		this.checked = checked;
-//	}
-//	public String getPermission() {
-//		return permission;
-//	}
+
+	private Boolean checked;
+
+	// public Boolean getChecked() {
+	// return checked;
+	// }
+	// public void setChecked(Boolean checked) {
+	// this.checked = checked;
+	// }
+	// public String getPermission() {
+	// return permission;
+	// }
 	public String getTag() {
 		return tag;
 	}
-	public Boolean getCheckedAuth() {
-		return checkedAuth;
+
+	public Boolean getChecked() {
+		return checked;
 	}
-	public void setCheckedAuth(Boolean checkedAuth) {
-		this.checkedAuth = checkedAuth;
+
+	public void setChecked(Boolean checked) {
+		this.checked = checked;
 	}
+
 	public void setTag(String tag) {
 		this.tag = tag;
 	}
-	
+
 	public String getIo() {
 		return io;
 	}
+
 	public void setIo(String io) {
 		this.io = io;
 	}
+
 	public String getType() {
 		return type;
 	}
+
 	public void setType(String type) {
 		this.type = type;
 	}
+
 	public String getId() {
 		return id;
 	}
+
 	public void setId(String id) {
 		this.id = id;
 	}
+
 	public String getLabel() {
 		return label;
 	}
+
 	public void setLabel(String label) {
 		this.label = label;
 	}
+
 	public boolean isLeaf() {
 		return leaf;
 	}
+
 	public void setLeaf(boolean leaf) {
 		this.leaf = leaf;
 	}

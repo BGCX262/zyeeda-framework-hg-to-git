@@ -11,4 +11,6 @@ public interface MenuManager {
 	
 	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList) throws XPathExpressionException, IOException;
 
+	
+
 }

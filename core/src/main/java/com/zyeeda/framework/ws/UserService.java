@@ -254,7 +254,7 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/current_user_in_dept_all_user")
 	@Produces("application/json")
-	public List<User> getCurrentUserInDepartmentAllUser() throws UserPersistException {
+	public List<UserVo> getCurrentUserInDepartmentAllUser() throws UserPersistException {
 		String currentUser = this.getSecurityService().getCurrentUser();
 		LdapService ldapSvc = this.getLdapService();
 		UserManager userManager = new LdapUserManager(ldapSvc);
@@ -273,22 +273,20 @@ public class UserService extends ResourceService {
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
 		}
-		
-		return users;
+		List<UserVo> listUser = fillUserListPropertiesToVo(users);
+		return listUser;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
-
 		userVo.setId(user.getId());
-		userVo.setType("io");
-		userVo.setLabel( user.getId() );
+		userVo.setType("task");
+		userVo.setLabel(user.getId() );
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
 		userVo.setKind("user");
-
 		return userVo;
 	}
 	
