@@ -1,13 +1,21 @@
 package com.zyeeda.framework.ws;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -21,20 +29,38 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.tapestry5.ioc.internal.services.RegistryShutdownHubImpl;
+import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
+import org.codehaus.jackson.JsonParseException;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.TypeReference;
+import org.slf4j.Logger;
 
+import com.zyeeda.framework.account.AccountService;
+import com.zyeeda.framework.account.internal.SystemAccountServiceProvider;
+import com.zyeeda.framework.config.ConfigurationService;
+import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
+import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
+import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
+import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
+import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
 import com.zyeeda.framework.utils.LdapEncryptUtils;
+import com.zyeeda.framework.viewmodels.AccountVo;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/users")
 public class UserService extends ResourceService {
+	
+	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
 	
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
@@ -182,14 +208,13 @@ public class UserService extends ResourceService {
 		
 		User u = userMgr.findById(id);
 		String ldapPw = u.getPassword();
-System.out.println("*************************" + u.getPassword());
 		String inputPw = oldPassword;
 		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
 			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
 				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
-			throw new RuntimeException("旧密码输入错�);
+			throw new RuntimeException("旧密码输入错误");
 		}
 		return userMgr.findById(id);
 	}
@@ -250,7 +275,7 @@ System.out.println("*************************" + u.getPassword());
 	}
 	
 	/**
-	 * 当前用户所属二级部门下所有的�
+	 * 当前用户所属二级部门下所有的user
 	 */
 	@GET
 	@Path("/current_user_in_dept_all_user")
@@ -356,7 +381,7 @@ System.out.println("*************************" + u.getPassword());
 	
 	/**
 	 * 配置系统信息
-	 * 将旧的数据删除，保存新的数据�
+	 * 将旧的数据删除，保存新的数据�
 	 * Json list
 	 * return  userList
 	 */
