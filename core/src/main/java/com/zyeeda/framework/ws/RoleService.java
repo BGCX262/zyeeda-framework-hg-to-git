@@ -37,7 +37,9 @@ import com.zyeeda.framework.ws.base.ResourceService;
 public class RoleService extends ResourceService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
-	
+	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+
+	private final static String PERMISSION_FILE = "permission.xml";
 	public RoleService(@Context ServletContext ctx) {
 		super(ctx);
 	}
@@ -98,7 +100,7 @@ public class RoleService extends ResourceService{
 		}
 		for(String auth:role.getPermissionList()){
 			PermissionVo permission = new PermissionVo();
-		    permission = permissionMgr.getPermissionByPath(auth);
+		    permission = permissionMgr.getPermissionByPath(auth, PERMISSION_FILE);
 			roleWithUserVo.getPermission().add(permission);
 		}
 		return roleWithUserVo;
@@ -185,7 +187,7 @@ public class RoleService extends ResourceService{
 		Role newrole = roleMgr.find(id);
 		String[] str = role.getPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
-		String authArray = permissionMgr.getParentPermissionListAuthByList(authList);
+		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
 		newrole.setPermissions(authArray); 
 		this.getPersistenceService().getCurrentSession().flush();
 		return newrole;
@@ -201,7 +203,7 @@ public class RoleService extends ResourceService{
 		Role newrole = roleMgr.find(id);
 		String[] str = role.getPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
-		String authArray = permissionMgr.getParentPermissionListAuthByList(authList);
+		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
 		newrole.setRamoPermissions(authArray);
 		this.getPersistenceService().getCurrentSession().flush();
 		return newrole;

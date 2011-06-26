@@ -17,6 +17,7 @@ import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public class DefaultMenuManager implements MenuManager {
 
+	private final static String PERMISSION_FILE = "permission.xml";
 	@SuppressWarnings("unchecked")
 	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList)
 			throws XPathExpressionException, IOException {
@@ -26,8 +27,7 @@ public class DefaultMenuManager implements MenuManager {
 		Map<String, MenuVo> menuMap = new LinkedHashMap<String, MenuVo>();
 		String	root = null;
 		for (String auth : authList) { 
-			System.out.println("&&************************88888" + auth);
-			PermissionVo childPermission = permissionMgr.getPermissionByPath(auth);
+			PermissionVo childPermission = permissionMgr.getPermissionByPath(auth, PERMISSION_FILE);
 			MenuVo childMenu = null;
 			if (childPermission != null) {
 				childMenu = this.convertPermission2Menu(childPermission);

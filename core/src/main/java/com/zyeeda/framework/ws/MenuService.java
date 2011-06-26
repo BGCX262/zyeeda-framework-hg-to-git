@@ -12,8 +12,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,14 +24,15 @@ import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.viewmodels.MenuAndPermission;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.viewmodels.PermissionVo;
-import com.zyeeda.framework.viewmodels.RoleWithUserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/menu")
 public class MenuService extends ResourceService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
-		
+	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+
+	private final static String PERMISSION_FILE = "permission.xml";
 	public MenuService(@Context ServletContext ctx) {
 		super(ctx);
 	}
@@ -57,7 +56,7 @@ public class MenuService extends ResourceService {
 //		session.setAttribute("auth", authList);
 		//List<PermissionVo> permissionVoList = new ArrayList<PermissionVo>();
 		for(String auth : authList) {
-			PermissionVo permission = permissionMgr.getRaomPermissionByPath(auth);
+			PermissionVo permission = permissionMgr.getPermissionByPath(auth, PERMISSION_FILE);
 			if(permission != null) {
 				roleWithUserVo.getListPermission().add(permission);
 			}
