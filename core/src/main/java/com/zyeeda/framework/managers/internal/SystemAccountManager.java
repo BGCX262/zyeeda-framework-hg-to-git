@@ -60,7 +60,7 @@ public class SystemAccountManager implements AccountManager {
 
 	public Account findByUserIdAndSystemName(String userId, String systemName)
 			throws UserPersistException {
-		String fullDN = userId;// + DEFAULT_DN_PREFIX;
+		String fullDN = "uid=" + userId;// + DEFAULT_DN_PREFIX;
 		String filter = "(systemName=" + systemName + ")";
 
 		logger.debug("find by user id and sys name's full dn = {}", fullDN);
@@ -115,17 +115,19 @@ public class SystemAccountManager implements AccountManager {
 
 		try {
 			context = this.getLdapContext();
-System.out.println("*********************" + dn);
+//			dn += ",dc=ehv,dc=csg,dc=cn";
+System.out.println("======================================" + dn);
 			NamingEnumeration<SearchResult> nes = context.search(dn, filter,
 					SearchControlsFactory
-							.getSearchControls(SearchControls.ONELEVEL_SCOPE));
-
+							.getSearchControls(SearchControls.SUBTREE_SCOPE));
+System.out.println("********" + nes);
 			if (nes == null) {
 				return accounts;
 			}
 
 			accounts = AccountHelper
 					.convertNameingEnumeractionToAccountList(nes);
+			System.out.println("********" + accounts);
 
 			return accounts;
 		} catch (NamingException e) {

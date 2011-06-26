@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +24,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.apache.tapestry5.ioc.internal.services.RegistryShutdownHubImpl;
@@ -422,25 +422,27 @@ public class UserService extends ResourceService {
 	}
 	*/
 //	
-	//@Path("/mock")
 	@GET
 	@Path("/systemUsers/{uid}/{systemName}")
 	@Produces("application/json")
-	public Account mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
-		logger.debug("uid = {} and systemName = {}", uid, systemName);
+	public Map<String, Object> mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
+		logger.debug(")))))))))))))uid = {} and systemName = {}", uid, systemName);
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		
 		RegistryShutdownHub regShutdownHub = new RegistryShutdownHubImpl(logger);
 		Collection<ServletContext> contexts = new ArrayList<ServletContext>();
 		contexts.add(this.getServletContext());
 		ConfigurationService configService = new DefaultConfigurationServiceProvider(contexts, regShutdownHub);
-		AccountService aService = new SystemAccountServiceProvider(configService, regShutdownHub);
-		List<Account> list = objAccountManager.findByUserId(uid);
+		AccountService accountSve = new SystemAccountServiceProvider(configService, regShutdownHub);
+//		List<Account> list = objAccountManager.findByUserId(uid);
 		
-		Map map = aService.getMockSignInConfig("oa.sign.in.url.test");
-		logger.debug("map url is {}", map.get("oa.sign.in.url.test"));
-		
-		return objAccountManager.findByUserIdAndSystemName(uid, systemName);
+		//Map map = accountSve.getMockSignInConfig("oa.sign.in.url.test");
+		//logger.debug(")))))))))))))))))map url is {}", map.get("oa.sign.in.url.test"));
+		Map<String,Object> result = new HashMap<String, Object>();
+		result.put("account", objAccountManager.findByUserIdAndSystemName(uid, systemName));
+		result.put("url", accountSve.getMockSignInConfig(systemName));
+		return result;
 	}
 	
 	@GET
@@ -449,5 +451,4 @@ public class UserService extends ResourceService {
 
 		return "uid = "+uid + " systemName = "+systemName;
 	}
-	
 }

@@ -64,6 +64,7 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 	
 	public void init(Configuration config) throws Exception {
 		this.providerUrl = config.getString(PROVIDER_URL);
+		logger.debug("-------------------------------------------" + this.providerUrl);
 		this.securityAuthentication = config.getString(SECURITY_AUTHENTICATION, DEFAULT_SECURITY_AUTHENTICATION);
 		this.systemSecurityPrincipal = config.getString(SYSTEM_SECURITY_PRINCIPAL);
 		this.systemSecurityCredentials = config.getString(SYSTEM_SECURITY_CREDENTIALS);

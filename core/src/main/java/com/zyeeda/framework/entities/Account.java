@@ -10,8 +10,7 @@ public class Account implements Serializable {
 	private String password;
 	private String systemName;
 	private String userFullPath;
-	private Boolean visible = true;
-	private Boolean noVisible = false;
+	private Boolean status = false;
 
 	public String getUserName() {
 		return this.userName;
@@ -45,16 +44,11 @@ public class Account implements Serializable {
 		this.systemName = systemName;
 	}
 
-	public Boolean getVisible() {
-		return visible;
+	public Boolean getStatus() {
+		return status;
 	}
 
-	public void setVisible(Boolean visible) {
-		this.visible = visible;
+	public void setStatus(Boolean status) {
+		this.status = status;
 	}
-
-	public Boolean getNoVisible() {
-		return !visible;
-	}
-
 }

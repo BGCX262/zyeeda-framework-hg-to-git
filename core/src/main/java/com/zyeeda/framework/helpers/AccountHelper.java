@@ -56,7 +56,7 @@ public class AccountHelper {
 		} else {
 			attributes.put("password", "123456");
 		}
-
+		attributes.put("status", account.getStatus().toString());
 		return attributes;
 	}
 
@@ -72,6 +72,7 @@ public class AccountHelper {
 		account.setPassword(attributes.get("password").get() != null ? (String) attributes
 						.get("password").get()
 						: "");
+		account.setStatus(Boolean.valueOf(attributes.get("status").get().toString()));
 		return account;
 	}
 
