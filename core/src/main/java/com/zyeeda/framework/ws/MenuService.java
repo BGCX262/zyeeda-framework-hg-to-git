@@ -32,7 +32,6 @@ public class MenuService extends ResourceService {
 	private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
 	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
 
-	private final static String PERMISSION_FILE = "permission.xml";
 	public MenuService(@Context ServletContext ctx) {
 		super(ctx);
 	}
@@ -56,7 +55,7 @@ public class MenuService extends ResourceService {
 //		session.setAttribute("auth", authList);
 		//List<PermissionVo> permissionVoList = new ArrayList<PermissionVo>();
 		for(String auth : authList) {
-			PermissionVo permission = permissionMgr.getPermissionByPath(auth, PERMISSION_FILE);
+			PermissionVo permission = permissionMgr.getPermissionByPath(auth, ROAM_PERMISSION_FILE);
 			if(permission != null) {
 				roleWithUserVo.getListPermission().add(permission);
 			}
