@@ -34,7 +34,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
-		
 	}
 	
 	@Override
@@ -45,7 +44,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
-		
 	}
 	
 	@Override
@@ -82,6 +80,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "";
+			System.out.println("dn--------------" + dn);
 			if ("root".equals(dn)) {
 				dn = "";
 				filter = "o=*";
@@ -143,6 +142,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 			throw new UserPersistException(e);
 		}
 	}
+	
+	
 	
 	private static Attributes unmarshal(Department dept) {
 		Attributes attrs = new BasicAttributes();
@@ -245,6 +246,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 			throw new UserPersistException(e);
 		}
 	}
+	
+	
+	
 	
 	/*
 	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)

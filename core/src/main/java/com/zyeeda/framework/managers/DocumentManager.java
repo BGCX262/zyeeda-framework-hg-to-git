@@ -41,10 +41,10 @@ public interface DocumentManager {
 	
 	
 
-	// 根据ID名字去查询
+	// 鏍规嵁ID鍚嶅瓧鍘绘煡璇
 	
 
-	// 根据拥有人关键字数据类别去查询
+	// 鏍规嵁鎷ユ湁浜哄叧閿瓧鏁版嵁绫诲埆鍘绘煡璇
 	public List<Document> findByKeyword(String owner, String[] keyword,
 			String foreignId, int skip, int limit) throws DocumentException;
 

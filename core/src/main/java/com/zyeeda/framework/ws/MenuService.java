@@ -25,7 +25,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/menu")
 public class MenuService extends ResourceService {
 	
-	private static final Logger logger = LoggerFactory.getLogger(LdapDepartmentManager.class);
+	private static final Logger logger = LoggerFactory.getLogger(MenuService.class);
 		
 	public MenuService(@Context ServletContext ctx) {
 		super(ctx);
@@ -43,6 +43,7 @@ public class MenuService extends ResourceService {
 		List<String> rolesAuth = new ArrayList<String>();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
+		System.out.println("*******************" + user);
 		roles = roleMgr.getRoleBySubject(user);	
 		if(roles.size() == 1) {
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());

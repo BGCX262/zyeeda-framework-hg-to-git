@@ -189,7 +189,7 @@ System.out.println("*************************" + u.getPassword());
 				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
-			throw new RuntimeException("旧密码输入错误");
+			throw new RuntimeException("旧密码输入错�);
 		}
 		return userMgr.findById(id);
 	}
@@ -250,7 +250,7 @@ System.out.println("*************************" + u.getPassword());
 	}
 	
 	/**
-	 * 当前用户所属二级部门下所有的人
+	 * 当前用户所属二级部门下所有的�
 	 */
 	@GET
 	@Path("/current_user_in_dept_all_user")
@@ -342,5 +342,144 @@ System.out.println("*************************" + u.getPassword());
 		}
 		return userVoList;
 	}
+	//	@POST
+//	@Path("/{id}")
+//	@Produces("application/json")
+//	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
+//		if(objAccount == null){
+//			throw new RuntimeException("用户名或密码不能为空");
+//		}else{
+//			objAccount.setUserFullPath(fullPath);
+//		}
+//		return objAccount;
+//	}	
 	
+	/**
+	 * 配置系统信息
+	 * 将旧的数据删除，保存新的数据�
+	 * Json list
+	 * return  userList
+	 */
+	@POST
+	@Path("/accounts/{id}")
+	@Produces("application/json")
+	public List<Account> updateAccounts(@FormParam("userList") String userListJson, @PathParam("id") String id) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		ObjectMapper mapper = new ObjectMapper();
+		List<Account> userList = null;
+		try {
+			userList = mapper.readValue(userListJson,
+					new TypeReference<List<Account>>() {
+					});
+			List<Account> tempAccountList = new ArrayList<Account>();
+			LdapContext ctx  = ldapSvc.getLdapContext();
+			NamingEnumeration<SearchResult> ns = ctx.search(id, "objectclass=*", SearchControlsFactory.getDefaultSearchControls());
+			while (ns.hasMore()) {
+				Account  ac = AccountHelper.convertAttributesToAccount(ns.next().getAttributes());
+				tempAccountList.add(ac);
+			}
+			for (Account account : tempAccountList) {
+				account.setUserFullPath(id);
+				objAccountManager.remove("username=" + account.getUserName() + "," + id);
+			}
+			for (Account account : userList) {
+				account.setUserFullPath(id);
+//				objAccountManager.remove("username=" + account.getUserName() + "," + id);
+				objAccountManager.update(account);
+			}
+//			logger.debug("UserList size is {}", userList.size());
+		} catch (JsonParseException e) {
+			logger.error(e.getMessage(), e);
+		} catch (JsonMappingException e) {
+			logger.error(e.getMessage(), e);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		} catch (NamingException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return userList;
+	}
+//	objAccountManager.remove(account.getSystemName());
+//	Account newAccount = objAccountManager.findByUserIdAndSystemName(id, account.getSystemName());
+//	newAccount.setUserName(account.getUserName());
+//	newAccount.setPassword(account.getPassword());
+//	newAccount.setVisible(account.getVisible());
+//	objAccountManager.update(newAccount);
+//	account.setUserFullPath(id);
+//	objAccountManager.remove(account.getSystemName());//.findByUserIdAndSystemName(id, account.getSystemName());
+////	newAccount.setUserName(account.getUserName());
+////	newAccount.setPassword(account.getPassword());
+////	newAccount.setVisible(account.getVisible());
+////	newAccount.setUserFullPath(id);
+
+	/**
+	 * get account list
+	 */
+	@GET
+	@Path("/accounts/{id}")
+	@Produces("application/json")
+	public AccountVo getAccounts(@PathParam("id") String id) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		List<Account> list = objAccountManager.findByUserId(id);
+		AccountVo avo = new AccountVo();
+		avo.setAccounts(list);
+		return avo;
+	}
+	
+//	public void removeSysConfigure(String systemName) throws UserPersistException{
+//		LdapService ldapSvc = this.getLdapService();
+//		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+//		objAccountManager.remove(systemName);
+//	}
+	
+	/*
+	@POST
+	@Path("/accounts/{id}")
+	@Produces("application/json")
+	public Account updateAccounts(@FormParam("") Account objAccount, @PathParam("id") String id) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+
+		if(objAccount == null){
+			throw new RuntimeException("用户名或密码为空");
+		} else {
+			objAccount.setUserFullPath("username=" + objAccount.getUserName() + "," + id);
+			objAccountManager.update(objAccount);
+			return objAccount;
+		}
+	}
+	*/
+//	
+	@GET
+	@Path("/systemUsers/{uid}/{systemName}")
+	@Produces("application/json")
+	public Map<String, Object> mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
+		logger.debug(")))))))))))))uid = {} and systemName = {}", uid, systemName);
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+		
+		RegistryShutdownHub regShutdownHub = new RegistryShutdownHubImpl(logger);
+		Collection<ServletContext> contexts = new ArrayList<ServletContext>();
+		contexts.add(this.getServletContext());
+		ConfigurationService configService = new DefaultConfigurationServiceProvider(contexts, regShutdownHub);
+		AccountService accountSve = new SystemAccountServiceProvider(configService, regShutdownHub);
+//		List<Account> list = objAccountManager.findByUserId(uid);
+		
+		//Map map = accountSve.getMockSignInConfig("oa.sign.in.url.test");
+		//logger.debug(")))))))))))))))))map url is {}", map.get("oa.sign.in.url.test"));
+		Map<String,Object> result = new HashMap<String, Object>();
+		result.put("account", objAccountManager.findByUserIdAndSystemName(uid, systemName));
+		result.put("url", accountSve.getMockSignInConfig(systemName));
+		return result;
+	}
+	
+	@GET
+	@Path("/tests/{uid}/{systemName}")
+	public String testMethod(@PathParam("uid") String uid,@PathParam("systemName") String systemName) {
+
+		return "uid = "+uid + " systemName = "+systemName;
+	}
+
 }

@@ -1,17 +1,18 @@
 package com.zyeeda.framework.entities;
 
 import java.util.List;
+
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Basic;
-import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -39,7 +40,10 @@ public class Role extends SimpleDomainEntity {
 	private String scopeType;
 	private String scopeId;
 	private String deptepment;
-	private String deptementId;
+	private String deptepmentId;
+	
+
+	
 
 	@ElementCollection
 	@CollectionTable(name = "SYS_SUBJECT", joinColumns = @JoinColumn(name = "F_ROLE_ID"))
@@ -101,13 +105,13 @@ public class Role extends SimpleDomainEntity {
 	}
 
 	@Basic
-	@Column(name = "F_DEPTEMENT_ID")
-	public String getDeptementId() {
-		return deptementId;
+	@Column(name = "F_DEPTEPMENT_ID")
+	public String getDeptepmentId() {
+		return deptepmentId;
 	}
 
-	public void setDeptementId(String deptementId) {
-		this.deptementId = deptementId;
+	public void setDeptepmentId(String deptepmentId) {
+		this.deptepmentId = deptepmentId;
 	}
 
 	/*

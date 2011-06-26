@@ -30,6 +30,7 @@ import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
 import com.zyeeda.framework.viewmodels.PermissionVo;
+import com.zyeeda.framework.viewmodels.RoleVo;
 import com.zyeeda.framework.viewmodels.RoleWithUserVo;
 import com.zyeeda.framework.viewmodels.UserNameVo;
 import com.zyeeda.framework.ws.base.ResourceService;
@@ -55,8 +56,38 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		//String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
+		//List<Role> listRole = roleMgr.getRoleDistinct(hql);
 		logger.debug("this get all roles is success!");
 		return roleMgr.findAll();
+	}
+	
+
+	@GET
+	@Path("/get_all_roles_vo")
+	@Produces("application/json")
+	public List<RoleVo> getRolesVo() {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
+		List<Role> listRole = new ArrayList<Role>();
+	    listRole = roleMgr.getRoleDistinct(hql);
+		logger.debug("this get all roles is success!", listRole.size());
+		List<RoleVo> roleVo = roleMgr.roleToVo(listRole);
+		logger.debug("this get all roles is success!");
+		return roleVo;
+	}
+	
+	@GET
+	@Path("/dept/{deptId}")
+	@Produces("applicatioin/json")
+	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		List<Role> list = new ArrayList<Role>();
+		Search search = new Search();
+		search.addFilterEqual("deptepmentId", deptId);
+		list = roleMgr.search(search);
+		List<RoleVo> roleVo = roleMgr.roleToVo(list);
+		return roleVo;
 	}
 	
 	@DELETE
@@ -258,7 +289,6 @@ public class RoleService extends ResourceService{
 				userVo.setUserName(user);
 				roleWithUserVo.getUserName().add(userVo);
 			}
-			//subjectList.addAll(role.getSubjects());
 		}
 		return roleWithUserVo;
 	}

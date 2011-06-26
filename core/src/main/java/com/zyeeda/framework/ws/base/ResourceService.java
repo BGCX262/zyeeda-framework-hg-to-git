@@ -65,4 +65,7 @@ public class ResourceService {
 	protected MongoDbService getMongoDbService() {
 		return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
 	}
+	
+	
+	
 }
