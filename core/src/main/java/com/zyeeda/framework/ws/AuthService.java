@@ -98,6 +98,39 @@ public class AuthService extends ResourceService {
 	}
 	
 	
+	
+	public List<AuthVO> getRaomAuthList(List<PermissionVo> list, String roleId,
+			List<String> auth) {
+		List<AuthVO> authList = new ArrayList<AuthVO>();
+		
+			for (PermissionVo permission : list) {
+				//PermissionVo permission = (PermissionVo) list.get(i);
+				AuthVO authVO = new AuthVO(); 
+				authVO.setId(permission.getId());
+				authVO.setLabel("<a>" + permission.getName() + "</a>");
+				authVO.setType("task");
+				authVO.setTag(permission.getValue());
+				for (String roleAuth : auth) {
+					if (roleAuth.trim().equals(permission.getValue().trim())) {
+						authVO.setChecked(true);
+						break;
+					} else {
+						authVO.setChecked(false);
+					}
+				}
+				if ("false".equals(permission.getIsHaveIO().toString())) {
+					authVO.setIo("/rest/auth/" + permission.getId() + "/raom_permission/" + roleId);
+					authVO.setLeaf(false);
+				} else {
+					authVO.setLeaf(true);
+				}
+				authList.add(authVO);
+//				if(permission.getPermissionList().size() > 0) {
+//					this.getAuthList(list, roleId, auth);
+//				}
+			}
+		return authList;
+	}
 //	
 //	@GET
 //	@Path("/{id}/{role_id}")

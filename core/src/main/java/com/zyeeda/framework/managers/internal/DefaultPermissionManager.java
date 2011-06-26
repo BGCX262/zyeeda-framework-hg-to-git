@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.xpath.XPath;
@@ -25,19 +27,19 @@ import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public class DefaultPermissionManager implements PermissionManager {
 
-
+	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
 	private final static String PERMISSION_FILE = "permission.xml";
-/**
+
 	public void getAllPermssion(List<PermissionVo> permissions)
 			throws XPathExpressionException, IOException {
 		Map<String, PermissionVo> permissionMap = new LinkedHashMap<String, PermissionVo>();
 		List<PermissionVo> list = new ArrayList<PermissionVo>();
 		for (PermissionVo permission : permissions) {
 			String authId = permission.getId();
-			PermissionVo permissionVo = getRaomPermissionByPath(permission
-					.getValue());
+			PermissionVo permissionVo = this.getPermissionByPath(permission
+					.getValue(), ROAM_PERMISSION_FILE);
 			permissionMap.put(permission.getId(), permissionVo);
-			List<PermissionVo> authList = this.findSubPermissionById(authId);
+			List<PermissionVo> authList = this.findSubRoamPermissionById(authId);
 			if (authList.size() == 0) {
 				continue;
 			}
@@ -103,40 +105,6 @@ public class DefaultPermissionManager implements PermissionManager {
 	}
 
 
-public PermissionVo getRaomPermissionByPath(String auth)
-			throws XPathExpressionException, IOException {
-		InputStream is = null;
-		InputSource src = null;
-		XPathExpression exp = null;
-		PermissionVo permission = new PermissionVo();
-		if (auth != null) {
-			try {
-				XPathFactory fac = XPathFactory.newInstance();
-				XPath xpath = fac.newXPath();
-				exp = xpath.compile("//p[@value='" + auth + "']");
-				is = this.getClass().getClassLoader().getResourceAsStream(
-						ROAM_PERMISSION_FILE);
-				src = new InputSource(is);
-				Node node = (Node) exp.evaluate(src, XPathConstants.NODE);
-				Element elementNode = (Element) node;
-				if (elementNode != null) {
-					if (elementNode.getAttribute("value") == null) {
-						return null;
-					}
-					permission.setId(elementNode.getAttribute("id"));
-					permission.setName(elementNode.getAttribute("name"));
-					permission.setValue(elementNode.getAttribute("value"));
-					permission.setOrderBy(elementNode.getAttribute("order"));
-				} else {
-					return null;
-				}
-			} finally {
-				is.close();
-			}
-		}
-		return permission;
-	}	
-*/
 	public List<PermissionVo> findSubPermissionById(String id, String authXml)
 			throws XPathExpressionException, IOException {
 		List<PermissionVo> authList = null;
@@ -205,6 +173,11 @@ public PermissionVo getRaomPermissionByPath(String auth)
 					permission.setName(elementNode.getAttribute("name"));
 					permission.setValue(elementNode.getAttribute("value"));
 					permission.setOrderBy(elementNode.getAttribute("order"));
+					if (elementNode.getAttribute("value").endsWith("*")) {
+						permission.setIsHaveIO(false);
+					} else {
+						permission.setIsHaveIO(true);
+					}
 				} else {
 					return null;
 				}
