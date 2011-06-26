@@ -1,8 +1,8 @@
 package com.zyeeda.framework.viewmodels;
 
 import java.util.ArrayList;
-
 import java.util.List;
+
 
 
 public class PermissionVo {
@@ -12,11 +12,20 @@ public class PermissionVo {
 	private Boolean isHaveIO;
 	private int path;
 	private String orderBy;
-	
+	private  List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 
+	public List<PermissionVo> getPermissionList() {
+		return permissionList;
+	}
+	
+	public void setPermissionList(List<PermissionVo> permissionList) {
+		this.permissionList = permissionList;
+	}
+	
 	public String getOrderBy() {
 		return orderBy;
 	}
+
 
 	public void setOrderBy(String orderBy) {
 		this.orderBy = orderBy;

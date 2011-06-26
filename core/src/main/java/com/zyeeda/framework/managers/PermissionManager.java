@@ -19,7 +19,8 @@ public interface PermissionManager {
 	public String getParentPermissionListAuthByList(List<String> authList, String authXml) throws XPathExpressionException, IOException;
 	
 	
-	
+	public List<PermissionVo> getPermissionToTree(String id)
+	throws XPathExpressionException, IOException ;
 //	public PermissionVo getRaomPermissionByPath(String auth)
 //	throws XPathExpressionException, IOException;
 	

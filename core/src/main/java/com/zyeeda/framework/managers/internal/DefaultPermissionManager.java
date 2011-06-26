@@ -36,16 +36,16 @@ public class DefaultPermissionManager implements PermissionManager {
 		List<PermissionVo> list = new ArrayList<PermissionVo>();
 		for (PermissionVo permission : permissions) {
 			String authId = permission.getId();
-			PermissionVo permissionVo = this.getPermissionByPath(permission
-					.getValue(), ROAM_PERMISSION_FILE);
-			permissionMap.put(permission.getId(), permissionVo);
+//			PermissionVo permissionVo = this.getPermissionByPath(permission
+//					.getValue(), ROAM_PERMISSION_FILE);
+			permissionMap.put(permission.getId(), permission);
 			List<PermissionVo> authList = this.findSubRoamPermissionById(authId);
 			if (authList.size() == 0) {
 				continue;
 			}
-			//permissionVo.getPermissionList().addAll(authList);
+			permission.getPermissionList().addAll(authList);
 			list.add(permission);
-			this.getAllPermssion(authList);
+			//this.getAllPermssion(authList);
 		}
 	}
 
