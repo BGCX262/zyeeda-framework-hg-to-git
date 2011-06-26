@@ -42,7 +42,6 @@ public class Role extends SimpleDomainEntity {
 	private String deptepment;
 	private String deptepmentId;
 	private String ramoPermissions;
-	
 
 	
 	@Basic
@@ -79,9 +78,6 @@ public class Role extends SimpleDomainEntity {
 	@Transient
 	public List<String> getPermissionList() {
 		String permissions = this.getPermissions();
-		if(this.getRamoPermissions() != null) {
-			 permissions = this.getPermissions() + ";" + this.getRamoPermissions();
-		}
 		String[] permissionArray = StringUtils.split(permissions,
 				PERMISSION_SEPARATOR);
 		return CollectionUtils.asList(permissionArray);

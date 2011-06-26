@@ -184,13 +184,15 @@ public class RoleService extends ResourceService{
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		Role newrole = roleMgr.find(id);
+		Role newRole = roleMgr.find(id);
 		String[] str = role.getPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
 		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
-		newrole.setPermissions(authArray); 
+		String auth = newRole.getPermissions();
+		auth.substring(0, auth.indexOf("_"));
+		newRole.setPermissions(authArray); 
 		this.getPersistenceService().getCurrentSession().flush();
-		return newrole;
+		return newRole;
 	}
 	
 	@POST
@@ -200,13 +202,18 @@ public class RoleService extends ResourceService{
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		Role newrole = roleMgr.find(id);
-		String[] str = role.getPermissions().split(";");
+		Role newRole = roleMgr.find(id);
+		System.out.println("this ramoPermissions is :" + role.getRamoPermissions());
+		String[] str = role.getRamoPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
 		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
-		newrole.setRamoPermissions(authArray);
+		System.out.println("this authArray is :" + authArray);
+		if(authArray != null) {
+			authArray = newRole.getPermissions() + "_" + authArray;
+		}
+		newRole.setPermissions(authArray);
 		this.getPersistenceService().getCurrentSession().flush();
-		return newrole;
+		return newRole;
 	}
 	
 	@POST
