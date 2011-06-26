@@ -1,6 +1,7 @@
 package com.zyeeda.framework.viewmodels;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 
@@ -9,7 +10,7 @@ public class PermissionVo {
 	private String name;
 	private String value;
 	private Boolean isHaveIO;
-	private int path = 0;
+	private int path;
 	private String orderBy;
 	
 

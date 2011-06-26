@@ -205,6 +205,8 @@ public PermissionVo getRaomPermissionByPath(String auth)
 					permission.setName(elementNode.getAttribute("name"));
 					permission.setValue(elementNode.getAttribute("value"));
 					permission.setOrderBy(elementNode.getAttribute("order"));
+				} else {
+					return null;
 				}
 			} finally {
 				is.close();
