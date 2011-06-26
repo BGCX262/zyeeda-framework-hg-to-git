@@ -24,6 +24,9 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/auth")
 public class AuthService extends ResourceService {
 
+	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+
+	private final static String PERMISSION_FILE = "permission.xml";
 	public AuthService(@Context ServletContext ctx) {
 		super(ctx);
 	}
@@ -34,11 +37,10 @@ public class AuthService extends ResourceService {
 	public List<AuthVO> getPermissionById(@PathParam("id") String id,
 			@PathParam("role_id") String roleId)
 			throws XPathExpressionException, IOException {
-		String authXML = "permission.xml";
 		RoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, authXML);
+		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, PERMISSION_FILE);
 		Role role = roleMgr.find(roleId);
 		List<AuthVO> authVO = getAuthList(list, roleId, role
 				.getPermissionList());
@@ -87,9 +89,8 @@ public class AuthService extends ResourceService {
 			throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
-		String authXml = "roamPermission.xml";
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, authXml);
+		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, ROAM_PERMISSION_FILE);
 		Role role = roleMgr.find(roleId);
 		List<AuthVO> authVO = getAuthList(list, roleId, role
 				.getPermissionList());
