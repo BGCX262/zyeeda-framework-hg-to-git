@@ -32,7 +32,7 @@ public class LDAPTest {
 		String root = "dc=ehv,dc=csg,dc=cn";
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, "ldap://192.168.1.85:389/" + root);
+		env.put(Context.PROVIDER_URL, "ldap://192.168.1.85:10389/" + root);
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
 		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
 		env.put(Context.SECURITY_CREDENTIALS, "admin");
@@ -196,8 +196,8 @@ System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").ge
 //		saveUserRefObject();
 //		ldapPageView();
 //		getAllUser();
-//		updateUserDeptFullPath();
-		ldapPageView();
+		updateUserDeptFullPath();
+//		ldapPageView();
 //		save();
 	}
 
