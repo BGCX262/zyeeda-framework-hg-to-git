@@ -322,16 +322,16 @@ logger.info("**************username is {}", userVo.getLabel());
 																	throws UserPersistException {
 		List<Department> deptList = this.searchByCondition("");
 		List<String> siteDeptList = new ArrayList<String>();
-		siteDeptList.add("广州�);
-		siteDeptList.add("宝安�);
-		siteDeptList.add("福山�);
-		siteDeptList.add("肇庆�);
-		siteDeptList.add("花都�);
-		siteDeptList.add("隧东�);
+		siteDeptList.add("广州站");
+		siteDeptList.add("宝安站");
+		siteDeptList.add("福山站");
+		siteDeptList.add("肇庆站");
+		siteDeptList.add("花都站");
+		siteDeptList.add("隧东站");
 //		siteDeptList.add("海口分局");
-//		siteDeptList.add("生产�);
-//		siteDeptList.add("综合�);
-//		siteDeptList.add("海缆运维�);
+//		siteDeptList.add("生产�);
+//		siteDeptList.add("综合�);
+//		siteDeptList.add("海缆运维�);
 		List<DepartmentVo> deptVoList = fillPropertiesToVo(deptList, "task");
 		List<DepartmentVo> removeDeptVoList = new ArrayList<DepartmentVo>();
 		for (DepartmentVo deptVo : deptVoList) {

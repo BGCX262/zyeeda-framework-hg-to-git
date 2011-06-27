@@ -78,14 +78,14 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 	}
 
 	
-	@SuppressWarnings("unchecked")
-	public List<Role> getRoleDistinct(String hql){
-		List<Role> list = new ArrayList<Role>();
-		TypedQuery<Role> createNativeQuery = (TypedQuery<Role>) this.em().createNativeQuery(hql);
-		TypedQuery<Role> query = createNativeQuery;
-		 list = query.getResultList();
-		return list;
-	}
+//	@SuppressWarnings("unchecked")
+//	public List<Role> getRoleDistinct(String hql){
+//		List<Role> list = new ArrayList<Role>();
+//		TypedQuery<Role> createNativeQuery = (TypedQuery<Role>) this.em().createNativeQuery(hql);
+//		TypedQuery<Role> query = createNativeQuery;
+//		 list = query.getResultList();
+//		return list;
+//	}
 	
 	public List<RoleVo> deptToVo(List<Role> listRole) {
 		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
@@ -103,21 +103,21 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		return listRoleVo;
 	}
 
-	public List<RoleVo> roleToVo(List<Role> listRole) {
-		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
-		for(Role role : listRole) {
-			RoleVo roleVo = new RoleVo();
-				roleVo.setCheckName(role.getName());
-				roleVo.setLabel(role.getName());
-				roleVo.setId(role.getId());
-				roleVo.setLeaf(false);
-				roleVo.setType("io");
-				roleVo.setKind("role");
-				roleVo.setIo("/rest/roles/depts/" + role.getId());
-				listRoleVo.add(roleVo);
-		}
-		return listRoleVo;
-	}
+//	public List<RoleVo> roleToVo(List<Role> listRole) {
+//		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
+//		for(Role role : listRole) {
+//			RoleVo roleVo = new RoleVo();
+//				roleVo.setCheckName(role.getName());
+//				roleVo.setLabel(role.getName());
+//				roleVo.setId(role.getId());
+//				roleVo.setLeaf(false);
+//				roleVo.setType("io");
+//				roleVo.setKind("role");
+//				roleVo.setIo("/rest/roles/depts/" + role.getId());
+//				listRoleVo.add(roleVo);
+//		}
+//		return listRoleVo;
+//	}
 	
 	public List<UserVo> getUserVoByRole(Role role) {
 		Set<String> user = role.getSubjects();

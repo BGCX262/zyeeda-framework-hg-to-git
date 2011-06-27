@@ -215,14 +215,14 @@ public class UserService extends ResourceService {
 //			ldapSvc.getLdapContext(userId, inputPw);
 //			userMgr.updatePassword(id, newPassword);
 //		} catch (Exception e) {
-//			throw new RuntimeException("旧密码输入错�);
+//			throw new RuntimeException("旧密码输入错�);
 //		}
 		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
 			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
 				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
-			throw new RuntimeException("旧密码输入错�);
+			throw new RuntimeException("旧密码输入错误");
 		}
 		return userMgr.findById(id);
 	}
@@ -387,7 +387,7 @@ public class UserService extends ResourceService {
 	
 	/**
 	 * 配置系统信息
-	 * 将旧的数据删除，保存新的数据�
+	 * 将旧的数据删除，保存新的数据�
 	 * Json list
 	 * return  userList
 	 */

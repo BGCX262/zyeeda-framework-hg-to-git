@@ -310,12 +310,12 @@ public class RoleService extends ResourceService{
 		UserManager userManager = new LdapUserManager(this.getLdapService());
 		List<User> userList = userManager.findByName(creator);
 		List<String> siteDeptList = new ArrayList<String>();
-		siteDeptList.add("广州�);
-		siteDeptList.add("宝安�);
-		siteDeptList.add("福山�);
-		siteDeptList.add("肇庆�);
-		siteDeptList.add("花都�);
-		siteDeptList.add("隧东�);
+		siteDeptList.add("广州站");
+		siteDeptList.add("宝安站");
+		siteDeptList.add("福山站");
+		siteDeptList.add("肇庆站");
+		siteDeptList.add("花都站");
+		siteDeptList.add("隧东站");
 		String subStationName = null;
 		if (userList != null && userList.size() > 0) {
 			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
@@ -337,7 +337,7 @@ public class RoleService extends ResourceService{
 		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
-			//if("当班�值长".equals(role.getName()) && role.getDeptepment()){
+			//if("当班�值长".equals(role.getName()) && role.getDeptepment()){
 				for(String user : role.getSubjects()){
 					UserVo userVo = new UserVo();
 					userVo.setCheckName(user);
