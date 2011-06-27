@@ -199,7 +199,7 @@ public class DepartmentService extends ResourceService {
 		}
 		
 		for (UserVo userVo: userVoList) {
-			logger.info("**************username is {}", userVo.getCheckName());
+			logger.debug("username = {}", userVo.getCheckName());
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
 			orgNodeVo.setId(userVo.getDeptFullPath());
 			orgNodeVo.setCheckName(userVo.getCheckName());
