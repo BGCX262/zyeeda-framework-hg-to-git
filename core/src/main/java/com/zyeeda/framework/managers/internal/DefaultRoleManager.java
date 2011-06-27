@@ -53,29 +53,29 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		return list;
 	}
 	
-	public List<RoleVo> roleToVo(List<Role> listRole) {
-		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
-		for(Role role : listRole) {
-			RoleVo roleVo = new RoleVo();
-			if(role.getDeptepment() == null && role.getDeptepmentId() == null){
-				roleVo.setCheckName(role.getName());
-				roleVo.setLabel(role.getName());
-				roleVo.setId(role.getId());
-				roleVo.setLeaf(true);
-				roleVo.setType("tesk");
-				roleVo.setKind("user");
-			} else {
-				roleVo.setId(role.getDeptepmentId());
-				roleVo.setCheckName(role.getDeptepment());
-				roleVo.setLabel(role.getDeptepment());
-				roleVo.setIo("/rest/line_location/"+role.getDeptepmentId());
-				roleVo.setLeaf(false);
-				roleVo.setType("io");
-			}
-			listRoleVo.add(roleVo);
-		}
-		return listRoleVo;
-	}
+//	public List<RoleVo> roleToVo(List<Role> listRole) {
+//		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
+//		for(Role role : listRole) {
+//			RoleVo roleVo = new RoleVo();
+//			if(role.getDeptepment() == null && role.getDeptepmentId() == null){
+//				roleVo.setCheckName(role.getName());
+//				roleVo.setLabel(role.getName());
+//				roleVo.setId(role.getId());
+//				roleVo.setLeaf(true);
+//				roleVo.setType("tesk");
+//				roleVo.setKind("user");
+//			} else {
+//				roleVo.setId(role.getDeptepmentId());
+//				roleVo.setCheckName(role.getDeptepment());
+//				roleVo.setLabel(role.getDeptepment());
+//				roleVo.setIo("/rest/line_location/"+role.getDeptepmentId());
+//				roleVo.setLeaf(false);
+//				roleVo.setType("io");
+//			}
+//			listRoleVo.add(roleVo);
+//		}
+//		return listRoleVo;
+//	}
 
 	
 //	@SuppressWarnings("unchecked")
@@ -103,21 +103,21 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		return listRoleVo;
 	}
 
-//	public List<RoleVo> roleToVo(List<Role> listRole) {
-//		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
-//		for(Role role : listRole) {
-//			RoleVo roleVo = new RoleVo();
-//				roleVo.setCheckName(role.getName());
-//				roleVo.setLabel(role.getName());
-//				roleVo.setId(role.getId());
-//				roleVo.setLeaf(false);
-//				roleVo.setType("io");
-//				roleVo.setKind("role");
-//				roleVo.setIo("/rest/roles/depts/" + role.getId());
-//				listRoleVo.add(roleVo);
-//		}
-//		return listRoleVo;
-//	}
+	public List<RoleVo> roleToVo(List<Role> listRole) {
+		List<RoleVo> listRoleVo = new ArrayList<RoleVo>();
+		for(Role role : listRole) {
+			RoleVo roleVo = new RoleVo();
+				roleVo.setCheckName(role.getName());
+				roleVo.setLabel(role.getName());
+				roleVo.setId(role.getId());
+				roleVo.setLeaf(false);
+				roleVo.setType("io");
+				roleVo.setKind("role");
+				roleVo.setIo("/rest/roles/depts/" + role.getId());
+				listRoleVo.add(roleVo);
+		}
+		return listRoleVo;
+	}
 	
 	public List<UserVo> getUserVoByRole(Role role) {
 		Set<String> user = role.getSubjects();
