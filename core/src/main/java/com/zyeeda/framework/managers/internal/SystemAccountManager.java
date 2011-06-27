@@ -82,7 +82,6 @@ public class SystemAccountManager implements AccountManager {
 //			String dn = "username=" + account.getUserName() + "," + account.getUserFullPath();
 //			NamingEnumeration<SearchResult> ne = context.search(account.getUserFullPath(), "username=" + account.getUserName(),
 //						   SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
-//			System.out.println("------------" + ne.hasMore());
 //			if (ne.hasMore()) {
 //				context.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attributes);
 //			} else {
@@ -116,18 +115,15 @@ public class SystemAccountManager implements AccountManager {
 		try {
 			context = this.getLdapContext();
 //			dn += ",dc=ehv,dc=csg,dc=cn";
-System.out.println("======================================" + dn);
 			NamingEnumeration<SearchResult> nes = context.search(dn, filter,
 					SearchControlsFactory
 							.getSearchControls(SearchControls.SUBTREE_SCOPE));
-System.out.println("********" + nes);
 			if (nes == null) {
 				return accounts;
 			}
 
 			accounts = AccountHelper
 					.convertNameingEnumeractionToAccountList(nes);
-			System.out.println("********" + accounts);
 
 			return accounts;
 		} catch (NamingException e) {

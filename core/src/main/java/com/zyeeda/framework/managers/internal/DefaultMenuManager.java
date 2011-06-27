@@ -29,7 +29,6 @@ public class DefaultMenuManager implements MenuManager {
 		Map<String, MenuVo> menuMap = new LinkedHashMap<String, MenuVo>();
 		String	root = null;
 		for (String auth : authList) { 
-			System.out.println("*************" + auth);
 			PermissionVo childPermission = permissionMgr.getPermissionByPath(auth, PERMISSION_FILE);
 			MenuVo childMenu = null;
 			if (childPermission != null) {
@@ -80,7 +79,6 @@ public class DefaultMenuManager implements MenuManager {
 			MenuListComparator comparator = new MenuListComparator();
 			Collections.sort(listMenu, comparator);
 		}
-		System.out.println("****************ssss" + listMenu.size());
 		return listMenu;
 	}
 	

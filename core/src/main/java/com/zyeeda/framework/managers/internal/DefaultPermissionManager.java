@@ -239,7 +239,6 @@ public class DefaultPermissionManager implements PermissionManager {
 		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 		permissionList = findSubPermissionByValue(auth, authXml);
 		for (PermissionVo permission : permissionList) {
-			System.out.println("*****" + permission.getValue());
 			allAuth.add(permission.getValue());
 			this.getParentPermissionListAuthByPath(permission.getValue(), allAuth, authXml);
 		}

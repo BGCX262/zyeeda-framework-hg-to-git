@@ -218,7 +218,7 @@ public class RoleService extends ResourceService{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
 		Role newRole = roleMgr.find(id);
-		System.out.println("this ramoPermissions is :" + role.getRamoPermissions());
+		logger.debug("this ramoPermissions is : {}", role.getRamoPermissions());
 		String[] str = role.getRamoPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
 		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
@@ -234,7 +234,7 @@ public class RoleService extends ResourceService{
 				newRole.setPermissions(menuPermission); 
 			} else {
 				String  menuPermission = auth + "_" + authArray;
-				System.out.println("this ramoPermissions is :" + menuPermission);
+				logger.debug("this ramoPermissions is : {}", menuPermission);
 				newRole.setPermissions(menuPermission); 
 			} 
 		}

@@ -173,8 +173,6 @@ public class FreemarkerTemplateServiceProvider extends AbstractService implement
     private void putBuildinVariables(Map<String, Object> args) {
     	args.put("APPLICATION_ROOT", this.configSvc.getApplicationRoot());
     	args.put("CONTEXT_PATH", this.configSvc.getContextPath());
-    	
-    	System.out.println(args);
     }
     
 }

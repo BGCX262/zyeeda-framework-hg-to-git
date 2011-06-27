@@ -49,7 +49,6 @@ public class MenuService extends ResourceService {
 		MenuAndPermission roleWithUserVo = new MenuAndPermission();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
-		System.out.println("*******************" + user);
 		roles = roleMgr.getRoleBySubject(user);	
 		Set<String> authList = roleMgr.getListAuth(roles);
 //		Session session = SecurityUtils.getSubject().getSession();
