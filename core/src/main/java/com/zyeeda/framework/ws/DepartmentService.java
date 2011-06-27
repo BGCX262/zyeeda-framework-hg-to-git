@@ -327,7 +327,7 @@ logger.info("**************username is {}", userVo.getLabel());
 		siteDeptList.add("福山站");
 		siteDeptList.add("肇庆站");
 		siteDeptList.add("花都站");
-		siteDeptList.add("隧东站");
+		siteDeptList.add("穗东站");
 //		siteDeptList.add("海口分局");
 //		siteDeptList.add("生产�);
 //		siteDeptList.add("综合�);
