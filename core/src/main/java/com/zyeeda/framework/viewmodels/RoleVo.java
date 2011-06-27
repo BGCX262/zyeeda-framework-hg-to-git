@@ -1,11 +1,8 @@
 package com.zyeeda.framework.viewmodels;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-import com.zyeeda.framework.entities.Role;
 
 @XmlRootElement(name = "roleVo")
 public class RoleVo {

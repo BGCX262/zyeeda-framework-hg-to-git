@@ -40,6 +40,7 @@ import com.zyeeda.framework.viewmodels.RoleWithUserVo;
 import com.zyeeda.framework.viewmodels.UserNameVo;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
+
 @Path("/roles")
 public class RoleService extends ResourceService{
 	
@@ -386,7 +387,7 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
-	@Path("/dept/{deptId}")
+	@Path("/dept_and_role/{deptId}")
 	@Produces("application/json")
 	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
