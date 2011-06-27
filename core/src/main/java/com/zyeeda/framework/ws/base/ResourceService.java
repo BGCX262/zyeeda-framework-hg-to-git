@@ -5,6 +5,8 @@ import javax.servlet.ServletContext;
 import org.apache.tapestry5.ioc.Registry;
 
 import com.zyeeda.framework.FrameworkConstants;
+import com.zyeeda.framework.ftp.FtpService;
+import com.zyeeda.framework.ftp.internal.CommonsFtpServiceProvider;
 import com.zyeeda.framework.knowledge.KnowledgeService;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.internal.SunLdapServiceProvider;
@@ -21,50 +23,52 @@ import com.zyeeda.framework.sync.internal.HttpClientUserSyncServiceProvider;
 import com.zyeeda.framework.utils.IocUtils;
 
 public class ResourceService {
-	
-	private ServletContext ctx;
-	private Registry reg;
 
-	public ResourceService(ServletContext ctx) {
-		this.ctx = ctx;
-		this.reg = (Registry) this.ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-	}
-	
-	protected ServletContext getServletContext() {
-		return this.ctx;
-	}
-	
-	protected Registry getServiceRegistry() {
-		return this.reg;
-	}
-	
-	protected PersistenceService getPersistenceService() {
-		return this.reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
-	}
-	
-	protected SecurityService<?> getSecurityService() {
-		return this.reg.getService(IocUtils.getServiceId(OpenIdConsumerSecurityServiceProvider.class), SecurityService.class);
-	}
-	
-	protected LdapService getLdapService() {
-		return this.reg.getService(IocUtils.getServiceId(SunLdapServiceProvider.class), LdapService.class);
-	}
-	
-	protected UserSyncService getUserSynchService() {
-		return this.reg.getService(IocUtils.getServiceId(HttpClientUserSyncServiceProvider.class), UserSyncService.class);
-	}
-	
-	protected SchedulerService<?> getSchedulerService() {
-		return this.reg.getService(IocUtils.getServiceId(QuartzSchedulerServiceProvider.class), SchedulerService.class);
-	}
-	
-	protected KnowledgeService getKnowledgeService(){
-		return this.reg.getService(KnowledgeService.class);
-	}
+    private ServletContext ctx;
+    private Registry reg;
 
-	protected MongoDbService getMongoDbService() {
-		return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
-	}
-	
-	
+    public ResourceService(ServletContext ctx) {
+        this.ctx = ctx;
+        this.reg = (Registry) this.ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
+    }
+
+    protected ServletContext getServletContext() {
+        return this.ctx;
+    }
+
+    protected Registry getServiceRegistry() {
+        return this.reg;
+    }
+
+    protected PersistenceService getPersistenceService() {
+        return this.reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
+    }
+
+    protected SecurityService<?> getSecurityService() {
+        return this.reg.getService(IocUtils.getServiceId(OpenIdConsumerSecurityServiceProvider.class), SecurityService.class);
+    }
+
+    protected LdapService getLdapService() {
+        return this.reg.getService(IocUtils.getServiceId(SunLdapServiceProvider.class), LdapService.class);
+    }
+
+    protected UserSyncService getUserSynchService() {
+        return this.reg.getService(IocUtils.getServiceId(HttpClientUserSyncServiceProvider.class), UserSyncService.class);
+    }
+
+    protected SchedulerService<?> getSchedulerService() {
+        return this.reg.getService(IocUtils.getServiceId(QuartzSchedulerServiceProvider.class), SchedulerService.class);
+    }
+
+    protected KnowledgeService getKnowledgeService(){
+        return this.reg.getService(KnowledgeService.class);
+    }
+
+    protected MongoDbService getMongoDbService() {
+        return this.reg.getService(IocUtils.getServiceId(DefaultMongoDbServiceProvider.class), MongoDbService.class);
+    }
+
+    protected FtpService getFtpService() {
+        return this.reg.getService(IocUtils.getServiceId(CommonsFtpServiceProvider.class), FtpService.class);
+    }
 }
