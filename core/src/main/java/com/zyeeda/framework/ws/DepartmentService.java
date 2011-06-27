@@ -297,20 +297,20 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("second_level_dept_role")
 	@Produces("application/json")
-	public RoleVoAndQualification getSecondLevelDepartmentAndRole() throws UserPersistException {
+	public List<DepartmentVo> getSecondLevelDepartmentAndRole() throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getChildrenById("o=广州局");
 		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVoAndRoles(deptList);
-		RoleVoAndQualification roleVoAndQualification = new RoleVoAndQualification();
-		roleVoAndQualification.getDepartmentVo().addAll(deptVoList);
-		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		Search searchNoDept = new Search();
-		searchNoDept.addFilterEmpty("deptepmentId");
-		List<Role> roleList = roleMgr.search(searchNoDept);
-		roleVoAndQualification.getRole().addAll(roleList);
-		return roleVoAndQualification;
+//		RoleVoAndQualification roleVoAndQualification = new RoleVoAndQualification();
+//		roleVoAndQualification.getDepartmentVo().addAll(deptVoList);
+//		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+//		Search searchNoDept = new Search();
+//		searchNoDept.addFilterEmpty("deptepmentId");
+//		List<Role> roleList = roleMgr.search(searchNoDept);
+//		roleVoAndQualification.getRole().addAll(roleList);
+		return deptVoList;
 	}
 	public static List<DepartmentVo> fillPropertiesToVoAndRoles(List<Department> deptList) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());

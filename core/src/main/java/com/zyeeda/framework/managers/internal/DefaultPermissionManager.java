@@ -1,10 +1,9 @@
 package com.zyeeda.framework.managers.internal;
 
-import java.io.File;
+
 import java.io.IOException;
 
 import java.io.InputStream;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -32,16 +31,17 @@ public class DefaultPermissionManager implements PermissionManager {
 	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
 	private final static String PERMISSION_FILE = "permission.xml";
 
-	public void getAllPermssion(List<PermissionVo> permissions)
+	public void getAllPermssion(String authId)
 			throws XPathExpressionException, IOException {
+		List<PermissionVo> permissions = new ArrayList<PermissionVo>();
 		Map<String, PermissionVo> permissionMap = new LinkedHashMap<String, PermissionVo>();
 		List<PermissionVo> list = new ArrayList<PermissionVo>();
-		for (PermissionVo permission : permissions) {
-			String authId = permission.getId();
+		List<PermissionVo> authList = this.findSubRoamPermissionById(authId);
+		for (PermissionVo permission : authList) {
+			//String authId = permission.getId();
 //			PermissionVo permissionVo = this.getPermissionByPath(permission
 //					.getValue(), ROAM_PERMISSION_FILE);
 			permissionMap.put(permission.getId(), permission);
-			List<PermissionVo> authList = this.findSubRoamPermissionById(authId);
 			if (authList.size() == 0) {
 				continue;
 			}
@@ -55,7 +55,9 @@ public class DefaultPermissionManager implements PermissionManager {
 			throws XPathExpressionException, IOException {
 		List<PermissionVo> listPermission = new ArrayList<PermissionVo>();
 		listPermission = this.findSubRoamPermissionById(id);
-		this.getAllPermssion(listPermission);
+		for(PermissionVo permission : listPermission) {
+			this.getAllPermssion(permission.getId());
+		}
 		return listPermission;
 	}
 

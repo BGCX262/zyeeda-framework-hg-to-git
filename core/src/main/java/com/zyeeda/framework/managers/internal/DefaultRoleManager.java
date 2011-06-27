@@ -1,13 +1,13 @@
 package com.zyeeda.framework.managers.internal;
 import java.util.ArrayList;
 
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.TypedQuery;
 
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

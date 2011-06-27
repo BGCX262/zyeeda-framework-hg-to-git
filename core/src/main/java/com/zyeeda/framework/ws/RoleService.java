@@ -232,7 +232,7 @@ public class RoleService extends ResourceService{
 				newRole.setPermissions(menuPermission); 
 			} else {
 				String  menuPermission = auth + "_" + authArray;
-				System.out.println("this n********** ramoPermissions is :" + menuPermission);
+				System.out.println("this ramoPermissions is :" + menuPermission);
 				newRole.setPermissions(menuPermission); 
 			} 
 		}
