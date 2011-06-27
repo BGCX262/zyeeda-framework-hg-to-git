@@ -14,7 +14,7 @@ public class Roles {
 	public void setRole(Collection<Role> roles) {
 		this.roles = roles;
 	}
-	 
+	
 	public Collection<Role> getRole() {
 		return this.roles;
 	}

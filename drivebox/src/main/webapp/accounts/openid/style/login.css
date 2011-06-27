@@ -1,0 +1,19 @@
+.unlogin {
+ 	margin: 0px;
+	padding: 0px;
+	background-color:#FFFFFF;
+	background-image:url(../img/unlogin_bg.jpg);
+	background-repeat:no-repeat;
+	background-position:0px 0px;
+	background-position:center top;
+ } 
+ 
+ .logined {
+ 	margin: 0px;
+	padding: 0px;
+	background-color:#FFFFFF;
+	background-image:url(../img/logined_bg.jpg);
+	background-repeat:no-repeat;
+	background-position:0px 0px;
+	background-position:center top;
+ } 

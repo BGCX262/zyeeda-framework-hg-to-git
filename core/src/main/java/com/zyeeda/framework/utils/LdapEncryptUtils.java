@@ -5,7 +5,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.digest.DigestUtils;
 
+@Deprecated
 public class LdapEncryptUtils {
 	
 	public static String md5Encode(String standardMd5) throws UnsupportedEncodingException {
@@ -34,7 +36,8 @@ public class LdapEncryptUtils {
 		}
 
 		// 解码BASE64
-		byte[] ldapPwByte = com.sun.org.apache.xerces.internal.impl.dv.util.Base64.decode(ldapPw);
+//		byte[] ldapPwByte = com.sun.org.apache.xerces.internal.impl.dv.util.Base64.decode(ldapPw);
+		byte[] ldapPwByte = Base64.decodeBase64(ldapPw);
 		byte[] shaCode;
 		byte[] salt;
 
@@ -61,8 +64,9 @@ public class LdapEncryptUtils {
 		return MessageDigest.isEqual(shaCode, inputPwByte);
 	}
 	
-	public static void main(String[] args) throws UnsupportedEncodingException {
+	public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		//e10adc3949ba59abbe56e057f20f883e
-		System.out.println(md5Encode("12345"));
+		System.out.println(DigestUtils.md5Hex("admin"));
+		System.out.println(verifySHA("{SSHA}6GjgruydvdSc7zNuTKvSSzQgKFDEg/SuE4MqIg==", DigestUtils.md5Hex("111111")));
 	}
 }
