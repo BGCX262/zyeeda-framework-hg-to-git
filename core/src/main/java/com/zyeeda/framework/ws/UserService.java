@@ -301,14 +301,14 @@ public class UserService extends ResourceService {
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
 		}
-		List<UserVo> listUser = fillUserListPropertiesToVo(users);
+		List<UserVo> listUser = fillUserListPropertiesToVo(users, "task");
 		return listUser;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 		userVo.setId(user.getId());
-		userVo.setType("io");
+		userVo.setType("task");
 		userVo.setLabel(user.getId() );
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
