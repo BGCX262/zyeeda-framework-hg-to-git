@@ -116,6 +116,9 @@ public class LdapUserManager implements UserManager {
 		List<User> userList = null;
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			if ("root".equals(id)) {
+				id = "";
+			}
 			List<Attributes> attrsList = ldapTemplate.getResultList(id,
 															 		"(uid=*)",
 															 		sc);
