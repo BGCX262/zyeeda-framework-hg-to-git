@@ -302,73 +302,7 @@ public class DefaultPermissionManager implements PermissionManager {
 		return authList;
 	}
 
-//	
-//	private void getParentRomaPermissionListAuthByPath(String auth,
-//			Set<String> allAuth, String authXml) throws XPathExpressionException, IOException {
-//		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
-//		permissionList = findRomaSubPermissionByValue(auth, authXml);
-//		for (PermissionVo permission : permissionList) {
-//			allAuth.add(permission.getValue());
-//			getParentRomaPermissionListAuthByPath(permission.getValue(), allAuth, authXml);
-//		}
-//	}
-//
-//	public String getParentRomaPermissionListAuthByList(List<String> authList, String authXml)
-//			throws XPathExpressionException, IOException {
-//		Set<String> allAuth = new HashSet<String>();
-//		for (String auth : authList) {
-//			allAuth.add(auth);
-//			getParentRomaPermissionListAuthByPath(auth, allAuth, authXml);
-//		}
-//		String utils = StringUtils.join(allAuth, ";");
-//		return utils;
-//	}
-//
-//	public  List<PermissionVo> findRomaSubPermissionByValue(String value, String authXml)
-//			throws XPathExpressionException, IOException {
-//		List<PermissionVo> authList = null;
-//		InputStream is = null;
-//		InputSource src = null;
-//		XPathExpression exp = null;
-//		try {
-//			XPathFactory fac = XPathFactory.newInstance();
-//			XPath xpath = fac.newXPath();
-//			exp = xpath.compile("//p[@value='" + value + "']");
-//			is = this.getClass().getClassLoader().getResourceAsStream(
-//					authXml);
-//			src = new InputSource(is);
-//			NodeList list = (NodeList) exp
-//					.evaluate(src, XPathConstants.NODESET);
-//			authList = new ArrayList<PermissionVo>();
-//			for (int i = 0; i < list.getLength(); i++) {
-//				Element element = (Element) list.item(i);
-//				if (element != null) {
-//					NodeList children = element.getChildNodes();
-//					for (int j = 0; j < children.getLength(); j++) {
-//						Node e = children.item(j);
-//						if (e instanceof Element) {
-//							Element el = (Element) e;
-//							PermissionVo permission = new PermissionVo();
-//							permission.setId(el.getAttribute("id"));
-//							permission.setName(el.getAttribute("name"));
-//							permission.setValue(el.getAttribute("value"));
-//							permission.setOrderBy(el.getAttribute("order"));
-//							if (el.getAttribute("value").endsWith("*")) {
-//								permission.setIsHaveIO(false);
-//							} else {
-//								permission.setIsHaveIO(true);
-//							}
-//							authList.add(permission);
-//						}
-//					}
-//				}
-//			}
-//		} finally {
-//			is.close();
-//		}
-//
-//		return authList;
-//	}
+
 
 	
 }
