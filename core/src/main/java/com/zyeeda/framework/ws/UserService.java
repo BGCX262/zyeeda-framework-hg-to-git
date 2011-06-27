@@ -280,6 +280,9 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
+	/**
+	 * 当前用户所属二级部门下所有的人
+	 */
 	@GET
 	@Path("/current_user_in_dept_all_user")
 	@Produces("application/json")
