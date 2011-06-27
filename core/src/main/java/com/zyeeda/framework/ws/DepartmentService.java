@@ -17,6 +17,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.entities.User;
@@ -32,6 +34,8 @@ import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/depts")
 public class DepartmentService extends ResourceService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(DepartmentService.class);
 	
 	public DepartmentService(@Context ServletContext ctx) {
 		super(ctx);
@@ -195,6 +199,8 @@ public class DepartmentService extends ResourceService {
 		}
 		
 		for (UserVo userVo: userVoList) {
+logger.info("**************username is {}", userVo.getCheckName());
+logger.info("**************username is {}", userVo.getLabel());
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
 			orgNodeVo.setId(userVo.getDeptFullPath());
 			orgNodeVo.setCheckName(userVo.getCheckName());
@@ -303,13 +309,67 @@ public class DepartmentService extends ResourceService {
 		return deptList;
 	}
 	
+	/**
+	 * 适用站点
+	 * @param condition
+	 * @return
+	 * @throws UserPersistException
+	 */
 	@GET
 	@Path("/site_dept")
 	@Produces("application/json")
 	public List<OrganizationNodeVo> getSiteDepartment(@QueryParam("condition") String condition)
 																	throws UserPersistException {
-		List<Department> deptList = this.searchByCondition(condition);
-		return this.mergeDepartmentVoAndUserVo(fillPropertiesToVo(deptList, "task"), new ArrayList<UserVo>());
+		List<Department> deptList = this.searchByCondition("");
+		List<String> siteDeptList = new ArrayList<String>();
+		siteDeptList.add("广州站");
+		siteDeptList.add("宝安站");
+		siteDeptList.add("福山站");
+		siteDeptList.add("肇庆站");
+		siteDeptList.add("花都站");
+		siteDeptList.add("隧东站");
+//		siteDeptList.add("海口分局");
+//		siteDeptList.add("生产部");
+//		siteDeptList.add("综合部");
+//		siteDeptList.add("海缆运维部");
+		List<DepartmentVo> deptVoList = fillPropertiesToVo(deptList, "task");
+		List<DepartmentVo> removeDeptVoList = new ArrayList<DepartmentVo>();
+		for (DepartmentVo deptVo : deptVoList) {
+			deptVo.setIo("");
+			logger.info("department name is {}", deptVo.getId());
+			if (!siteDeptList.contains(deptVo.getId())) {
+				removeDeptVoList.add(deptVo);
+			}
+		}
+		deptVoList.removeAll(removeDeptVoList);
+		return this.mergeDepartmentVoAndUserVo(deptVoList, new ArrayList<UserVo>());
+	}
+	
+	/**
+	 * 适用班组
+	 * @return
+	 * @throws UserPersistException 
+	 */
+	@GET
+	@Path("/site_team/{id}")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getSuitTeam(@Context HttpServletRequest request, 
+												@PathParam("id") String id) throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getChildrenById(id);
+		List<DepartmentVo> deptVoList = fillPropertiesToVo(deptList, "task");
+		List<DepartmentVo> removeDeptVoList = new ArrayList<DepartmentVo>();
+		for (DepartmentVo departmentVo : deptVoList) {
+			departmentVo.setIo("");
+			logger.info("department name is {}", departmentVo.getId());
+			if ("物资管理人员".equals(departmentVo.getId())) {
+				removeDeptVoList.add(departmentVo);
+			}
+		}
+		deptVoList.removeAll(removeDeptVoList);
+		return this.mergeDepartmentVoAndUserVo(deptVoList, new ArrayList<UserVo>());
 	}
 	
 	/**

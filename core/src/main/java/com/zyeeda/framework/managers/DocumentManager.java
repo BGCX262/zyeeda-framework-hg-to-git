@@ -26,10 +26,7 @@ public interface DocumentManager {
 	
 	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes);
 	
-	
-	
-	
-	
+	public void copyFile(String oldForeignId, String newForeignId);
 	
 	/*
 	public int findNumber(String owner,String foreignId,String[] keyword) throws DocumentException;

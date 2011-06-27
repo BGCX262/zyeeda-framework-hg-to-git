@@ -209,6 +209,14 @@ public class UserService extends ResourceService {
 		User u = userMgr.findById(id);
 		String ldapPw = u.getPassword();
 		String inputPw = oldPassword;
+//		try {
+//logger.info("this user base dn {}", inputPw);
+//            String userId = StringUtils.substring(id, id.indexOf("=") + 1, id.indexOf(","));
+//			ldapSvc.getLdapContext(userId, inputPw);
+//			userMgr.updatePassword(id, newPassword);
+//		} catch (Exception e) {
+//			throw new RuntimeException("旧密码输入错误");
+//		}
 		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
 			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
 				userMgr.updatePassword(id, newPassword);
@@ -308,8 +316,8 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType("io");
-		userVo.setLabel( user.getId() );
-		userVo.setCheckName(user.getId());
+		userVo.setLabel(user.getUsername());
+		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
@@ -323,8 +331,8 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType(type);
-		userVo.setLabel( user.getId());
-		userVo.setCheckName(user.getId());
+		userVo.setLabel(user.getUsername());
+		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());

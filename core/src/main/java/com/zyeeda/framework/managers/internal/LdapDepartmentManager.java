@@ -80,7 +80,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "";
-			System.out.println("dn--------------" + dn);
 			if ("root".equals(dn)) {
 				dn = "";
 				filter = "o=*";
@@ -230,7 +229,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "(|(o=*" + condition + "*)(ou=*" + condition + "*" + "))";
-			if ("*".equals(condition)) {
+			if ("*".equals(condition) || StringUtils.isBlank(condition)) {
 				filter = "(|(o=*)(ou=*))";
 			}
 			List<Attributes> attrsList = ldapTemplate.getResultList("",
@@ -246,8 +245,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 			throw new UserPersistException(e);
 		}
 	}
-	
-	
 	
 	
 	/*
