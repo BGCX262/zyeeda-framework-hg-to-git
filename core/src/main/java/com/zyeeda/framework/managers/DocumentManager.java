@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.zyeeda.framework.entities.Document;
 
+
 public interface DocumentManager {
 	
 	public void persist(Document doc);
@@ -24,11 +25,7 @@ public interface DocumentManager {
 	
 	public void eraseTemp();
 	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes);
-	
-	public void eraseTemp();
-	
-	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes);
-	
+
 	public void copyFile(String oldForeignId, String newForeignId);
 	
 	/*
