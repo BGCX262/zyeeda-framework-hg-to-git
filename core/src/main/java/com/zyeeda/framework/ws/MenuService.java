@@ -62,7 +62,7 @@ public class MenuService extends ResourceService {
 			}
 		}
 		session.setAttribute("auth", authList);
-		session.setAttribute("auth", roleWithUserVo.getListPermission());
+//		session.setAttribute("auth", roleWithUserVo.getListPermission());
 		if(roles.size() == 1) {
 			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionList());
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
