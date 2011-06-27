@@ -130,7 +130,11 @@ public class UserService extends ResourceService {
 			user.setDeptFullPath(id);
 			userMgr.update(user);
 			user = userMgr.findById(id);
-			userSyncService.update(user);
+			if (user != null) {
+				userSyncService.update(user);
+			} else {
+				userSyncService.persist(user);
+			}
 			return user;
 		}
 	}
@@ -304,7 +308,7 @@ public class UserService extends ResourceService {
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 		userVo.setId(user.getId());
-		userVo.setType("task");
+		userVo.setType("io");
 		userVo.setLabel(user.getId() );
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);

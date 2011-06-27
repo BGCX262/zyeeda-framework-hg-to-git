@@ -199,8 +199,7 @@ public class DepartmentService extends ResourceService {
 		}
 		
 		for (UserVo userVo: userVoList) {
-logger.info("**************username is {}", userVo.getCheckName());
-logger.info("**************username is {}", userVo.getLabel());
+			logger.info("**************username is {}", userVo.getCheckName());
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
 			orgNodeVo.setId(userVo.getDeptFullPath());
 			orgNodeVo.setCheckName(userVo.getCheckName());
@@ -327,11 +326,7 @@ logger.info("**************username is {}", userVo.getLabel());
 		siteDeptList.add("福山站");
 		siteDeptList.add("肇庆站");
 		siteDeptList.add("花都站");
-		siteDeptList.add("隧东站");
-//		siteDeptList.add("海口分局");
-//		siteDeptList.add("生产部");
-//		siteDeptList.add("综合部");
-//		siteDeptList.add("海缆运维部");
+		siteDeptList.add("穗东站");
 		List<DepartmentVo> deptVoList = fillPropertiesToVo(deptList, "task");
 		List<DepartmentVo> removeDeptVoList = new ArrayList<DepartmentVo>();
 		for (DepartmentVo deptVo : deptVoList) {
