@@ -1,7 +1,8 @@
 package com.zyeeda.framework.ws;
-
 import java.io.IOException;
+
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -25,26 +26,33 @@ import org.slf4j.LoggerFactory;
 
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.managers.PermissionManager;
 import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.UserManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
+import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 import com.zyeeda.framework.viewmodels.RoleVo;
 import com.zyeeda.framework.viewmodels.RoleWithUserVo;
 import com.zyeeda.framework.viewmodels.UserNameVo;
+import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/roles")
 public class RoleService extends ResourceService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
-	
+	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+
+	private final static String PERMISSION_FILE = "permission.xml";
 	public RoleService(@Context ServletContext ctx) {
 		super(ctx);
 	}
 	
 	@GET
-	@Path("/{id}/getRole")
+	@Path("/{id}/get_role")
 	@Produces("application/json")
 	public Role getOneRolesById(@PathParam("id") String id) {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -56,52 +64,29 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		//String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
-		//List<Role> listRole = roleMgr.getRoleDistinct(hql);
 		logger.debug("this get all roles is success!");
 		return roleMgr.findAll();
 	}
 	
 
-	@GET
-	@Path("/get_all_roles_vo")
-	@Produces("application/json")
-	public List<RoleVo> getRolesVo() {
-		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
-		List<Role> listRole = new ArrayList<Role>();
-	    listRole = roleMgr.getRoleDistinct(hql);
-		logger.debug("this get all roles is success!", listRole.size());
-		List<RoleVo> roleVo = roleMgr.roleToVo(listRole);
-		logger.debug("this get all roles is success!");
-		return roleVo;
-	}
-	
-	@GET
-	@Path("/dept/{deptId}")
-	@Produces("applicatioin/json")
-	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
-		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		List<Role> list = new ArrayList<Role>();
-		Search search = new Search();
-		search.addFilterEqual("deptepmentId", deptId);
-		list = roleMgr.search(search);
-		List<RoleVo> roleVo = roleMgr.roleToVo(list);
-		return roleVo;
-	}
 	
 	@DELETE
 	@Path("/")
 	@Produces("application/json")
-	public List<Role>  getRoles(@QueryParam("ids") String ids ){
+	public boolean  getRoles(@QueryParam("ids") String ids ){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		if(roleMgr != null){
-			String[] id=ids.split(";");
-			for(String sigleId:id){
-				roleMgr.removeById(sigleId);
+		boolean bool = true;
+		try {
+			if(roleMgr != null){
+				String[] id=ids.split(";");
+				for(String sigleId:id){
+					roleMgr.removeById(sigleId);
+				}
 			}
+		} catch (Exception e) {
+			bool = false;
 		}
-		return roleMgr.findAll();
+		return bool;
 	}
 	
 	@GET
@@ -120,7 +105,7 @@ public class RoleService extends ResourceService{
 		}
 		for(String auth:role.getPermissionList()){
 			PermissionVo permission = new PermissionVo();
-		    permission = permissionMgr.getPermissionByPath(auth);
+		    permission = permissionMgr.getPermissionByPath(auth, PERMISSION_FILE);
 			roleWithUserVo.getPermission().add(permission);
 		}
 		return roleWithUserVo;
@@ -129,22 +114,19 @@ public class RoleService extends ResourceService{
 	@POST
 	@Path("/{id}/edite")
 	@Produces("application/json")
-	public List<Role> editeRole(@PathParam("id") String id, @FormParam("") Role role){
+	public Role editeRole(@PathParam("id") String id, @FormParam("") Role role){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role newRole=roleMgr.find(id);
 		newRole.setName(role.getName());
 		newRole.setDescription(role.getDescription());
-		//newRole.setPermissions(role.getPermissions());
 		this.getPersistenceService().getCurrentSession().flush();
-		return roleMgr.findAll();
+		return roleMgr.find(id);
 	}
-	
-	
 	
 	@POST
 	@Path("/")
 	@Produces("application/json")
-	public List<Role> creatRole(@FormParam("") Role role) {
+	public Role creatRole(@FormParam("") Role role) {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String name = role.getName();
 		Search search = new Search();
@@ -155,8 +137,8 @@ public class RoleService extends ResourceService{
 		}else{
 			roleMgr.persist(role);
 			this.getPersistenceService().getCurrentSession().flush();
+			return roleMgr.find(role.getId());
 		}
-		return roleMgr.findAll();
 	}
 
 	@PUT
@@ -187,14 +169,14 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
-	@Path("/{id}/subUser")
+	@Path("/{id}/sub_user")
 	@Produces("application/json")
 	public List<String> getUserByRoleId(@PathParam("id") String id){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		Set<String> user = role.getSubjects();
 		List<String>  list = new ArrayList<String>();
-		for(String userId:user){
+		for(String userId:user) {
 			list.add(userId);
 		}
 		return list;
@@ -207,17 +189,61 @@ public class RoleService extends ResourceService{
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		Role newrole = roleMgr.find(id);
+		Role newRole = roleMgr.find(id);
 		String[] str = role.getPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
-		String authArray = permissionMgr.getParentPermissionListAuthByList(authList);
-		newrole.setPermissions(authArray); 
+		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
+		String auth = newRole.getPermissions();
+		if(StringUtils.isBlank(auth)){
+			newRole.setPermissions(authArray); 
+		} else {
+			int flog = auth.indexOf("_");
+			if(flog >= 0){
+				String menuAuth = auth.substring(flog + 1, auth.length());
+				String menuPermission = authArray + "_" + menuAuth;
+				newRole.setPermissions(menuPermission); 
+			} else {
+				newRole.setPermissions(authArray); 
+			}
+		}
 		this.getPersistenceService().getCurrentSession().flush();
-		return newrole;
+		return newRole;
 	}
 	
 	@POST
-	@Path("/{id}/removeAuth")
+	@Path("/{id}/assign_raom_auth")
+	@Produces("application/json")
+	public Role assignroamRoleAuth(@PathParam("id") String id,
+			@FormParam("") Role role) throws XPathExpressionException, IOException {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		Role newRole = roleMgr.find(id);
+		System.out.println("this ramoPermissions is :" + role.getRamoPermissions());
+		String[] str = role.getRamoPermissions().split(";");
+		List<String> authList = CollectionUtils.asList(str);
+		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
+		String auth = newRole.getPermissions();
+		if(StringUtils.isBlank(auth)) {
+			String menuPermission =   "_" + authArray;
+			newRole.setPermissions(menuPermission);
+		} else {
+			int flog = auth.indexOf("_");
+			if(flog >= 0){
+				String menuAuth = auth.substring(0, flog);
+				String menuPermission =  menuAuth+ "_" + authArray;
+				newRole.setPermissions(menuPermission); 
+			} else {
+				String  menuPermission = auth + "_" + authArray;
+				System.out.println("this ramoPermissions is :" + menuPermission);
+				newRole.setPermissions(menuPermission); 
+			} 
+		}
+		this.getPersistenceService().getCurrentSession().flush();
+		return newRole;
+	}
+	
+	@POST
+	@Path("/{id}/remove_auth")
 	@Produces("application/json")
 	public Role removeAuth(@PathParam("id") String id, @QueryParam("permission") String permission) throws XPathExpressionException, IOException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -238,16 +264,16 @@ public class RoleService extends ResourceService{
 
 	
 	@POST
-	@Path("/{id}/removeUser")
+	@Path("/{id}/remove_user")
 	@Produces("application/json")
-	public RoleWithUserVo removeUser(@PathParam("id") String id, @QueryParam("subject") String subject) throws XPathExpressionException, IOException{
+	public boolean removeUser(@PathParam("id") String id, @QueryParam("subject") String subject) throws XPathExpressionException, IOException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		String[] subjects = subject.split(";");
 		boolean result = false;
-		for(String subjectsSub:subjects){
-			for(String auth:role.getSubjects()){
-				if(auth.equals(subjectsSub)){
+		for(String subjectsSub:subjects) {
+			for(String auth:role.getSubjects()) {
+				if(auth.equals(subjectsSub)) {
 					result = true;
 					logger.debug("this role's subject remove is success" );
 					break;
@@ -258,39 +284,118 @@ public class RoleService extends ResourceService{
 			}
 		}
 		this.getPersistenceService().getCurrentSession().flush();
-		PermissionManager permissionMgr = new DefaultPermissionManager();
-		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
-		for(String userName:role.getSubjects()){
-			UserNameVo userVo = new UserNameVo();
-			userVo.setUserName(userName);
-			roleWithUserVo.getUserName().add(userVo);
-		}
-		for(String auth:role.getPermissionList()){
-			PermissionVo permission = new PermissionVo();
-		    permission = permissionMgr.getPermissionByPath(auth);
-			roleWithUserVo.getPermission().add(permission);
-		}
-		//this.getPersistenceService().getCurrentSession().flush();
-		return roleWithUserVo;
+//		PermissionManager permissionMgr = new DefaultPermissionManager();
+//		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
+//		for(String userName:role.getSubjects()){
+//			UserNameVo userVo = new UserNameVo();
+//			userVo.setUserName(userName);
+//			roleWithUserVo.getUserName().add(userVo);
+//		}
+//		for(String auth:role.getPermissionList()){
+//			PermissionVo permission = new PermissionVo();
+//		    permission = permissionMgr.getPermissionByPath(auth);
+//			roleWithUserVo.getPermission().add(permission);
+//		}
+		return result;
 	}
 	
-	@POST
-	@Path("/get_roes_subuser")
+	@GET 
+	@Path("/get_roles_subuser")
 	@Produces("application/json")
-	public RoleWithUserVo  getAllSubUser(){
+	public Set<UserVo>  getAllSubUser() throws UserPersistException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String userName = this.getSecurityService().getCurrentUser();
 		List<Role> roleList = roleMgr.getRoleBySubject(userName);
-		//List<String> subjectList = new ArrayList<String>();
-		RoleWithUserVo roleWithUserVo = new RoleWithUserVo();
-		for(Role role : roleList){
-			for(String user:role.getSubjects()){
-				UserNameVo userVo = new UserNameVo();
-				userVo.setUserName(user);
-				roleWithUserVo.getUserName().add(userVo);
+		String creator = this.getSecurityService().getCurrentUser();
+		UserManager userManager = new LdapUserManager(this.getLdapService());
+		List<User> userList = userManager.findByName(creator);
+		List<String> siteDeptList = new ArrayList<String>();
+		siteDeptList.add("广州�);
+		siteDeptList.add("宝安�);
+		siteDeptList.add("福山�);
+		siteDeptList.add("肇庆�);
+		siteDeptList.add("花都�);
+		siteDeptList.add("隧东�);
+		String subStationName = null;
+		if (userList != null && userList.size() > 0) {
+			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
+				String fullPath = userList.get(0).getDeptFullPath();
+				String[] spilt = StringUtils.split(fullPath, ",");
+				for (int i = 0; i < spilt.length; i++) {
+					if (spilt[i].indexOf("=") != -1) {
+						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
+								.indexOf("=") + 1, spilt[i].length());
+						if (siteDeptList.contains(spilt[i])) {
+							subStationName = spilt[i];
+							break;
+						}
+					}
+				}
 			}
 		}
-		return roleWithUserVo;
+		
+		//List<String> subjectList = new ArrayList<String>();
+		Set<UserVo> userNameVoList = new HashSet<UserVo>();
+		for(Role role : roleList){
+			//if("当班�值长".equals(role.getName()) && role.getDeptepment()){
+				for(String user : role.getSubjects()){
+					UserVo userVo = new UserVo();
+					userVo.setCheckName(user);
+					userVo.setLabel(user);
+					userVo.setType("task");
+					userVo.setLeaf(true);
+					if(userNameVoList.size() == 0) {
+						userNameVoList.add(userVo);
+						continue;
+					}
+					for(UserVo userNameVo : userNameVoList){
+						if(!(userNameVo.getCheckName().equals(user))){
+							userNameVoList.add(userVo);
+							break;
+						}
+					}
+				}
+			//}
+		}
+		return userNameVoList;
+	}
+	
+	
+	@GET
+	@Path("/depts/{id}")
+	@Produces("application/json")
+	public List<UserVo> getUserVo(@PathParam("id") String id) {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		Role role = roleMgr.find(id);
+		List<UserVo> listUserVo = roleMgr.getUserVoByRole(role);
+		return listUserVo;
+	}
+	
+
+	@GET
+	@Path("/get_all_roles_vo")
+	@Produces("application/json")
+	public List<RoleVo> getRolesVo() {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		String hql = "select distinct F_DEPTEMENT_ID, F_DEPTEPMENT from sys_role";
+		List<Role> listRole = new ArrayList<Role>();
+	    listRole = roleMgr.getRoleDistinct(hql);
+		logger.debug("this get all roles is success!", listRole.size());
+		List<RoleVo> roleVo = roleMgr.deptToVo(listRole);
+		return roleVo;
+	}
+	
+	@GET
+	@Path("/dept/{deptId}")
+	@Produces("application/json")
+	public List<RoleVo>  getDeptById(@PathParam("deptId") String deptId){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		List<Role> list = new ArrayList<Role>();
+		Search search = new Search();
+		search.addFilterEqual("deptepmentId", deptId);
+		list = roleMgr.search(search);
+		List<RoleVo> roleVo = roleMgr.roleToVo(list);
+		return roleVo;
 	}
 	
 }

@@ -215,14 +215,14 @@ public class UserService extends ResourceService {
 //			ldapSvc.getLdapContext(userId, inputPw);
 //			userMgr.updatePassword(id, newPassword);
 //		} catch (Exception e) {
-//			throw new RuntimeException("旧密码输入错误");
+//			throw new RuntimeException("旧密码输入错�);
 //		}
 		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
 			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
 				userMgr.updatePassword(id, newPassword);
 			}
 		} else {
-			throw new RuntimeException("旧密码输入错误");
+			throw new RuntimeException("旧密码输入错�);
 		}
 		return userMgr.findById(id);
 	}
@@ -288,7 +288,7 @@ public class UserService extends ResourceService {
 	@GET
 	@Path("/current_user_in_dept_all_user")
 	@Produces("application/json")
-	public List<User> getCurrentUserInDepartmentAllUser() throws UserPersistException {
+	public List<UserVo> getCurrentUserInDepartmentAllUser() throws UserPersistException {
 		String currentUser = this.getSecurityService().getCurrentUser();
 		LdapService ldapSvc = this.getLdapService();
 		UserManager userManager = new LdapUserManager(ldapSvc);
@@ -307,22 +307,20 @@ public class UserService extends ResourceService {
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
 		}
-		
-		return users;
+		List<UserVo> listUser = fillUserListPropertiesToVo(users);
+		return listUser;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
-
 		userVo.setId(user.getId());
-		userVo.setType("io");
+		userVo.setType("task");
 		userVo.setLabel(user.getUsername());
 		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
 		userVo.setKind("user");
-
 		return userVo;
 	}
 	
@@ -389,7 +387,7 @@ public class UserService extends ResourceService {
 	
 	/**
 	 * 配置系统信息
-	 * 将旧的数据删除，保存新的数据�
+	 * 将旧的数据删除，保存新的数据�
 	 * Json list
 	 * return  userList
 	 */

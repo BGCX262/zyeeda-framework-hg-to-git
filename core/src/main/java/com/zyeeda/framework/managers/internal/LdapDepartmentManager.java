@@ -1,5 +1,6 @@
 package com.zyeeda.framework.managers.internal;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.naming.directory.SearchControls;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.Department;
+import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.LdapTemplate;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
@@ -93,7 +95,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 			for (Attributes attr : attrList) {
 				Department department = marshal(attr);
 				department.setParent(dn);
-				department.setDeptFullPath(dn);
+				department.setDeptFullPath("ou=" + department.getId() + "," + dn);
 				deptList.add(department);
 			}
 			
@@ -228,6 +230,17 @@ public class LdapDepartmentManager implements DepartmentManager {
 		List<Department> deptList = null;
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			List<Attributes> attrList = ldapTemplate.getResultList("",
+									   							   "uid=" + condition,
+									                               SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
+			List<User> userList = new ArrayList<User>(attrList.size());
+			for (Attributes attrs : attrList) {
+				User user = LdapUserManager.marshal(attrs);
+				userList.add(user);
+			}
+			if (userList != null && userList.size() > 0) {
+				
+			}
 			String filter = "(|(o=*" + condition + "*)(ou=*" + condition + "*" + "))";
 			if ("*".equals(condition) || StringUtils.isBlank(condition)) {
 				filter = "(|(o=*)(ou=*))";
@@ -243,8 +256,12 @@ public class LdapDepartmentManager implements DepartmentManager {
 			return deptList;
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
 		}
 	}
+	
+	
 	
 	
 	/*

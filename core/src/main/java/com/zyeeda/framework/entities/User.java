@@ -29,6 +29,7 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 //	private byte[] photo;
 	private String departmentName;
 	private String deptFullPath;
+	private String departmentNo;
 
 	@Id @Column(name = "F_ID")
 	public String getId() {
@@ -102,7 +103,9 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.mobile = mobile;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP) @Column(name = "F_BIRTHDAY", length = 19)
+	
+	@javax.persistence.Temporal(TemporalType.TIMESTAMP)
+	@javax.persistence.Column(name = "F_BIRTHDAY")
 	public Date getBirthday() {
 		return birthday;
 	}
@@ -111,7 +114,8 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.birthday = birthday;
 	}
 
-	@Temporal(TemporalType.TIMESTAMP) @Column(name = "F_DATEOFWORK", length = 19)
+	@javax.persistence.Temporal(TemporalType.TIMESTAMP)
+	@javax.persistence.Column(name = "F_DATEOFWORK")
 	public Date getDateOfWork() {
 		return dateOfWork;
 	}
@@ -164,4 +168,11 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.deptFullPath = deptFullPath;
 	}
 
-}
+	@Column(name = "F_DEPARTMENT_NO", length = 100) 
+	public String getDepartmentNo() {
+		return this.departmentNo;
+	}
+	public void setDepartmentNo(String departmentNo) {
+		this.departmentNo = departmentNo;
+	}
+ }
