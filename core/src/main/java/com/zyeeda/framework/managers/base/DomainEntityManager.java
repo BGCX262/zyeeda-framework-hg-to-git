@@ -17,7 +17,6 @@ import com.googlecode.genericdao.dao.jpa.GenericDAOImpl;
 import com.googlecode.genericdao.search.MetadataUtil;
 import com.googlecode.genericdao.search.jpa.JPASearchProcessor;
 import com.googlecode.genericdao.search.jpa.hibernate.HibernateMetadataUtil;
-
 import com.zyeeda.framework.persistence.PersistenceService;
 
 @SuppressWarnings("unchecked")
@@ -61,7 +60,7 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 	protected static <E> String getEntityName(Class<E> clazz){
 		String entityname = clazz.getSimpleName();
 		Entity entity = clazz.getAnnotation(Entity.class);
-		if(entity.name()!=null && !"".equals(entity.name())){
+		if(entity.name() != null && !"".equals(entity.name())){
 			entityname = entity.name();
 		}
 		return entityname;

@@ -242,7 +242,7 @@ public class LdapDepartmentManager implements DepartmentManager {
 				
 			}
 			String filter = "(|(o=*" + condition + "*)(ou=*" + condition + "*" + "))";
-			if ("*".equals(condition)) {
+			if ("*".equals(condition) || StringUtils.isBlank(condition)) {
 				filter = "(|(o=*)(ou=*))";
 			}
 			List<Attributes> attrsList = ldapTemplate.getResultList("",

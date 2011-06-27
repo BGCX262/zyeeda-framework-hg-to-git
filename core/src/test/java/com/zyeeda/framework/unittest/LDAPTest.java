@@ -8,9 +8,7 @@ import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
@@ -34,8 +32,9 @@ public class LDAPTest {
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		env.put(Context.PROVIDER_URL, "ldap://192.168.1.85:389/" + root);
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
-		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
-		env.put(Context.SECURITY_CREDENTIALS, "admin");
+		env.put(Context.SECURITY_PRINCIPAL, "uid=liangguozhu,o=广州局,dc=ehv,dc=csg,dc=cn");
+		System.err.println(DigestUtils.md5Hex("111111"));
+		env.put(Context.SECURITY_CREDENTIALS, "96e79218965eb72c92a549dd5a330112");
 		LdapContext ctx = new InitialLdapContext(env, null);
 		return ctx;
 	}
@@ -54,16 +53,16 @@ public class LDAPTest {
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
 		String condition = "Test";
-		NamingEnumeration<SearchResult> results = ctx.search("", "uid=Test5",
+		NamingEnumeration<SearchResult> results = ctx.search("", "(|(uid=*" + "A" + "*)(cn=*" + "A" + "*))",
 				sc);
 		// Iterate over a batch of search results sent by the server
 		while (results != null && results.hasMore()) {
 			// Display an entry
 			SearchResult entry = (SearchResult) results.next();
 			Attributes attributes = entry.getAttributes();
-//			System.out.println(new String((byte[])attributes.get("userpassword").get()));
+			System.out.println(new String((byte[])attributes.get("userpassword").get()));
 //			System.out.println(attributes.get("userpassword").get());
-			System.out.println(new String((byte[]) attributes.get("userpassword").get()));
+//			System.out.println(attributes);
 			// Handle the entry's response controls (if any)
 			if (entry instanceof HasControls) {
 				// ((HasControls)entry).getControls();
@@ -173,20 +172,24 @@ public class LDAPTest {
 		SearchResult rs = null;
 		while (results.hasMore()) {
 			rs = results.next();
+//			System.out.println(rs.getAttributes().get("uid").get());
+//			System.out.println(rs.getNameInNamespace());
+//			System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
 			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
-System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
-				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-	   				   new BasicAttribute("deptName", 
-	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
-	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
-	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
-				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-		   				   new BasicAttribute("deptFullPath", 
-		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
-				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
-				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
-																	, mods);
+//System.out.println(rs.getAttributes().get("uid").get());
+//System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
+//				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+//	   				   new BasicAttribute("deptName", 
+//	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
+//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
+//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
+//				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+//		   				   new BasicAttribute("deptFullPath", 
+//		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+//				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+//		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
+//				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+//																	, mods);
 			}
 		}
 	}
@@ -196,8 +199,8 @@ System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").ge
 //		saveUserRefObject();
 //		ldapPageView();
 //		getAllUser();
-//		updateUserDeptFullPath();
-		ldapPageView();
+		updateUserDeptFullPath();
+//		ldapPageView();
 //		save();
 	}
 

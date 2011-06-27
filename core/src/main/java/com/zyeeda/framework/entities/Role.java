@@ -4,15 +4,15 @@ import java.util.List;
 
 import java.util.Set;
 
+import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Basic;
-import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -42,7 +42,6 @@ public class Role extends SimpleDomainEntity {
 	private String deptepment;
 	private String deptepmentId;
 	private String ramoPermissions;
-	
 
 	
 	@Basic
@@ -79,8 +78,13 @@ public class Role extends SimpleDomainEntity {
 	@Transient
 	public List<String> getPermissionList() {
 		String permissions = this.getPermissions();
-		if(this.getRamoPermissions() != null) {
-			 permissions = this.getPermissions() + ";" + this.getRamoPermissions();
+		if(StringUtils.isNotBlank(permissions)){
+			int flog = permissions.indexOf("_");
+			if(flog > 0) {
+				permissions.replace("_", ";");
+			} else if(flog == 0) {
+				permissions.replace("_", "").trim();
+			}
 		}
 		String[] permissionArray = StringUtils.split(permissions,
 				PERMISSION_SEPARATOR);

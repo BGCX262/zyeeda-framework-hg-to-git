@@ -3,9 +3,11 @@ package com.zyeeda.framework.managers.internal;
 import static com.zyeeda.framework.managers.internal.MongoDbDocumentManagerHelper.document2GridFSFile;
 import static com.zyeeda.framework.managers.internal.MongoDbDocumentManagerHelper.gridFSDBFile2Document;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -152,11 +154,22 @@ public class MongoDbDocumentManager implements DocumentManager {
 		DBCollection c = this.getFilesCollection();
 		return c.count(query);
 	}
-	
-	
-	
-	
 
+	@Override
+	public void copyFile(String oldForeignId, String newForeignId) {
+		List<Document> docs = this.findByForeignId(oldForeignId);
+		DBObject query = new BasicDBObject();
+		
+		GridFS fs = new GridFS(this.mongodbSvc.getDefaultDatabase());
+		for (Document doc : docs) {
+			query.put("_id", new ObjectId(doc.getId()));
+			GridFSDBFile file = fs.findOne(query);
+			doc.setForeignId(newForeignId);
+			InputStream in = file.getInputStream();
+			doc.setContent(in);
+			this.persist(doc);
+		}
+	}
 	
 	/*
 	private List<Document> find(Map<String, Object> map,

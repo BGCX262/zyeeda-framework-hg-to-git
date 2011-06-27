@@ -7,7 +7,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "menuAndPermission")
 public class MenuAndPermission {
+	
 	private List<MenuVo> listMenu = new ArrayList<MenuVo>();
+	
 	private List<PermissionVo> listPermission = new ArrayList<PermissionVo>();
 
 	public List<MenuVo> getListMenu() {
