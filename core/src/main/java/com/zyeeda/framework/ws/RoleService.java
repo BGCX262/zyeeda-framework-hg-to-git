@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -17,10 +18,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.PermissionManager;
@@ -189,8 +192,18 @@ public class RoleService extends ResourceService{
 		List<String> authList = CollectionUtils.asList(str);
 		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
 		String auth = newRole.getPermissions();
-		auth.substring(0, auth.indexOf("_"));
-		newRole.setPermissions(authArray); 
+		if(StringUtils.isBlank(auth)){
+			newRole.setPermissions(authArray); 
+		} else {
+			int flog = auth.indexOf("_");
+			if(flog >= 0){
+				String menuAuth = auth.substring(flog + 1, auth.length());
+				String menuPermission = authArray + "_" + menuAuth;
+				newRole.setPermissions(menuPermission); 
+			} else {
+				newRole.setPermissions(authArray); 
+			}
+		}
 		this.getPersistenceService().getCurrentSession().flush();
 		return newRole;
 	}
@@ -207,11 +220,22 @@ public class RoleService extends ResourceService{
 		String[] str = role.getRamoPermissions().split(";");
 		List<String> authList = CollectionUtils.asList(str);
 		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
-		System.out.println("this authArray is :" + authArray);
-		if(authArray != null) {
-			authArray = newRole.getPermissions() + "_" + authArray;
+		String auth = newRole.getPermissions();
+		if(StringUtils.isBlank(auth)) {
+			String menuPermission =   "_" + authArray;
+			newRole.setPermissions(menuPermission);
+		} else {
+			int flog = auth.indexOf("_");
+			if(flog >= 0){
+				String menuAuth = auth.substring(0, flog);
+				String menuPermission =  menuAuth+ "_" + authArray;
+				newRole.setPermissions(menuPermission); 
+			} else {
+				String  menuPermission = auth + "_" + authArray;
+				System.out.println("this n********** ramoPermissions is :" + menuPermission);
+				newRole.setPermissions(menuPermission); 
+			} 
 		}
-		newRole.setPermissions(authArray);
 		this.getPersistenceService().getCurrentSession().flush();
 		return newRole;
 	}

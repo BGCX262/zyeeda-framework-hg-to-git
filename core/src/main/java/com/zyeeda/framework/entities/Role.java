@@ -78,6 +78,14 @@ public class Role extends SimpleDomainEntity {
 	@Transient
 	public List<String> getPermissionList() {
 		String permissions = this.getPermissions();
+		if(StringUtils.isNotBlank(permissions)){
+			int flog = permissions.indexOf("_");
+			if(flog > 0) {
+				permissions.replace("_", ";");
+			} else if(flog == 0) {
+				permissions.replace("_", "").trim();
+			}
+		}
 		String[] permissionArray = StringUtils.split(permissions,
 				PERMISSION_SEPARATOR);
 		return CollectionUtils.asList(permissionArray);

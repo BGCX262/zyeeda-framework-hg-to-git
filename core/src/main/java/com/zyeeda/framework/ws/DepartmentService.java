@@ -19,6 +19,7 @@ import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.entities.User;
@@ -31,6 +32,7 @@ import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.DepartmentVo;
 import com.zyeeda.framework.viewmodels.OrganizationNodeVo;
+import com.zyeeda.framework.viewmodels.RoleVoAndQualification;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
 
@@ -295,13 +297,20 @@ public class DepartmentService extends ResourceService {
 	@GET
 	@Path("second_level_dept_role")
 	@Produces("application/json")
-	public List<DepartmentVo> getSecondLevelDepartmentAndRole() throws UserPersistException {
+	public RoleVoAndQualification getSecondLevelDepartmentAndRole() throws UserPersistException {
 		List<Department> deptList = null;
 		LdapService ldapSvc = this.getLdapService();
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		deptList = deptMgr.getChildrenById("o=广州局");
 		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVoAndRoles(deptList);
-		return deptVoList;
+		RoleVoAndQualification roleVoAndQualification = new RoleVoAndQualification();
+		roleVoAndQualification.getDepartmentVo().addAll(deptVoList);
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		Search searchNoDept = new Search();
+		searchNoDept.addFilterEmpty("deptepmentId");
+		List<Role> roleList = roleMgr.search(searchNoDept);
+		roleVoAndQualification.getRole().addAll(roleList);
+		return roleVoAndQualification;
 	}
 	public static List<DepartmentVo> fillPropertiesToVoAndRoles(List<Department> deptList) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());

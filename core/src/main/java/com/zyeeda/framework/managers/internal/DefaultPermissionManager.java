@@ -1,8 +1,10 @@
 package com.zyeeda.framework.managers.internal;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -230,14 +232,14 @@ public class DefaultPermissionManager implements PermissionManager {
 	}
 
 	
-	
 	private void getParentPermissionListAuthByPath(String auth,
 			Set<String> allAuth, String authXml) throws XPathExpressionException, IOException {
 		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 		permissionList = findSubPermissionByValue(auth, authXml);
 		for (PermissionVo permission : permissionList) {
+			System.out.println("*****" + permission.getValue());
 			allAuth.add(permission.getValue());
-			getParentPermissionListAuthByPath(permission.getValue(), allAuth, authXml);
+			this.getParentPermissionListAuthByPath(permission.getValue(), allAuth, authXml);
 		}
 	}
 
@@ -246,7 +248,7 @@ public class DefaultPermissionManager implements PermissionManager {
 		Set<String> allAuth = new HashSet<String>();
 		for (String auth : authList) {
 			allAuth.add(auth);
-			getParentPermissionListAuthByPath(auth, allAuth, authXml);
+			this.getParentPermissionListAuthByPath(auth, allAuth, authXml);
 		}
 		String utils = StringUtils.join(allAuth, ";");
 		return utils;
@@ -298,7 +300,7 @@ public class DefaultPermissionManager implements PermissionManager {
 		return authList;
 	}
 
-	
+//	
 //	private void getParentRomaPermissionListAuthByPath(String auth,
 //			Set<String> allAuth, String authXml) throws XPathExpressionException, IOException {
 //		List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
@@ -320,7 +322,7 @@ public class DefaultPermissionManager implements PermissionManager {
 //		return utils;
 //	}
 //
-//	public List<PermissionVo> findRomaSubPermissionByValue(String value, String authXml)
+//	public  List<PermissionVo> findRomaSubPermissionByValue(String value, String authXml)
 //			throws XPathExpressionException, IOException {
 //		List<PermissionVo> authList = null;
 //		InputStream is = null;
@@ -366,5 +368,5 @@ public class DefaultPermissionManager implements PermissionManager {
 //		return authList;
 //	}
 
-
+	
 }
