@@ -60,7 +60,7 @@ public class SystemAccountManager implements AccountManager {
 
 	public Account findByUserIdAndSystemName(String userId, String systemName)
 			throws UserPersistException {
-		String fullDN = "uid=" + userId;// + DEFAULT_DN_PREFIX;
+		String fullDN = userId;// + DEFAULT_DN_PREFIX;
 		String filter = "(systemName=" + systemName + ")";
 
 		logger.debug("find by user id and sys name's full dn = {}", fullDN);
@@ -94,10 +94,9 @@ public class SystemAccountManager implements AccountManager {
 	
 	public void update(Account account) throws UserPersistException {
 		Attributes attributes = AccountHelper.convertAccountToAttributes(account);
-		String dn = "username=" + account.getUserName() + "," + account.getUserFullPath();
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			ldapTemplate.bind(dn, attributes);
+			ldapTemplate.bind("uid=" + account.getUserName() + "," + account.getUserFullPath(), attributes);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}
