@@ -200,7 +200,6 @@ public class DepartmentService extends ResourceService {
 		
 		for (UserVo userVo: userVoList) {
 logger.info("**************username is {}", userVo.getCheckName());
-logger.info("**************username is {}", userVo.getLabel());
 			OrganizationNodeVo orgNodeVo = new OrganizationNodeVo();
 			orgNodeVo.setId(userVo.getDeptFullPath());
 			orgNodeVo.setCheckName(userVo.getCheckName());
@@ -273,6 +272,21 @@ logger.info("**************username is {}", userVo.getLabel());
 		deptList = deptMgr.getRootAndSecondLevelDepartment();
 //		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
 		return deptList;
+	}
+	
+	@GET
+	@Path("root_and_second_level_dept_vo")
+	@Produces("application/json")
+	public List<DepartmentVo> getRootAndSecondLevelDepartmentVo() throws UserPersistException {
+		List<Department> deptList = null;
+		LdapService ldapSvc = this.getLdapService();
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		deptList = deptMgr.getRootAndSecondLevelDepartment();
+		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVo(deptList);
+		for (DepartmentVo deptVo : deptVoList) {
+			deptVo.setIo("");
+		}
+		return deptVoList;
 	}
 	
 	@GET
