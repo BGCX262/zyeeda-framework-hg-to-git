@@ -147,7 +147,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 	
 	
 	
-	
 	private static Attributes unmarshal(Department dept) {
 		Attributes attrs = new BasicAttributes();
 		

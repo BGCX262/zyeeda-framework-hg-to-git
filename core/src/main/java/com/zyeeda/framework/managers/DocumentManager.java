@@ -23,6 +23,9 @@ public interface DocumentManager {
 	public long countByIsTemp();
 	
 	public void eraseTemp();
+	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes);
+	
+	public void eraseTemp();
 	
 	public long countBySuffixes(String foreignId, String tempForeignId, String... suffixes);
 	

@@ -75,6 +75,7 @@ public class Module {
 		
 		configSvc.start();
 		tplSvc.start();
+		mongodbSvc.start();
 		//txSvc.start();
 		//validationSvc.start();
 		//defaultPersistenceSvc.start();

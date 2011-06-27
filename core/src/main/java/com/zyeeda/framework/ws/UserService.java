@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.naming.directory.SearchControls;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.servlet.ServletContext;
@@ -36,6 +36,7 @@ import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.account.AccountService;
 import com.zyeeda.framework.account.internal.SystemAccountServiceProvider;
@@ -60,7 +61,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/users")
 public class UserService extends ResourceService {
 	
-	private static final Logger logger = org.slf4j.LoggerFactory.getLogger(UserService.class);
+	private Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	public UserService(@Context ServletContext ctx) {
 		super(ctx);
@@ -209,14 +210,6 @@ public class UserService extends ResourceService {
 		User u = userMgr.findById(id);
 		String ldapPw = u.getPassword();
 		String inputPw = oldPassword;
-//		try {
-//logger.info("this user base dn {}", inputPw);
-//            String userId = StringUtils.substring(id, id.indexOf("=") + 1, id.indexOf(","));
-//			ldapSvc.getLdapContext(userId, inputPw);
-//			userMgr.updatePassword(id, newPassword);
-//		} catch (Exception e) {
-//			throw new RuntimeException("旧密码输入错误");
-//		}
 		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
 			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
 				userMgr.updatePassword(id, newPassword);
@@ -282,13 +275,10 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
-	/**
-	 * 当前用户所属二级部门下所有的user
-	 */
 	@GET
 	@Path("/current_user_in_dept_all_user")
 	@Produces("application/json")
-	public List<User> getCurrentUserInDepartmentAllUser() throws UserPersistException {
+	public List<UserVo> getCurrentUserInDepartmentAllUser() throws UserPersistException {
 		String currentUser = this.getSecurityService().getCurrentUser();
 		LdapService ldapSvc = this.getLdapService();
 		UserManager userManager = new LdapUserManager(ldapSvc);
@@ -307,22 +297,20 @@ public class UserService extends ResourceService {
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
 		}
-		
-		return users;
+		List<UserVo> listUser = fillUserListPropertiesToVo(users);
+		return listUser;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
-
 		userVo.setId(user.getId());
-		userVo.setType("io");
-		userVo.setLabel(user.getUsername());
-		userVo.setCheckName(user.getUsername());
+		userVo.setType("task");
+		userVo.setLabel(user.getId() );
+		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
 		userVo.setKind("user");
-
 		return userVo;
 	}
 	
@@ -331,8 +319,8 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType(type);
-		userVo.setLabel(user.getUsername());
-		userVo.setCheckName(user.getUsername());
+		userVo.setLabel( user.getId());
+		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
@@ -340,21 +328,6 @@ public class UserService extends ResourceService {
 
 		return userVo;
 	}
-
-//	public static UserVo fillUserPropertiesToVo(User user, String type) {
-//		UserVo userVo = new UserVo();
-//
-//		userVo.setId(user.getId());
-//		userVo.setType(type);
-//		userVo.setLabel("<a>" + user.getId() + "<a>");
-//		userVo.setCheckName(user.getId());
-//		userVo.setLeaf(true);
-//		userVo.setUid(user.getId());
-//		userVo.setDeptFullPath(user.getDeptFullPath());
-//		userVo.setKind("user");
-//
-//		return userVo;
-//	}
 
 	public static List<UserVo> fillUserListPropertiesToVo(List<User> userList) {
 		List<UserVo> userVoList = new ArrayList<UserVo>(userList.size());
@@ -375,7 +348,8 @@ public class UserService extends ResourceService {
 		}
 		return userVoList;
 	}
-	//	@POST
+	
+//	@POST
 //	@Path("/{id}")
 //	@Produces("application/json")
 //	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
@@ -389,7 +363,7 @@ public class UserService extends ResourceService {
 	
 	/**
 	 * 配置系统信息
-	 * 将旧的数据删除，保存新的数据�
+	 * 将旧的数据删除，保存新的数据。
 	 * Json list
 	 * return  userList
 	 */
@@ -514,5 +488,4 @@ public class UserService extends ResourceService {
 
 		return "uid = "+uid + " systemName = "+systemName;
 	}
-
 }

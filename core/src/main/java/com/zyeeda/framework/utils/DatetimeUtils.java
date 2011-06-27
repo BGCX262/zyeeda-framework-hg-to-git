@@ -29,12 +29,20 @@ import java.util.Date;
  */
 public class DatetimeUtils {
 	
+	public static final String DEFAULT_DATE_FORMAT_PATTERN = "yyyy-MM-dd";
+	public static final String DEFAULT_DATETIME_FORMAT_PATTERN = "yyyy-MM-dd hh:mm:ss";
+	public static final String GMT_DATETIME_FORMAT_PATTERN = "yyyy-MM-dd'T'HH:mm:ssz";
+	
 	private static SimpleDateFormat getDefaultDateFormat() {
-		return new SimpleDateFormat("yyyy-MM-dd");
+		return new SimpleDateFormat(DEFAULT_DATE_FORMAT_PATTERN);
 	}
 	
 	private static SimpleDateFormat getDefaultDatetimeFormat() {
-		return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		return new SimpleDateFormat(DEFAULT_DATETIME_FORMAT_PATTERN);
+	}
+	
+	private static SimpleDateFormat getGMTDatetimeFormat() {
+		return new SimpleDateFormat(GMT_DATETIME_FORMAT_PATTERN);
 	}
 
 	public static Date parseDate(String str) throws ParseException {
@@ -47,6 +55,11 @@ public class DatetimeUtils {
 		return sdf.parse(str);
 	}
 	
+	public static Date parseGMTDatetime(String str) throws ParseException {
+		SimpleDateFormat sdf = getGMTDatetimeFormat();
+		return sdf.parse(str);
+	}
+	
 	public static String formatDate(Date date) {
 		SimpleDateFormat sdf = getDefaultDateFormat();
 		return sdf.format(date);
@@ -54,6 +67,11 @@ public class DatetimeUtils {
 	
 	public static String formatDatetime(Date date) {
 		SimpleDateFormat sdf = getDefaultDatetimeFormat();
+		return sdf.format(date);
+	}
+	
+	public static String formatGMTDatetime(Date date) {
+		SimpleDateFormat sdf = getGMTDatetimeFormat();
 		return sdf.format(date);
 	}
 }
