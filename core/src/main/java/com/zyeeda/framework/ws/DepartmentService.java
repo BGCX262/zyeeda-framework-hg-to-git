@@ -573,5 +573,7 @@ public class DepartmentService extends ResourceService {
 		}
 		return deptVoList;
 	}
+	
+	
 
 }
