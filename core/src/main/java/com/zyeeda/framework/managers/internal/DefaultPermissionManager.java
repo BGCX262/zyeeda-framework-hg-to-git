@@ -182,7 +182,7 @@ public class DefaultPermissionManager implements PermissionManager {
 					return null;
 				}
 			} finally {
-				is.close();
+				if(is!=null){is.close();}
 			}
 		}
 		return permission;
@@ -292,7 +292,6 @@ public class DefaultPermissionManager implements PermissionManager {
 						}
 					}
 				}
-			}
 		} finally {
 			is.close();
 		}
