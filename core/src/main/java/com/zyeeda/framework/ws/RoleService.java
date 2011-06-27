@@ -338,7 +338,7 @@ public class RoleService extends ResourceService{
 		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
-			//if("当班�值长".equals(role.getName()) && role.getDeptepment()){
+			if("当班-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
 				for(String user : role.getSubjects()){
 					UserVo userVo = new UserVo();
 					userVo.setCheckName(user);
@@ -356,7 +356,7 @@ public class RoleService extends ResourceService{
 						}
 					}
 				}
-			//}
+			}
 		}
 		return userNameVoList;
 	}
