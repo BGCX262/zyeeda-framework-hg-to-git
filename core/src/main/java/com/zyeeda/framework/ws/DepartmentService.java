@@ -447,11 +447,11 @@ public class DepartmentService extends ResourceService {
 	@Path("/get_children/{id}")
 	@Produces("application/json")
 	public List<Department> getChindrenById(@PathParam("id") String id) throws UserPersistException {
-	List<Department> deptList = null;
-	LdapService ldapSvc = this.getLdapService();
-	LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-	deptList = deptMgr.getChildrenById(id);
-	return deptList;
+			List<Department> deptList = null;
+			LdapService ldapSvc = this.getLdapService();
+			LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+			deptList = deptMgr.getChildrenById(id);
+			return deptList;
 	}
 	
 	

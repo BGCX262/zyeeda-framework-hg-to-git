@@ -1,6 +1,11 @@
 package com.zyeeda.framework.managers.internal;
 
+import java.math.BigDecimal;
+
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.TypedQuery;
 
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.ActionHistory;
@@ -36,9 +41,25 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 		return this.search(search);
 	}
 	
+	
 	public List<ActionHistory> findListByProcessCreator(String name){
 		Search search = new Search();
 		search.addFilterEqual("creator", name);
 		return this.search(search);
 	}
+//	public List<Long> findListByProcessCreator(String name){
+//		String sql = "select distinct f_process_ins_id  FROM ZDA_SYS_ACTION_HISTORY where f_creator = ?";
+//		TypedQuery<Object[]> createNativeQuery = (TypedQuery<Object[]>) this.em().createNativeQuery(sql);
+//		TypedQuery<Object[]> query = createNativeQuery;
+//		query.setParameter(1, name);
+//		List<Object[]> list = query.getResultList();
+//		List<Long> listLong = new ArrayList<Long>();
+//		Long instanceId = null;
+//		for (Object[] objs : list) {
+//			instanceId = (Long) objs[0] == null ? 0 : (Long) objs[0];
+//			listLong.add(instanceId);
+//		}
+		
+	//	return null;
+	//}
 }
