@@ -79,7 +79,6 @@ public class DefaultMenuManager implements MenuManager {
 			MenuListComparator comparator = new MenuListComparator();
 			Collections.sort(listMenu, comparator);
 		}
-		System.out.println("****************ssss" + listMenu.size());
 		return listMenu;
 	}
 	

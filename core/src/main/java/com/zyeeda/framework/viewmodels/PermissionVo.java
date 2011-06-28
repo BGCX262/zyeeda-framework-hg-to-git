@@ -6,12 +6,14 @@ import java.util.List;
 
 
 public class PermissionVo {
+	
 	private String id;
 	private String name;
 	private String value;
 	private Boolean isHaveIO;
 	private int path;
 	private String orderBy;
+	
 	private  List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 
 	public List<PermissionVo> getPermissionList() {
