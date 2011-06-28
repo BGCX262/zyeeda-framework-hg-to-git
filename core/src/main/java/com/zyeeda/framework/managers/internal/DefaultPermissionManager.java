@@ -186,7 +186,7 @@ public class DefaultPermissionManager implements PermissionManager {
 					return null;
 				}
 			} finally {
-				is.close();
+				if(is!=null){is.close();}
 			}
 		}
 		return permission;
@@ -195,6 +195,7 @@ public class DefaultPermissionManager implements PermissionManager {
 	public PermissionVo getParentPermissionByPath(String auth)
 			throws XPathExpressionException, IOException {
 		InputStream is = null;
+		System.out.println("*****************22*" + auth);
 		InputSource src = null;
 		XPathExpression exp = null;
 		PermissionVo permission = new PermissionVo();
@@ -291,9 +292,9 @@ public class DefaultPermissionManager implements PermissionManager {
 							}
 							authList.add(permission);
 						}
+						}
 					}
 				}
-			}
 		} finally {
 			is.close();
 		}

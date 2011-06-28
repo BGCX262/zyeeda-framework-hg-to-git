@@ -306,6 +306,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 	}
 	*/
 
+
 	/*@Override
 	public void updateDocument(Document document) throws DocumentException {
 		try {
