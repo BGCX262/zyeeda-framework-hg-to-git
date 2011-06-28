@@ -16,22 +16,11 @@ public class UrlSessionTrackingValve extends ValveBase {
 	
 	private final static Logger logger = LoggerFactory.getLogger(UrlSessionTrackingValve.class);
 	
-	//private final static String JSESSIONID_KEY = ";jsessionid=";
-	
 	private final static String JSESSIONID_PATTERN = "^(.*?)(?:\\;jsessionid=([^\\?#]*))?(\\?[^#]*)?(#.*)?$";
 
 	@Override
 	public void invoke(Request request, Response response) throws IOException,
 			ServletException {
-		/*String uri = request.getRequestURI();
-		int start = uri.lastIndexOf(JSESSIONID_KEY);
-		if (start > 0) {
-			String jsessionid = uri.substring(start + JSESSIONID_KEY.length());
-			logger.debug("Find jsessionid {} from url {}, set request session id.", jsessionid, uri);
-			request.setRequestedSessionId(jsessionid);
-			request.setRequestedSessionURL(true);
-		}*/
-		
 		Pattern pattern = Pattern.compile(JSESSIONID_PATTERN, Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(request.getRequestURI());
 		if (matcher.matches()) {

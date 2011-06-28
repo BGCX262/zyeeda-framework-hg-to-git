@@ -119,6 +119,7 @@
 
     <modules>
         <module>core</module>
-		<module>drivebox</module>
+        <module>tomcat</module>
+        <module>drivebox</module>
     </modules>
 </project>
