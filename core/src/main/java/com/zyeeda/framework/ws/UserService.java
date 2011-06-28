@@ -316,8 +316,8 @@ public class UserService extends ResourceService {
 		UserVo userVo = new UserVo();
 		userVo.setId(user.getId());
 		userVo.setType("task");
-		userVo.setLabel(user.getId() );
-		userVo.setCheckName(user.getId());
+		userVo.setLabel(user.getUsername());
+		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
@@ -330,8 +330,8 @@ public class UserService extends ResourceService {
 
 		userVo.setId(user.getId());
 		userVo.setType(type);
-		userVo.setLabel( user.getId());
-		userVo.setCheckName(user.getId());
+		userVo.setLabel( user.getUsername());
+		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
 		userVo.setUid(user.getId());
 		userVo.setDeptFullPath(user.getDeptFullPath());
