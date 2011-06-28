@@ -51,7 +51,6 @@ public class MenuService extends ResourceService {
 		MenuAndPermission roleWithUserVo = new MenuAndPermission();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
-		System.out.println("*******************" + user);
 		roles = roleMgr.getRoleBySubject(user);	
 		Set<String> authList = roleMgr.getListAuth(roles);
 		Session session = SecurityUtils.getSubject().getSession();
@@ -63,7 +62,6 @@ public class MenuService extends ResourceService {
 			}
 		}
 		session.setAttribute("auth", authList);
-//		session.setAttribute("auth", roleWithUserVo.getListPermission());
 		if(roles.size() == 1) {
 			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionList());
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
