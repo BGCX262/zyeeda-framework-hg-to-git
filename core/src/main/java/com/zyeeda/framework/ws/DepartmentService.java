@@ -462,11 +462,11 @@ public class DepartmentService extends ResourceService {
 	@Path("/get_children/{id}")
 	@Produces("application/json")
 	public List<Department> getChindrenById(@PathParam("id") String id) throws UserPersistException {
-	List<Department> deptList = null;
-	LdapService ldapSvc = this.getLdapService();
-	LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
-	deptList = deptMgr.getChildrenById(id);
-	return deptList;
+			List<Department> deptList = null;
+			LdapService ldapSvc = this.getLdapService();
+			LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+			deptList = deptMgr.getChildrenById(id);
+			return deptList;
 	}
 	
 	
@@ -574,6 +574,92 @@ public class DepartmentService extends ResourceService {
 		return deptVoList;
 	}
 	
+	@GET
+	@Path("/{id}/children/for_user_combobox_dept_not_combobox")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChildrenByIdForUserComboboxDeptNotCombobox(
+													@Context HttpServletRequest request,
+													@PathParam("id") String id)
+											   throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<DepartmentVo> deptVoList = null;
+		List<UserVo> userVoList = null;
+		String type = request.getParameter("type");
+		deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id));
+		for (DepartmentVo deptVo : deptVoList) {
+			deptVo.setIo("/rest/depts/" + deptVo.getDeptFullPath() + "/children/for_user_combobox_dept_not_combobox?type=task");
+		}
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), type);
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
+		
+		return orgList;
+	}
 	
+	@GET
+	@Path("/{id}/children/for_dept_combobox_user_not_combobox")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChildrenByIdForDeptComboboxUserNotCombobox(
+													@Context HttpServletRequest request,
+													@PathParam("id") String id)
+											   throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<DepartmentVo> deptVoList = null;
+		List<UserVo> userVoList = null;
+		String type = request.getParameter("type");
+		deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id), type);
+		for (DepartmentVo deptVo : deptVoList) {
+			deptVo.setIo("/rest/depts/" +  deptVo.getDeptFullPath() + "/children/for_dept_combobox_user_not_combobox?type=task");
+		}
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
+		
+		return orgList;
+	}
+	
+	
+	
+	@GET
+	@Path("/{id}/children/for_user_combobox_dept_not_combobox")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChildrenByIdForUserComboboxDeptNotCombobox(
+													@PathParam("id") String id)
+											   throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<DepartmentVo> deptVoList = null;
+		List<UserVo> userVoList = null;
+		deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id));
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id), "task");
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
+		
+		return orgList;
+	}
+	
+	@GET
+	@Path("/{id}/children/for_dept_combobox_user_not_combobox")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getChildrenByIdForDeptComboboxUserNotCombobox(
+													@PathParam("id") String id)
+											   throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		List<DepartmentVo> deptVoList = null;
+		List<UserVo> userVoList = null;
+		deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id), "task");
+		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
+		
+		return orgList;
+	}
 
 }

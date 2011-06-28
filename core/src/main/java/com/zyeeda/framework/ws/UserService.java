@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.directory.SearchControls;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.servlet.ServletContext;
@@ -44,12 +44,15 @@ import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
+import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
+import com.zyeeda.framework.managers.DepartmentManager;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
+import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
@@ -292,23 +295,27 @@ public class UserService extends ResourceService {
 		User user = null;
 		if (users != null && users.size() > 0) {
 			user = users.get(0);
-			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
-				String secondDept = user.getDepartmentName();
+			if (user != null && StringUtils.isNotBlank(user.getDeptFullPath())) {
+				String secondDept = user.getDeptFullPath();
+				secondDept = secondDept.substring(secondDept.indexOf(",") + 1,
+						secondDept.length());
 				String[] spilt = StringUtils.split(secondDept);
-				if (spilt.length >=2) {
-					secondDept = spilt[spilt.length - 2] + "," + spilt[spilt.length - 1];
+				if (spilt.length >= 2) {
+					secondDept = spilt[spilt.length - 2] + ","
+							+ spilt[spilt.length - 1];
 				}
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
+
 		}
-		List<UserVo> listUser = fillUserListPropertiesToVo(users);
+		List<UserVo> listUser = fillUserListPropertiesToVo(users, "task");
 		return listUser;
 	}
 	
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 		userVo.setId(user.getId());
-		userVo.setType("io");
+		userVo.setType("task");
 		userVo.setLabel(user.getId() );
 		userVo.setCheckName(user.getId());
 		userVo.setLeaf(true);
@@ -491,5 +498,24 @@ public class UserService extends ResourceService {
 	public String testMethod(@PathParam("uid") String uid,@PathParam("systemName") String systemName) {
 
 		return "uid = "+uid + " systemName = "+systemName;
+	}
+	
+	@GET
+	@Path("/userlist_for_defect_by_current_site_user_send_sms/{deptName}")
+	@Produces("application/json")
+	public List<User> getUserListByDepartmentName(@PathParam("deptName") String deptName)
+															throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		DepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		
+		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
+		List<Department> deptList = deptMgr.findByName(deptName);
+		Department dept = null;
+		if (deptList != null && deptList.size() > 0) {
+			dept = deptList.get(0);
+		}
+		List<User> userList = userMgr.findByDepartmentId(dept.getDeptFullPath(), sc);
+		return userList;
 	}
 }

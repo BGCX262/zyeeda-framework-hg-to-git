@@ -90,6 +90,7 @@ public class RoleService extends ResourceService{
 		return bool;
 	}
 	
+	
 	@GET
 	@Path("/{id}/role_and_auth")
 	@Produces("application/json")
