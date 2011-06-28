@@ -268,6 +268,7 @@ public class DepartmentService extends ResourceService {
 		List<DepartmentVo> deptVoList = DepartmentService.fillPropertiesToVoAndRoles(deptList);
 		return deptVoList;
 	}
+	
 	public static List<DepartmentVo> fillPropertiesToVoAndRoles(List<Department> deptList) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
 		DepartmentVo deptVo = null; 
