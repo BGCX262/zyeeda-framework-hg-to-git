@@ -48,7 +48,7 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 		this.username = username;
 	}
 
-	@Column(name = "F_PASSWORD", nullable = false, length = 36)
+	@Column(name = "F_PASSWORD", nullable = false, length = 46)
 	public String getPassword() {
 		return password;
 	}

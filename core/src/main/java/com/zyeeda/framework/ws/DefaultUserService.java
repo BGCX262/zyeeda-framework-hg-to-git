@@ -10,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import org.openxri.xri3.impl.parser.Parser.iauthority;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 @Path("/sync")
 public class DefaultUserService extends ResourceService {
 
-	private Logger logger = LoggerFactory.getLogger(DefaultUserService.class);
+	private Logger logger = LoggerFactory.getLogger(UserService.class);
 	
 	public DefaultUserService(@Context ServletContext ctx) {
 		super(ctx);
@@ -48,10 +49,8 @@ public class DefaultUserService extends ResourceService {
 				.getPersistenceService());
 
 		User u = userMg.find(user.getId());
-		logger.info("this user id is {}", u);
-		if (u == null) {
-			userMg.persist(user);
-		} else {
+		logger.info("this user id is {}", user.getId());
+		if (u != null) {
 			u.setUsername(user.getUsername());
 			u.setEmail(user.getEmail());
 			u.setBirthday(user.getBirthday());
@@ -60,15 +59,17 @@ public class DefaultUserService extends ResourceService {
 			u.setDepartmentName(user.getDepartmentName());
 			u.setDeptFullPath(user.getDeptFullPath());
 			u.setGender(user.getGender());
-			u.setPassword(user.getPassword());
+//			u.setPassword(user.getPassword());
 			u.setMobile(user.getMobile());
 			u.setPosition(user.getPosition());
 			u.setPostStatus(user.getPostStatus());
 			u.setStatus(user.getStatus());
 			userMg.update(u);
+			return u;
+		} else {
+			userMg.persist(user);
+			return user;
 		}
-		
-		return u;
 	}
 
 	@PUT
