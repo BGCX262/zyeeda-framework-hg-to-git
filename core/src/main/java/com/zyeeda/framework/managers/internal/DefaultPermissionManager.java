@@ -33,7 +33,7 @@ public class DefaultPermissionManager implements PermissionManager {
 
 	public void getAllPermssion(String authId)
 			throws XPathExpressionException, IOException {
-		List<PermissionVo> permissions = new ArrayList<PermissionVo>();
+		//List<PermissionVo> permissions = new ArrayList<PermissionVo>();
 		Map<String, PermissionVo> permissionMap = new LinkedHashMap<String, PermissionVo>();
 		List<PermissionVo> list = new ArrayList<PermissionVo>();
 		List<PermissionVo> authList = this.findSubRoamPermissionById(authId);
@@ -195,7 +195,6 @@ public class DefaultPermissionManager implements PermissionManager {
 	public PermissionVo getParentPermissionByPath(String auth)
 			throws XPathExpressionException, IOException {
 		InputStream is = null;
-		System.out.println("*****************22*" + auth);
 		InputSource src = null;
 		XPathExpression exp = null;
 		PermissionVo permission = new PermissionVo();
