@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,6 +164,7 @@ public class MongoDbDocumentManager implements DocumentManager {
 			query.put("_id", new ObjectId(doc.getId()));
 			GridFSDBFile file = fs.findOne(query);
 			doc.setForeignId(newForeignId);
+			logger.info("save file id is  {}" , newForeignId);
 			InputStream in = file.getInputStream();
 			doc.setContent(in);
 			this.persist(doc);

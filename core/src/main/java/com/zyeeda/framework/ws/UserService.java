@@ -134,8 +134,11 @@ public class UserService extends ResourceService {
 			userMgr.update(user);
 			User u = userMgr.findById(id);
 			if (u != null) {
+				logger.info("this user pwd id is {}", u.getPassword());
+				user.setPassword(u.getPassword());
 				userSyncService.update(user);
 			} else {
+				logger.info("this user pwd id = {}", user.getPassword());
 				userSyncService.persist(user);
 			}
 			return user;
