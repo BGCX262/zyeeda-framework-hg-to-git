@@ -11,9 +11,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.directory.SearchControls;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
 import javax.servlet.ServletContext;
@@ -44,13 +44,15 @@ import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.config.internal.DefaultConfigurationServiceProvider;
 import com.zyeeda.framework.entities.Account;
 import com.zyeeda.framework.entities.User;
+import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
+import com.zyeeda.framework.managers.DepartmentManager;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
-import com.zyeeda.framework.managers.internal.DefaultUserManager;
+import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
@@ -280,9 +282,6 @@ public class UserService extends ResourceService {
 		userMgr.update(user);
 	}
 	
-	/**
-	 * 当前用户所属二级部门下所有的人
-	 */
 	@GET
 	@Path("/current_user_in_dept_all_user")
 	@Produces("application/json")
@@ -296,14 +295,18 @@ public class UserService extends ResourceService {
 		User user = null;
 		if (users != null && users.size() > 0) {
 			user = users.get(0);
-			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
-				String secondDept = user.getDepartmentName();
+			if (user != null && StringUtils.isNotBlank(user.getDeptFullPath())) {
+				String secondDept = user.getDeptFullPath();
+				secondDept = secondDept.substring(secondDept.indexOf(",") + 1,
+						secondDept.length());
 				String[] spilt = StringUtils.split(secondDept);
-				if (spilt.length >=2) {
-					secondDept = spilt[spilt.length - 2] + "," + spilt[spilt.length - 1];
+				if (spilt.length >= 2) {
+					secondDept = spilt[spilt.length - 2] + ","
+							+ spilt[spilt.length - 1];
 				}
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
+
 		}
 		List<UserVo> listUser = fillUserListPropertiesToVo(users, "task");
 		return listUser;
@@ -357,7 +360,17 @@ public class UserService extends ResourceService {
 		return userVoList;
 	}
 	
-
+//	@POST
+//	@Path("/{id}")
+//	@Produces("application/json")
+//	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
+//		if(objAccount == null){
+//			throw new RuntimeException("用户名或密码不能为空");
+//		}else{
+//			objAccount.setUserFullPath(fullPath);
+//		}
+//		return objAccount;
+//	}	
 	
 	/**
 	 * 配置系统信息
@@ -379,9 +392,7 @@ public class UserService extends ResourceService {
 					});
 			List<Account> tempAccountList = new ArrayList<Account>();
 			LdapContext ctx  = ldapSvc.getLdapContext();
-			DefaultUserManager dum = new DefaultUserManager(this.getPersistenceService());
-			User user = dum.findById(id);
-			NamingEnumeration<SearchResult> ns = ctx.search(user.getDeptFullPath(), "objectclass=*", SearchControlsFactory.getDefaultSearchControls());
+			NamingEnumeration<SearchResult> ns = ctx.search(id, "objectclass=*", SearchControlsFactory.getDefaultSearchControls());
 			while (ns.hasMore()) {
 				Account  ac = AccountHelper.convertAttributesToAccount(ns.next().getAttributes());
 				tempAccountList.add(ac);
@@ -391,11 +402,11 @@ public class UserService extends ResourceService {
 				objAccountManager.remove("username=" + account.getUserName() + "," + id);
 			}
 			for (Account account : userList) {
-				account.setUserFullPath(user.getDeptFullPath());
-
+				account.setUserFullPath(id);
+//				objAccountManager.remove("username=" + account.getUserName() + "," + id);
 				objAccountManager.update(account);
 			}
-
+//			logger.debug("UserList size is {}", userList.size());
 		} catch (JsonParseException e) {
 			logger.error(e.getMessage(), e);
 		} catch (JsonMappingException e) {
@@ -407,10 +418,21 @@ public class UserService extends ResourceService {
 		}
 		return userList;
 	}
-
+//	objAccountManager.remove(account.getSystemName());
+//	Account newAccount = objAccountManager.findByUserIdAndSystemName(id, account.getSystemName());
+//	newAccount.setUserName(account.getUserName());
+//	newAccount.setPassword(account.getPassword());
+//	newAccount.setVisible(account.getVisible());
+//	objAccountManager.update(newAccount);
+//	account.setUserFullPath(id);
+//	objAccountManager.remove(account.getSystemName());//.findByUserIdAndSystemName(id, account.getSystemName());
+////	newAccount.setUserName(account.getUserName());
+////	newAccount.setPassword(account.getPassword());
+////	newAccount.setVisible(account.getVisible());
+////	newAccount.setUserFullPath(id);
 
 	/**
-//	 * get account list
+	 * get account list
 	 */
 	@GET
 	@Path("/accounts/{id}")
@@ -418,19 +440,41 @@ public class UserService extends ResourceService {
 	public AccountVo getAccounts(@PathParam("id") String id) throws UserPersistException{
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
-		DefaultUserManager dum = new DefaultUserManager(this.getPersistenceService());
-		User user = dum.findById(id);
-		List<Account> list = objAccountManager.findByUserId(user.getDeptFullPath());
+		List<Account> list = objAccountManager.findByUserId(id);
 		AccountVo avo = new AccountVo();
 		avo.setAccounts(list);
 		return avo;
 	}
+	
+//	public void removeSysConfigure(String systemName) throws UserPersistException{
+//		LdapService ldapSvc = this.getLdapService();
+//		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
+//		objAccountManager.remove(systemName);
+//	}
+	
+	/*
+	@POST
+	@Path("/accounts/{id}")
+	@Produces("application/json")
+	public Account updateAccounts(@FormParam("") Account objAccount, @PathParam("id") String id) throws UserPersistException{
+		LdapService ldapSvc = this.getLdapService();
+		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 
+		if(objAccount == null){
+			throw new RuntimeException("用户名或密码为空");
+		} else {
+			objAccount.setUserFullPath("username=" + objAccount.getUserName() + "," + id);
+			objAccountManager.update(objAccount);
+			return objAccount;
+		}
+	}
+	*/
+//	
 	@GET
 	@Path("/systemUsers/{uid}/{systemName}")
 	@Produces("application/json")
 	public Map<String, Object> mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
-		logger.debug("uid = {} and systemName = {}", uid, systemName);
+		logger.debug(")))))))))))))uid = {} and systemName = {}", uid, systemName);
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 		
@@ -439,13 +483,39 @@ public class UserService extends ResourceService {
 		contexts.add(this.getServletContext());
 		ConfigurationService configService = new DefaultConfigurationServiceProvider(contexts, regShutdownHub);
 		AccountService accountSve = new SystemAccountServiceProvider(configService, regShutdownHub);
-		Map<String,Object> result = new HashMap<String, Object>();
+//		List<Account> list = objAccountManager.findByUserId(uid);
 		
-		DefaultUserManager dum = new DefaultUserManager(this.getPersistenceService());
-		User user = dum.findById(uid);
-		result.put("account", objAccountManager.findByUserIdAndSystemName(user.getDeptFullPath(), systemName));
- 		result.put("url", accountSve.getMockSignInConfig(systemName));
+		//Map map = accountSve.getMockSignInConfig("oa.sign.in.url.test");
+		//logger.debug(")))))))))))))))))map url is {}", map.get("oa.sign.in.url.test"));
+		Map<String,Object> result = new HashMap<String, Object>();
+		result.put("account", objAccountManager.findByUserIdAndSystemName(uid, systemName));
+		result.put("url", accountSve.getMockSignInConfig(systemName));
 		return result;
 	}
 	
+	@GET
+	@Path("/tests/{uid}/{systemName}")
+	public String testMethod(@PathParam("uid") String uid,@PathParam("systemName") String systemName) {
+
+		return "uid = "+uid + " systemName = "+systemName;
+	}
+	
+	@GET
+	@Path("/userlist_for_defect_by_current_site_user_send_sms/{deptName}")
+	@Produces("application/json")
+	public List<User> getUserListByDepartmentName(@PathParam("deptName") String deptName)
+															throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		DepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		
+		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
+		List<Department> deptList = deptMgr.findByName(deptName);
+		Department dept = null;
+		if (deptList != null && deptList.size() > 0) {
+			dept = deptList.get(0);
+		}
+		List<User> userList = userMgr.findByDepartmentId(dept.getDeptFullPath(), sc);
+		return userList;
+	}
 }

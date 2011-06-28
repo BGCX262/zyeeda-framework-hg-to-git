@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import com.googlecode.genericdao.search.Search;
@@ -47,19 +48,17 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 		search.addFilterEqual("creator", name);
 		return this.search(search);
 	}
+	
 //	public List<Long> findListByProcessCreator(String name){
 //		String sql = "select distinct f_process_ins_id  FROM ZDA_SYS_ACTION_HISTORY where f_creator = ?";
-//		TypedQuery<Object[]> createNativeQuery = (TypedQuery<Object[]>) this.em().createNativeQuery(sql);
-//		TypedQuery<Object[]> query = createNativeQuery;
+//		Query query  =  this.em().createNativeQuery(sql);
 //		query.setParameter(1, name);
+//		List<Long> longList = new ArrayList<Long>();
 //		List<Object[]> list = query.getResultList();
-//		List<Long> listLong = new ArrayList<Long>();
-//		Long instanceId = null;
-//		for (Object[] objs : list) {
-//			instanceId = (Long) objs[0] == null ? 0 : (Long) objs[0];
-//			listLong.add(instanceId);
+//		for(int i = 0; i < list.size(); i ++) {
+//			Object[] obj = list.get(i);
+//			longList.add((Long)obj[0]);
 //		}
-		
-	//	return null;
-	//}
+//		return longList;
+//	}
 }
