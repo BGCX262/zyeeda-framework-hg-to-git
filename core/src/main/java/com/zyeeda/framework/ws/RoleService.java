@@ -53,6 +53,17 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
+	@Path("/get_role_with_out_dept")
+	@Produces("application/json")
+	public List<Role> getRoleWithOutDept(){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		Search search = new Search();
+		search.addFilterEmpty("deptepment");
+		List<Role> list = roleMgr.search(search);
+		return list;
+	}
+	
+	@GET
 	@Path("/{id}/get_role")
 	@Produces("application/json")
 	public Role getOneRolesById(@PathParam("id") String id) {
