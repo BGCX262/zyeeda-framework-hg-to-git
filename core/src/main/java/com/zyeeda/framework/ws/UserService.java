@@ -52,6 +52,7 @@ import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.DepartmentManager;
 import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
+import com.zyeeda.framework.managers.internal.DefaultUserManager;
 import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.SystemAccountManager;
@@ -404,10 +405,13 @@ public class UserService extends ResourceService {
 				account.setUserFullPath(id);
 				objAccountManager.remove("username=" + account.getUserName() + "," + id);
 			}
-			for (Account account : userList) {
-				account.setUserFullPath(id);
-//				objAccountManager.remove("username=" + account.getUserName() + "," + id);
-				objAccountManager.update(account);
+			DefaultUserManager dum = new DefaultUserManager(this.getPersistenceService());
+			User user = dum.findById(id);
+			if( user != null ){
+				for (Account account : userList) {
+					account.setUserFullPath(user.getDeptFullPath());
+					objAccountManager.update(account);
+				}
 			}
 //			logger.debug("UserList size is {}", userList.size());
 		} catch (JsonParseException e) {
@@ -443,10 +447,15 @@ public class UserService extends ResourceService {
 	public AccountVo getAccounts(@PathParam("id") String id) throws UserPersistException{
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
-		List<Account> list = objAccountManager.findByUserId(id);
-		AccountVo avo = new AccountVo();
-		avo.setAccounts(list);
-		return avo;
+		DefaultUserManager dum = new DefaultUserManager(this.getPersistenceService());
+		User user = dum.findById(id);
+		if( user != null ){
+			List<Account> list = objAccountManager.findByUserId(user.getDeptFullPath());
+			AccountVo avo = new AccountVo();
+			avo.setAccounts(list);
+			return avo;
+		}
+		return null;
 	}
 	
 //	public void removeSysConfigure(String systemName) throws UserPersistException{
@@ -486,12 +495,13 @@ public class UserService extends ResourceService {
 		contexts.add(this.getServletContext());
 		ConfigurationService configService = new DefaultConfigurationServiceProvider(contexts, regShutdownHub);
 		AccountService accountSve = new SystemAccountServiceProvider(configService, regShutdownHub);
-//		List<Account> list = objAccountManager.findByUserId(uid);
 		
-		//Map map = accountSve.getMockSignInConfig("oa.sign.in.url.test");
-		//logger.debug(")))))))))))))))))map url is {}", map.get("oa.sign.in.url.test"));
 		Map<String,Object> result = new HashMap<String, Object>();
-		result.put("account", objAccountManager.findByUserIdAndSystemName(uid, systemName));
+		DefaultUserManager dum = new DefaultUserManager(this.getPersistenceService());
+		User user = dum.findById(uid);
+		if( user != null ){
+			result.put("account", objAccountManager.findByUserIdAndSystemName(user.getDeptFullPath(), systemName));
+		}
 		result.put("url", accountSve.getMockSignInConfig(systemName));
 		return result;
 	}
