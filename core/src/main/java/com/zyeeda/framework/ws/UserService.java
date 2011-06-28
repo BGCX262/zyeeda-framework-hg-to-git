@@ -132,8 +132,8 @@ public class UserService extends ResourceService {
 		} else {
 			user.setDeptFullPath(id);
 			userMgr.update(user);
-			user = userMgr.findById(id);
-			if (user != null) {
+			User u = userMgr.findById(id);
+			if (u != null) {
 				userSyncService.update(user);
 			} else {
 				userSyncService.persist(user);
