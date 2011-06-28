@@ -63,6 +63,8 @@ public class RoleService extends ResourceService{
 		return list;
 	}
 	
+	
+	
 	@GET
 	@Path("/{id}/get_role")
 	@Produces("application/json")
@@ -101,6 +103,20 @@ public class RoleService extends ResourceService{
 		return bool;
 	}
 	
+	@DELETE
+	@Path("/defect_zizhi")
+	@Produces("application/json")
+	public List<Role>  getRolesReturn(@QueryParam("ids") String ids ){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+			if(roleMgr != null){
+				String[] id=ids.split(";");
+				for(String sigleId:id){
+					roleMgr.removeById(sigleId);
+				}
+			}
+		return roleMgr.findAll();
+	}
+	
 	
 	@GET
 	@Path("/{id}/role_and_auth")
@@ -137,6 +153,18 @@ public class RoleService extends ResourceService{
 	}
 	
 	@POST
+	@Path("/{id}/zizhi_edite")
+	@Produces("application/json")
+	public List<Role> editeRoleReturnAll(@PathParam("id") String id, @FormParam("") Role role){
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		Role newRole=roleMgr.find(id);
+		newRole.setName(role.getName());
+		newRole.setDescription(role.getDescription());
+		this.getPersistenceService().getCurrentSession().flush();
+		return roleMgr.findAll();
+	}
+	
+	@POST
 	@Path("/")
 	@Produces("application/json")
 	public Role creatRole(@FormParam("") Role role) {
@@ -151,6 +179,25 @@ public class RoleService extends ResourceService{
 			roleMgr.persist(role);
 			this.getPersistenceService().getCurrentSession().flush();
 			return roleMgr.find(role.getId());
+		}
+	}
+
+	
+	@POST
+	@Path("/return_all")
+	@Produces("application/json")
+	public List<Role> creatRoleReturnAll(@FormParam("") Role role) {
+		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
+		String name = role.getName();
+		Search search = new Search();
+		search.addFilterEqual("name", name);
+		List<Role> list = roleMgr.search(search);
+		if (list.size() > 0) {
+			return null;
+		}else{
+			roleMgr.persist(role);
+			this.getPersistenceService().getCurrentSession().flush();
+			return roleMgr.findAll();
 		}
 	}
 

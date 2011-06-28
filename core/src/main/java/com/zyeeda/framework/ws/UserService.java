@@ -518,4 +518,58 @@ public class UserService extends ResourceService {
 		List<User> userList = userMgr.findByDepartmentId(dept.getDeptFullPath(), sc);
 		return userList;
 	}
+	
+	
+	@GET
+	@Path("/current_all_user_defect")
+	@Produces("application/json")
+	public List<UserVo> getCurrentUserInDepartmentAllUserDefect() throws UserPersistException {
+		String currentUser = this.getSecurityService().getCurrentUser();
+		LdapService ldapSvc = this.getLdapService();
+		UserManager userManager = new LdapUserManager(ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> users = userManager.findByName(currentUser, sc);
+		User user = null;
+		if (users != null && users.size() > 0) {
+			user = users.get(0);
+			if (user != null && StringUtils.isNotBlank(user.getDeptFullPath())) {
+				String secondDept = user.getDeptFullPath();
+				secondDept = secondDept.substring(secondDept.indexOf(",") + 1,
+						secondDept.length());
+				String[] spilt = StringUtils.split(secondDept);
+				if (spilt.length >= 2) {
+					secondDept = spilt[spilt.length - 2] + ","
+							+ spilt[spilt.length - 1];
+				}
+				users = userManager.findByDepartmentId(secondDept, sc);
+			}
+
+		}
+		List<UserVo> listUser = fillUserListPropertiesToVoDefect(users);
+		return listUser;
+	}
+	
+	public static List<UserVo> fillUserListPropertiesToVoDefect(List<User> userList) {
+		List<UserVo> userVoList = new ArrayList<UserVo>(userList.size());
+		UserVo userVo = null;
+		for (User user : userList) {
+			userVo = UserService.fillUserPropertiesToVo(user);
+			userVoList.add(userVo);
+		}
+		return userVoList;
+	}
+	
+	public static UserVo fillUserPropertiesToVoDefect(User user) {
+		UserVo userVo = new UserVo();
+		userVo.setId(user.getId());
+		userVo.setType("task");
+		userVo.setLabel(user.getId() );
+		userVo.setCheckName(user.getId());
+		userVo.setLeaf(true);
+		userVo.setUid(user.getId());
+		userVo.setDeptFullPath(user.getDeptFullPath());
+		userVo.setKind("user");
+		return userVo;
+	}
 }

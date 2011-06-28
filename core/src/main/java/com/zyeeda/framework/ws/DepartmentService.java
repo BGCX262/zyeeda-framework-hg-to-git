@@ -509,7 +509,7 @@ public class DepartmentService extends ResourceService {
 			orgNodeVo.setIo(userVo.getId());
 			for(String id:userId){
 				if(id.equals(userVo.getId())){
-					orgNodeVo.setCheckedAuth(true);
+					orgNodeVo.setChecked(true);
 				}
 			}
 			orgNodeVo.setLabel(userVo.getLabel());
