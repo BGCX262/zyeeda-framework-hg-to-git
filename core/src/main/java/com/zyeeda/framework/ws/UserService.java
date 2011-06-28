@@ -295,14 +295,18 @@ public class UserService extends ResourceService {
 		User user = null;
 		if (users != null && users.size() > 0) {
 			user = users.get(0);
-			if (user != null && StringUtils.isNotBlank(user.getDepartmentName())) {
-				String secondDept = user.getDepartmentName();
+			if (user != null && StringUtils.isNotBlank(user.getDeptFullPath())) {
+				String secondDept = user.getDeptFullPath();
+				secondDept = secondDept.substring(secondDept.indexOf(",") + 1,
+						secondDept.length());
 				String[] spilt = StringUtils.split(secondDept);
-				if (spilt.length >=2) {
-					secondDept = spilt[spilt.length - 2] + "," + spilt[spilt.length - 1];
+				if (spilt.length >= 2) {
+					secondDept = spilt[spilt.length - 2] + ","
+							+ spilt[spilt.length - 1];
 				}
 				users = userManager.findByDepartmentId(secondDept, sc);
 			}
+
 		}
 		List<UserVo> listUser = fillUserListPropertiesToVo(users, "task");
 		return listUser;
