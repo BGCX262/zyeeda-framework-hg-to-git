@@ -1,13 +1,5 @@
 package com.zyeeda.framework.managers.internal;
-
-import java.math.BigDecimal;
-
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.ActionHistory;
 import com.zyeeda.framework.managers.ActionHistoryManager;
@@ -39,6 +31,8 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 	public List<ActionHistory> findListByProcessId(Long processInsId){
 		Search search = new Search();
 		search.addFilterEqual("processInstanceId", processInsId);
+		search.addFilterEqual("nodeType", "StateNode");
+		search.addSortDesc("createdTime");
 		return this.search(search);
 	}
 	
