@@ -33,7 +33,7 @@ public class LDAPTest {
 		String root = "dc=ehv,dc=csg,dc=cn";
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, "ldap://192.168.1.85:389/" + root);
+		env.put(Context.PROVIDER_URL, "ldap://192.168.1.14:389/" + root);
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
 		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
 		env.put(Context.SECURITY_CREDENTIALS, "admin");
@@ -168,7 +168,7 @@ public class LDAPTest {
 		LdapContext ctx = getLdapContext();
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=baiwei)",
+		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=*)",
 				sc);
 		ModificationItem[] mods = new ModificationItem[3];
 		SearchResult rs = null;

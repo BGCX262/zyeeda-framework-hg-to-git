@@ -13,6 +13,9 @@ import java.util.Map;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
@@ -28,6 +31,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.ioc.internal.services.RegistryShutdownHubImpl;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
@@ -575,4 +579,5 @@ public class UserService extends ResourceService {
 		userVo.setKind("user");
 		return userVo;
 	}
+	
 }

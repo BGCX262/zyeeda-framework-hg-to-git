@@ -66,7 +66,7 @@ public class LdapEncryptUtils {
 	
 	public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		//e10adc3949ba59abbe56e057f20f883e
-		System.out.println(DigestUtils.md5Hex("111111"));
-		System.out.println(verifySHA("{SSHA}6GjgruydvdSc7zNuTKvSSzQgKFDEg/SuE4MqIg==", DigestUtils.md5Hex("111111")));
+		System.out.println(DigestUtils.md5Hex("admin"));
+		System.out.println(verifySHA("{SSHA}RphV6QRjgL1WMfCQOkpzwhHrXSUbpfAKnshKjA==", DigestUtils.md5Hex("111111")));
 	}
 }

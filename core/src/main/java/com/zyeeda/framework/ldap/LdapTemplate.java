@@ -77,6 +77,16 @@ public class LdapTemplate{
 		}
 	}
 	
+	public void rename(String oldName, String newName) throws NamingException {
+		try {
+			this.ctx.rename(oldName, newName);
+		} catch (NamingException e) {
+			throw new RuntimeException(e);
+		} finally {
+			LdapUtils.closeContext(this.ctx);
+		}
+	}
+	
 	public void modifyAttributes(String dn, Attributes attrs) throws NamingException {
 		this.ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
 	}
@@ -308,7 +318,6 @@ public class LdapTemplate{
         }
 	}
 	
-	@SuppressWarnings("rawtypes")
 	public void deleteRecursively(LdapContext entry) 
     								throws NamingException {
 		NamingEnumeration<Binding> ne = entry.listBindings("");
