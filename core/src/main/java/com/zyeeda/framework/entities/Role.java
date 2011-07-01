@@ -44,8 +44,7 @@ public class Role extends SimpleDomainEntity {
 	private String ramoPermissions;
 
 	
-	@Basic
-	@Column(name = "F_RAMO_PERMISSIONS", length=3000)
+	
 	public String getRamoPermissions() {
 		return ramoPermissions;
 	}

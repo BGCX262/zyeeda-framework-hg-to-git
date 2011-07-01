@@ -170,22 +170,10 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public Role creatRole(@FormParam("") Role role) {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		//String name = role.getName();
-		//Search search = new Search();
-		//search.addFilterEqual("name", name);
-		//List<Role> list = roleMgr.search(search);
 		roleMgr.persist(role);
 		this.getPersistenceService().getCurrentSession().flush();
 		return roleMgr.find(role.getId());
-		/*
-		if (list.size() > 0) {
-			return null;
-		}else{
-			roleMgr.persist(role);
-			this.getPersistenceService().getCurrentSession().flush();
-			return roleMgr.find(role.getId());
-		}
-		*/
+		
 	}
 
 	
