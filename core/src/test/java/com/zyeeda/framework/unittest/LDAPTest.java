@@ -168,14 +168,13 @@ public class LDAPTest {
 		LdapContext ctx = getLdapContext();
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=*)",
+		NamingEnumeration<SearchResult> results = ctx.search("", "(uid=baiwei)",
 				sc);
-		ModificationItem[] mods = new ModificationItem[1];
+		ModificationItem[] mods = new ModificationItem[3];
 		SearchResult rs = null;
 		while (results.hasMore()) {
 			String deptName = "";
 			rs = results.next();
-//			System.out.println(rs.getAttributes());
 			String nameInNamespace = rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "");
 			nameInNamespace = nameInNamespace.substring(nameInNamespace.indexOf(",") + 1, nameInNamespace.length());
 			String[] spilt = StringUtils.split(nameInNamespace, ",");
@@ -183,27 +182,18 @@ public class LDAPTest {
 				deptName += StringUtils.substring(spilt[i -1], spilt[i -1].indexOf("=") + 1, spilt[i -1].length()) + "/";
 			}
 			deptName = deptName.substring(0, deptName.lastIndexOf("/"));
-			System.out.println(deptName);
-//			System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
+		    System.out.println(rs.getAttributes().get("uid"));
+			System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
 			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
-//System.out.println(rs.getAttributes().get("uid").get());
-				System.out.println(rs.getAttributes().get("deptName").get());
-				if (rs.getAttributes().get("userPassword") != null) {
-					System.out.println(new String((byte[]) rs.getAttributes().get("userPassword").get()));
-				}
-
 				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 	   				   new BasicAttribute("deptName", deptName));
-//	   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").substring(
-//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").indexOf(",") + 1, 
-//	   					rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "").length())));
-//				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-//		   				   new BasicAttribute("deptFullPath", 
-//		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
-//				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-//		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
-//				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
-//																	, mods);
+				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("deptFullPath", 
+		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
+				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+																	, mods);
 			}
 		}
 	}
