@@ -13,23 +13,23 @@ import static org.testng.Assert.*;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.unittest.TestSuiteBase;
 
-@Test
+@Test()
 public class LdapServiceTest extends TestSuiteBase {
 
-	@Test
+	@Test(enabled = false)
 	public void testGetLdapService() {
 		LdapService ldapSvc = this.getService();
 		assertNotNull(ldapSvc);
 	}
 	
-	@Test
+	@Test(enabled = false)
 	public void testGetDefaultLdapContext() throws NamingException {
 		LdapService ldapSvc = this.getService();
 		LdapContext ctx = ldapSvc.getLdapContext();
 		assertNotNull(ctx);
 	}
 	
-	@Test
+	@Test(enabled = false)
 	public void testGetLdapContext() throws NamingException, IOException {
 		LdapService ldapSvc = this.getService();
 		LdapContext ctx = ldapSvc.getLdapContext("mborn", "secret");

@@ -21,8 +21,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.helpers.LoggerHelper;
-
 /**
  * JPassport implementation of {@link javax.servlet.http.HttpServletRequest HttpServletRequest}.
  * 
@@ -41,7 +39,7 @@ public class JPassportHttpServletRequest extends HttpServletRequestWrapper {
 	}
 	
 	public void setRemoteUser(String remoteUser) {
-		LoggerHelper.debug(logger, "remote user = {}", remoteUser);
+		logger.debug("remote user = {}", remoteUser);
 		this.remoteUser = remoteUser;
 	}
 	

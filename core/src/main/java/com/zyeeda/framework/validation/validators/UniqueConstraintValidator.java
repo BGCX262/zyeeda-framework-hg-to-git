@@ -12,7 +12,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.validation.ValidationEvent;
 import com.zyeeda.framework.validation.constraints.Unique;
@@ -50,11 +49,11 @@ public class UniqueConstraintValidator extends AbstractConstraintValidator<Uniqu
 			int count = query.getMaxResults();
 			return count == 0;
 		} catch (NoSuchMethodException e) {
-			LoggerHelper.error(logger, e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		} catch (IllegalAccessException e) {
-			LoggerHelper.error(logger, e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		} catch (InvocationTargetException e) {
-			LoggerHelper.error(logger, e.getMessage(), e);
+			logger.error(e.getMessage(), e);
 		}
 		return false;
 	}

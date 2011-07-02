@@ -1,6 +1,7 @@
 package com.zyeeda.framework.config.internal;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import javax.servlet.ServletContext;
@@ -14,22 +15,20 @@ import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
-import org.slf4j.Logger;
 
 import com.zyeeda.framework.config.ConfigurationService;
 import com.zyeeda.framework.service.AbstractService;
 
-@ServiceId("default-configuration-service-provider")
+@ServiceId("default-configuration-service")
 @Marker(Primary.class)
 public class DefaultConfigurationServiceProvider extends AbstractService implements ConfigurationService {
 	
 	private ServletContext context;
 	
 	public DefaultConfigurationServiceProvider(
-			Collection<ServletContext> contexts, Logger logger, RegistryShutdownHub shutdownHub) {
+			Collection<ServletContext> contexts, RegistryShutdownHub shutdownHub) {
 		
-		super(logger, shutdownHub);
-		
+		super(shutdownHub);
 		if (contexts.size() != 1) {
 			throw new IllegalStateException("There should be one and only one context.");
 		}
@@ -46,26 +45,35 @@ public class DefaultConfigurationServiceProvider extends AbstractService impleme
 			throw new RuntimeException(String.format("Resource [%s] not found.", resource.toString()));
 		}
 		
-		Configuration config = null;
 		try {
             if (resource.getFile().endsWith(".xml")) {
-                config = new XMLConfiguration(resource.toURL());
-            } else if (resource.getFile().endsWith(".properties")) {
-            	config = new PropertiesConfiguration(resource.toURL());
-            } else {
-                throw new RuntimeException(String.format("Unsupported configuration file type. [%s]", resource.toString()));
+            	XMLConfiguration xmlConfig = new XMLConfiguration();
+            	xmlConfig.load(resource.openStream(), "UTF-8");
+            	return xmlConfig;
             }
+            
+            if (resource.getFile().endsWith(".properties")) {
+            	PropertiesConfiguration propConfig = new PropertiesConfiguration();
+            	propConfig.load(resource.openStream(), "UTF-8");
+            	return propConfig;
+            }
+            
+            throw new RuntimeException(String.format("Unsupported configuration file type. [%s]", resource.toString()));
         } catch (ConfigurationException e) {
             throw new RuntimeException(e);
-        }
-
-        return config;
+        } catch (IOException e) {
+        	throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public File getApplicationRoot() {
 		String contextRoot = this.context.getRealPath("/");
 		return new File(contextRoot);
+	}
+	
+	public String getContextPath() {
+		return this.context.getContextPath();
 	}
 	
 	@Override

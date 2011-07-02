@@ -16,5 +16,27 @@
         <property name="hibernate.format_sql">false</property>
         <property name="hibernate.use_sql_comments">false</property>
         <property name="hibernate.id.new_generator_mappings">true</property>
+        
+        <mapping class="org.drools.task.Attachment" />
+        <mapping class="org.drools.task.Content" />
+        <mapping class="org.drools.task.BooleanExpression" />
+        <mapping class="org.drools.task.Comment" />
+        <mapping class="org.drools.task.Deadline" />
+        <mapping class="org.drools.task.Deadlines" />
+        <mapping class="org.drools.task.Delegation" />
+        <mapping class="org.drools.task.Escalation" />
+        <mapping class="org.drools.task.Group" />
+        <mapping class="org.drools.task.I18NText" />
+        <mapping class="org.drools.task.Notification" />
+        <mapping class="org.drools.task.EmailNotification" />
+        <mapping class="org.drools.task.EmailNotificationHeader" />
+        <mapping class="org.drools.task.PeopleAssignments" />
+        <mapping class="org.drools.task.Reassignment" />
+        <mapping class="org.drools.task.Task" />
+        <mapping class="org.drools.task.TaskData" />
+        <mapping class="org.drools.task.SubTasksStrategy" />
+        <mapping class="org.drools.task.OnParentAbortAllSubTasksEndStrategy" />
+        <mapping class="org.drools.task.OnAllSubTasksEndParentEndStrategy" />
+        <mapping class="org.drools.task.User" />
     </session-factory>
 </hibernate-configuration>

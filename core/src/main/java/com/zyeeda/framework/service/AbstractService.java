@@ -15,12 +15,16 @@
  */
 package com.zyeeda.framework.service;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.tapestry5.ioc.Resource;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
+import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.apache.tapestry5.ioc.services.RegistryShutdownListener;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.zyeeda.framework.helpers.LoggerHelper;
+import com.zyeeda.framework.config.ConfigurationService;
 
 /**
  * Abstract service.
@@ -31,11 +35,11 @@ import com.zyeeda.framework.helpers.LoggerHelper;
  */
 public abstract class AbstractService implements Service, RegistryShutdownListener {
 	
-	private final Logger logger;
+	private final static Logger logger = LoggerFactory.getLogger(AbstractService.class);
+	
     private ServiceState state = ServiceState.NEW;
 
-    protected AbstractService(Logger logger, RegistryShutdownHub shutdownHub) {
-    	this.logger = logger;
+    public AbstractService(RegistryShutdownHub shutdownHub) {
     	shutdownHub.addRegistryShutdownListener(this);
     }
     
@@ -60,20 +64,22 @@ public abstract class AbstractService implements Service, RegistryShutdownListen
 	@Override
 	public void registryDidShutdown() {
 		try {
-			LoggerHelper.info(logger, "{} stopping", this.getClass().getSimpleName());
+			logger.info("{} stopping", this.getClass().getSimpleName());
 			this.stop();
-			LoggerHelper.info(logger, "{} stopped", this.getClass().getSimpleName());
+			logger.info("{} stopped", this.getClass().getSimpleName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
 	
-	protected Logger getLogger() {
-		return this.logger;
-	}
-	
 	protected String getServiceId() {
 		return this.getClass().getAnnotation(ServiceId.class).value();
+	}
+	
+	protected Configuration getConfiguration(ConfigurationService configSvc) {
+		Resource configFile = new ClasspathResource(String.format("%s.properties", this.getServiceId()));
+    	Configuration config = configSvc.getConfiguration(configFile);
+    	return config;
 	}
     
 }

@@ -14,17 +14,17 @@ import com.zyeeda.framework.unittest.TestSuiteBase;
 @Test
 public class TemplateServiceTest extends TestSuiteBase {
 
-	@Test
+	@Test(enabled = false)
 	public void testGetTemplateService() {
 		TemplateService tplSvc = this.getService();
 		assertNotNull(tplSvc);
 	}
 	
-	@Test
+	@Test(enabled = false)
 	public void testRenderString() throws IOException {
 		TemplateService tplSvc = this.getService();
 		String tpl = "hello ${name}";
-		Map<String, String> args = new HashMap<String, String>(1);
+		Map<String, Object> args = new HashMap<String, Object>(1);
 		args.put("name", "world");
 		String result = tplSvc.render(tpl, args);
 		assertEquals(result, "hello world");

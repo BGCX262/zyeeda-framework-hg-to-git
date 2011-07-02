@@ -18,8 +18,8 @@ public class ConfigurationServiceContributionDef implements ContributionDef {
 		this.context = context;
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			Configuration configuration) {
 		
@@ -27,10 +27,12 @@ public class ConfigurationServiceContributionDef implements ContributionDef {
 	}
 
 	@Override
+	@SuppressWarnings("rawtypes")
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			OrderedConfiguration configuration) {
 	}
 
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void contribute(ModuleBuilderSource moduleSource, ServiceResources resources,
 			MappedConfiguration configuration) {

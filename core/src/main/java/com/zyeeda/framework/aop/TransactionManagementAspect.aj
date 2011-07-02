@@ -2,16 +2,15 @@ package com.zyeeda.framework.aop;
 
 import javax.servlet.ServletContext;
 import javax.transaction.Status;
-import javax.transaction.SystemException;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.Registry;
+import org.aspectj.lang.annotation.SuppressAjWarnings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.aop.Transactional;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.transaction.TransactionService;
 import com.zyeeda.framework.transaction.internal.BitronixTransactionServiceProvider;
 import com.zyeeda.framework.utils.IocUtils;
@@ -24,6 +23,7 @@ public aspect TransactionManagementAspect {
 		execution(@Transactional public * *.*(ServletContext, ..)) 
 		&& args(ctx);
 	
+	@SuppressAjWarnings("adviceDidNotMatch")
 	Object around(ServletContext ctx) : txEnabledMethod(ctx) {
 		Registry reg = (Registry) ctx.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
 		
@@ -32,33 +32,28 @@ public aspect TransactionManagementAspect {
 		try {
 			utx = txSvc.getTransaction();
 			if (utx.getStatus() == Status.STATUS_ACTIVE) {
-				LoggerHelper.info(logger, "transaction is active");
+				logger.debug("transaction is active");
 				return proceed(ctx);
 			}
 
-			LoggerHelper.info(logger, "trying to begin transaction");
+			logger.debug("trying to begin transaction");
 			utx.begin();
-			LoggerHelper.info(logger, "transaction begin");
+			logger.debug("transaction begin");
 			Object retValue = proceed(ctx);
 			utx.commit();
-			LoggerHelper.info(logger, "transaction commit");
+			logger.debug("transaction commit");
 			return retValue;
 		} catch (Throwable t) {
-			try {
-				if (utx != null && utx.getStatus() == Status.STATUS_ACTIVE) {
+			if (utx != null) {
+				try {
 					utx.rollback();
-					LoggerHelper.info(logger, "transaction rollback");
+				} catch (Throwable t2) {
+					logger.error("Transaction roll back failed.", t2);
 				}
-			} catch (IllegalStateException e) {
-				LoggerHelper.error(logger, e.getMessage(), e);
-			} catch (SecurityException e) {
-				LoggerHelper.error(logger, e.getMessage(), e);
-			} catch (SystemException e) {
-				LoggerHelper.error(logger, e.getMessage(), e);
+				logger.debug("transaction rollback");
 			}
 			throw new RuntimeException(t);
 		}
 	}
-
 
 }

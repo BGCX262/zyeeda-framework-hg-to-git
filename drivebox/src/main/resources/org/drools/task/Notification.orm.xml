@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm classpath:///META-INF/schema/orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.Notification" access="FIELD">
+        <table name="DRL5_NOTIFICATION" />
+        <inheritance strategy="SINGLE_TABLE" />
+        <discriminator-column discriminator-type="STRING" name="F_DTYPE" length="100" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="notificationIdGenerator" />
+                <table-generator name="notificationIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="NOTIFICATION_ID" />
+            </id>
+            <basic name="priority">
+                <column name="F_PRIORITY" />
+            </basic>
+            <one-to-many name="documentation">
+                <join-column name="F_NOTIFICATION_DOC_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="names">
+                <join-column name="F_NOTIFICATION_NAMES_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="subjects">
+                <join-column name="F_NOTIFICATION_SUBJECTS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="descriptions">
+                <join-column name="F_NOTIFICATION_DESC_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <many-to-many name="recipients">
+                <join-table name="DRL5_NOTIFICATION_RECIPIENTS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+            <many-to-many name="businessAdministrators">
+                <join-table name="DRL5_NOTIFICATION_BIZ_ADMINS">
+                    <join-column name="F_TASK_ID" />
+                    <inverse-join-column name="F_ENTITY_ID" />
+                </join-table>
+            </many-to-many>
+        </attributes>
+    </entity>
+</entity-mappings>

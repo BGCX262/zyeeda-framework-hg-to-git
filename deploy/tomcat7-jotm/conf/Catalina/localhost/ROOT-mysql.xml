@@ -1,0 +1,31 @@
+<Context allowLinking="true" reloadable="false"
+    docBase="{YOUR WEBAPP BASE}">
+
+    <Resource name="jdbc/defaultDS" auth="Container" type="javax.sql.XADataSource"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/framework"
+        username="root" password="root" />
+
+    <Resource name="jdbc/droolsTaskDS" auth="Container" type="javax.sql.DataSource"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/framework"
+        username="root" password="root" />
+
+    <Resource name="jdbc/attachmentDS" auth="Container" type="javax.sql.DataSource"
+        factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+        driverClassName="com.mysql.jdbc.Driver"
+        url="jdbc:mysql://localhost:3306/framework-attachment"
+        username="root" password="root" />
+
+    <Resource name="UserTransaction" auth="Container"
+        type="javax.transaction.UserTransaction" />
+    <Transaction factory="org.objectweb.jotm.UserTransactionFactory"
+        jotm.timeout="60" />
+        
+    <Resource name="TransactionManager" auth="Container"
+    	type="javax.transaction.TransactionManager"
+    	factory="org.objectweb.jotm.UserTransactionFactory" />
+
+</Context>

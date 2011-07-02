@@ -31,9 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.FrameworkConstants;
 import com.zyeeda.framework.persistence.PersistenceService;
-import com.zyeeda.framework.persistence.internal.HibernatePersistenceServiceProvider;
+import com.zyeeda.framework.persistence.internal.DefaultPersistenceServiceProvider;
 import com.zyeeda.framework.transaction.TransactionService;
-import com.zyeeda.framework.transaction.internal.BitronixTransactionServiceProvider;
+import com.zyeeda.framework.transaction.internal.DefaultTransactionServiceProvider;
 import com.zyeeda.framework.utils.IocUtils;
 
 /**
@@ -67,8 +67,8 @@ public class OpenSessionInViewFilter implements Filter {
         UserTransaction utx = null;
         
         try {
-        	TransactionService txSvc = reg.getService(IocUtils.getServiceId(BitronixTransactionServiceProvider.class), TransactionService.class);
-        	defaultPersistenceSvc = reg.getService(IocUtils.getServiceId(HibernatePersistenceServiceProvider.class), PersistenceService.class);
+        	TransactionService txSvc = reg.getService(IocUtils.getServiceId(DefaultTransactionServiceProvider.class), TransactionService.class);
+        	defaultPersistenceSvc = reg.getService(IocUtils.getServiceId(DefaultPersistenceServiceProvider.class), PersistenceService.class);
         	
         	utx = txSvc.getTransaction();
         	

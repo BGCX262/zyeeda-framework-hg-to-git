@@ -1,0 +1,24 @@
+<Context allowLinking="true" reloadable="false"
+    docBase="{YOUR WEBAPP BASE}">
+
+    <Resource name="jdbc/defaultDS" auth="Container" type="javax.sql.XADataSource"
+        factory="bitronix.tm.resource.ResourceObjectFactory"
+        uniqueName="jdbc/defaultDS" />
+
+    <Resource name="jdbc/droolsTaskDS" auth="Container" type="javax.sql.XADataSource"
+        factory="bitronix.tm.resource.ResourceObjectFactory"
+        uniqueName="jdbc/droolsTaskDS" />
+
+    <Resource name="TransactionManager" auth="Container"
+        type="javax.transaction.TransactionManager"
+        factory="bitronix.tm.BitronixTransactionManagerObjectFactory" />
+        
+    <Resource name="TransactionSynchronizationRegistry" auth="Container"
+        type="javax.transaction.TransactionSynchronizationRegistry"
+        factory="bitronix.tm.BitronixTransactionSynchronizationRegistryObjectFactory" />
+
+    <Resource name="UserTransaction" auth="Container"
+        type="javax.transaction.UserTransaction" />
+    <Transaction factory="bitronix.tm.BitronixUserTransactionObjectFactory" />
+
+</Context>

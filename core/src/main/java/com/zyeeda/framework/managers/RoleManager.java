@@ -2,23 +2,21 @@ package com.zyeeda.framework.managers;
 
 import java.util.List;
 
-import javax.persistence.EntityManager;
-
+import com.googlecode.genericdao.dao.jpa.GenericDAO;
 import com.zyeeda.framework.entities.Role;
-import com.zyeeda.framework.persistence.PersistenceService;
+import com.zyeeda.framework.viewmodels.RoleVo;
+import com.zyeeda.framework.viewmodels.UserVo;
 
-public class RoleManager extends DomainEntityManager {
-	
-	public RoleManager(PersistenceService persistenceSvc) {
-		super(persistenceSvc);
-	}
+public interface RoleManager extends GenericDAO<Role, String> {
 
-	public List<Role> getRolesBySubject(String subject) {
-		EntityManager session = this.getPersistenceService().getCurrentSession();
-		List<Role> roles = session.createNamedQuery("getRolesBySubject", Role.class)
-			.setParameter("subject", subject).getResultList();
+		public  List<Role> getRoleBySubject(String subject);
 		
-		return roles;
-	}
-	
+		public List<Role> getRoleDistinct(String hql);
+		
+		public List<RoleVo> roleToVo(List<Role> listRole);
+		
+		public List<UserVo> getUserVoByRole(Role role);
+		
+		public List<RoleVo> deptToVo(List<Role> listRole);
+		
 }

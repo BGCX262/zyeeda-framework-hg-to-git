@@ -2,14 +2,14 @@
 <process xmlns="http://drools.org/drools-5.0/process"
          xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
          xs:schemaLocation="http://drools.org/drools-5.0/process drools-processes-5.0.xsd"
-         type="RuleFlow" name="Test Flow" id="com.zyeeda.system.TestFlow" package-name="com.zyeeda.system" >
+         type="RuleFlow" name="Test Flow" id="com.zyeeda.system.TestFlow" package-name="com.zyeeda.system" version="1.0" >
 
   <header>
   </header>
 
   <nodes>
     <start id="1" name="Start" x="100" y="100" width="48" height="48" />
-    <humanTask id="2" name="Sample Task" x="203" y="100" width="121" height="48" >
+    <humanTask id="2" name="中文" x="203" y="100" width="121" height="48" >
       <work name="Human Task" >
         <parameter name="ActorId" >
           <type name="org.drools.process.core.datatype.impl.type.StringDataType" />

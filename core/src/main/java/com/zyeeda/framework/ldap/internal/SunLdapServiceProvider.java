@@ -1,66 +1,64 @@
 package com.zyeeda.framework.ldap.internal;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Map;
 
 import javax.naming.Context;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringUtils;
-import org.apache.tapestry5.ioc.Resource;
+import org.apache.shiro.realm.ldap.LdapUtils;
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
 import org.apache.tapestry5.ioc.annotations.ServiceId;
-import org.apache.tapestry5.ioc.internal.util.ClasspathResource;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.config.ConfigurationService;
-import com.zyeeda.framework.helpers.LoggerHelper;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.LdapServiceException;
+import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.service.AbstractService;
-import com.zyeeda.framework.template.TemplateService;
-import com.zyeeda.framework.template.TemplateServiceException;
 
-@ServiceId("sun-ldap-service-provider")
+@ServiceId("sun-ldap-service")
 @Marker(Primary.class)
 public class SunLdapServiceProvider extends AbstractService implements LdapService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(SunLdapServiceProvider.class);
 	
 	private static final String PROVIDER_URL = "providerUrl";
 	private static final String SECURITY_AUTHENTICATION = "securityAuthentication";
 	private static final String SYSTEM_SECURITY_PRINCIPAL = "systemSecurityPrincipal";
 	private static final String SYSTEM_SECURITY_CREDENTIALS = "systemSecurityCredentials";
 	private static final String SECURITY_PRINCIPAL_TEMPLATE = "securityPrincipalTemplate";
+	private static final String BASE_DN = "baseDN";
 	
 	private static final String DEFAULT_INITIAL_CONTEXT_FACTORY = "com.sun.jndi.ldap.LdapCtxFactory";
 	private static final String DEFAULT_SECURITY_AUTHENTICATION = "simple";
-	
-	// Injected
-	private final TemplateService tplSvc;
+	private static final String DEFAULT_SECURITY_PRINCIPAL_TEMPLATE = "(uid=%s)";
+	private static final String DEFAULT_BASE_DN = "";
 	
 	private String providerUrl;
 	private String securityAuthentication;
 	private String systemSecurityPrincipal;
 	private String systemSecurityCredentials;
 	private String securityPrincipalTemplate;
+	private String baseDn;
 	
 	public SunLdapServiceProvider(
 			ConfigurationService configSvc, 
-			TemplateService tplSvc,
-			Logger logger,
 			RegistryShutdownHub shutdownHub) throws Exception {
 		
-		super(logger, shutdownHub);
-		this.tplSvc = tplSvc;
+		super(shutdownHub);
 		
-		Resource configFile = new ClasspathResource(String.format("%s.properties", this.getServiceId()));
-    	Configuration config = configSvc.getConfiguration(configFile);
+		Configuration config = this.getConfiguration(configSvc);
     	this.init(config);
 	}
 	
@@ -69,15 +67,15 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 		this.securityAuthentication = config.getString(SECURITY_AUTHENTICATION, DEFAULT_SECURITY_AUTHENTICATION);
 		this.systemSecurityPrincipal = config.getString(SYSTEM_SECURITY_PRINCIPAL);
 		this.systemSecurityCredentials = config.getString(SYSTEM_SECURITY_CREDENTIALS);
-		this.securityPrincipalTemplate = config.getString(SECURITY_PRINCIPAL_TEMPLATE);
+		this.securityPrincipalTemplate = config.getString(SECURITY_PRINCIPAL_TEMPLATE, DEFAULT_SECURITY_PRINCIPAL_TEMPLATE);
+		this.baseDn = config.getString(BASE_DN, DEFAULT_BASE_DN);
 		
-		if (this.getLogger().isDebugEnabled()) {
-			this.getLogger().debug("provider url = {}", this.providerUrl);
-			this.getLogger().debug("security authentication = {}", this.securityAuthentication);
-			this.getLogger().debug("system security principal = {}", this.systemSecurityPrincipal);
-			this.getLogger().debug("system security credentials = ******");
-			this.getLogger().debug("security princiapl template = {}", this.securityPrincipalTemplate);
-		}
+		logger.debug("provider url = {}", this.providerUrl);
+		logger.debug("security authentication = {}", this.securityAuthentication);
+		logger.debug("system security principal = {}", this.systemSecurityPrincipal);
+		logger.debug("system security credentials = ******");
+		logger.debug("security principal template = {}", this.securityPrincipalTemplate);
+		logger.debug("base dn = {}", this.baseDn);
 	}
 
 	@Override
@@ -89,21 +87,33 @@ public class SunLdapServiceProvider extends AbstractService implements LdapServi
 	}
 
 	@Override
-	public LdapContext getLdapContext(String username, String password)	throws NamingException, IOException, TemplateServiceException {
-		if (this.getLogger().isDebugEnabled()) {
-			this.getLogger().debug("username = {}", username);
-			this.getLogger().debug("password = ******");
+	public LdapContext getLdapContext(String username, String password)	throws NamingException, IOException {
+		logger.debug("username = {}", username);
+		logger.debug("password = ******");
+		
+		LdapContext ctx = null;
+		try {
+			ctx = this.getLdapContext();
+			SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
+			NamingEnumeration<SearchResult> ne = ctx.search(this.baseDn, String.format(this.securityPrincipalTemplate, username), sc);
+			SearchResult result = ne.hasMore() ? ne.next() : null;
+			if (result == null) {
+				throw new NamingException("User not found.");
+			}
+			if (ne.hasMore()) {
+				throw new NamingException("More than one user has the same name.");
+			}
+			
+			String principal = result.getNameInNamespace();
+			logger.debug("searched principal = {}", principal);
+			
+			Hashtable<String, String> env = this.setupEnvironment();
+			env.put(Context.SECURITY_PRINCIPAL, principal);
+			env.put(Context.SECURITY_CREDENTIALS, password);
+			return new InitialLdapContext(env, null);
+		} finally {
+			LdapUtils.closeContext(ctx);
 		}
-		
-		Hashtable<String, String> env = this.setupEnvironment();
-		Map<String, String> args = new HashMap<String, String>(1);
-		args.put("username", username);
-		String principal = this.tplSvc.render(this.securityPrincipalTemplate, args);
-		LoggerHelper.debug(this.getLogger(), "rendered principal = {}", principal);
-		
-		env.put(Context.SECURITY_PRINCIPAL, principal);
-		env.put(Context.SECURITY_CREDENTIALS, password);
-		return new InitialLdapContext(env, null);
 	}
 	
 	private Hashtable<String, String> setupEnvironment() {

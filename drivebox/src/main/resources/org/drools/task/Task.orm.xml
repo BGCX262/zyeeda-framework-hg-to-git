@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm classpath:///META-INF/schema/orm_2_0.xsd"
+    version="2.0">
+    <entity class="org.drools.task.Task" access="FIELD">
+        <table name="DRL5_TASK" />
+
+        <attributes>
+            <id name="id">
+                <column name="F_ID" />
+                <generated-value strategy="TABLE" generator="taskIdGenerator" />
+                <table-generator name="taskIdGenerator" table="DRL5_ID_GENERATOR"
+                    pk-column-name="F_ID_GEN_NAME" value-column-name="F_ID_GEN_VALUE"
+                    pk-column-value="TASK_ID" />
+            </id>
+            <basic name="priority">
+                <column name="F_PRIORITY" />
+            </basic>
+            <one-to-many name="names">
+                <join-column name="F_TASK_NAMES_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="subjects">
+                <join-column name="F_TASK_SUBJECTS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="descriptions">
+                <join-column name="F_TASK_DESCRIPTIONS_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <one-to-many name="subTaskStrategies">
+                <join-column name="F_TASK_ID" nullable="true" />
+                <cascade>
+                    <cascade-all />
+                </cascade>
+            </one-to-many>
+            <embedded name="peopleAssignments" />
+            <embedded name="delegation" />
+            <embedded name="taskData" />
+            <embedded name="deadlines" />
+        </attributes>
+    </entity>
+</entity-mappings>
