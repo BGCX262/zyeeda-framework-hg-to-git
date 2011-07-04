@@ -389,7 +389,8 @@ public class RoleService extends ResourceService{
 		Search search = new Search();
 		search.addFilterEqual("name", "当班值-值长");
 		search.addFilterEqual("deptepment", subStationName);
-		Role role = roleMgr.searchUnique(search);
+		List<Role> roleList = roleMgr.search(search);
+		for(Role role : roleList){
 			if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
 				for(String user : role.getSubjects()){
 					
@@ -412,6 +413,7 @@ public class RoleService extends ResourceService{
 					}
 				}
 			}
+		}
 		return userNameVoList;
 	}
 	
@@ -453,7 +455,8 @@ public class RoleService extends ResourceService{
 		Search search = new Search();
 		search.addFilterEqual("name", "当班值-值班员");
 		search.addFilterEqual("deptepment", subStationName);
-		Role role = roleMgr.searchUnique(search);
+		List<Role> roleList = roleMgr.search(search);
+		for(Role role : roleList){
 		if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
 			for(String user : role.getSubjects()){
 				UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
@@ -474,6 +477,7 @@ public class RoleService extends ResourceService{
 					}
 				}
 			}
+		}
 		}
 		return userNameVoList;
 	}
