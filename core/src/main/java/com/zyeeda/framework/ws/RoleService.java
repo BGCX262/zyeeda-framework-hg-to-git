@@ -78,7 +78,7 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
-	@Path("/getAllRoles")
+	@Path("/getAllRoles")//TODO;
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -189,7 +189,7 @@ public class RoleService extends ResourceService{
 		String name = role.getName();
 		Search search = new Search();
 		search.addFilterEqual("name", name);
-		
+		search.addFilterEqual("deptepment", role.getDeptepment());
 		List<Role> list = roleMgr.search(search);
 		if (list.size() > 0) {
 			return null;
@@ -249,9 +249,6 @@ public class RoleService extends ResourceService{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role newRole = roleMgr.find(id);
 		String authArray =  role.getPermissions();
-//		String[] str = role.getPermissions().split(";");
-//		List<String> authList = CollectionUtils.asList(str);
-//		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
 		String auth = newRole.getPermissions();
 		if(StringUtils.isBlank(auth)){
 			newRole.setPermissions(authArray); 
@@ -275,13 +272,9 @@ public class RoleService extends ResourceService{
 	public Role assignroamRoleAuth(@PathParam("id") String id,
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		//PermissionManager permissionMgr = new DefaultPermissionManager();
 		Role newRole = roleMgr.find(id);
 		String authArray =  role.getRamoPermissions();
 		logger.debug("this ramoPermissions is : {}", role.getRamoPermissions());
-//		String[] str = role.getRamoPermissions().split(";");
-//		List<String> authList = CollectionUtils.asList(str);
-//		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
 		String auth = newRole.getPermissions();
 		if(StringUtils.isBlank(auth)) {
 			String menuPermission =   "&" + authArray;
@@ -364,8 +357,6 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public Set<UserVo>  getAllSubUser() throws UserPersistException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String userName = this.getSecurityService().getCurrentUser();
-		List<Role> roleList = roleMgr.getRoleBySubject(userName);
 		String creator = this.getSecurityService().getCurrentUser();
 		UserManager userManager = new LdapUserManager(this.getLdapService());
 		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
@@ -394,33 +385,33 @@ public class RoleService extends ResourceService{
 				}
 			}
 		}
-		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
-		for(Role role : roleList){
-			if(role.getName() != null && role.getDeptepment() != null) {
-				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
-					for(String user : role.getSubjects()){
-						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
-						User userId = userMgr.findById(user);
-						UserVo userVo = new UserVo();
-						userVo.setCheckName(userId.getUsername());
-						userVo.setLabel(userId.getUsername());
-						userVo.setType("task");
-						userVo.setLeaf(true);
-						if(userNameVoList.size() == 0) {
+		Search search = new Search();
+		search.addFilterEqual("name", "当班值-值长");
+		search.addFilterEqual("deptepment", subStationName);
+		Role role = roleMgr.searchUnique(search);
+			if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+				for(String user : role.getSubjects()){
+					
+					UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+					User userId = userMgr.findById(user);
+					UserVo userVo = new UserVo();
+					userVo.setCheckName(userId.getUsername());
+					userVo.setLabel(userId.getUsername());
+					userVo.setType("task");
+					userVo.setLeaf(true);
+					if(userNameVoList.size() == 0) {
+						userNameVoList.add(userVo);
+						continue;
+					}
+					for(UserVo userNameVo : userNameVoList){
+						if(!(userNameVo.getCheckName().equals(user))){
 							userNameVoList.add(userVo);
-							continue;
-						}
-						for(UserVo userNameVo : userNameVoList){
-							if(!(userNameVo.getCheckName().equals(user))){
-								userNameVoList.add(userVo);
-								break;
-							}
+							break;
 						}
 					}
 				}
 			}
-		}
 		return userNameVoList;
 	}
 	
@@ -429,8 +420,6 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public Set<UserVo>  getAllNotSubUser() throws UserPersistException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String userName = this.getSecurityService().getCurrentUser();
-		List<Role> roleList = roleMgr.getRoleBySubject(userName);
 		String creator = this.getSecurityService().getCurrentUser();
 		UserManager userManager = new LdapUserManager(this.getLdapService());
 		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
@@ -460,29 +449,28 @@ public class RoleService extends ResourceService{
 			}
 		}
 		logger.debug("this substationName value is : ", subStationName);
-		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
-		for(Role role : roleList){
-			if(role.getName() != null && role.getDeptepment() != null) {
-				if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
-					for(String user : role.getSubjects()){
-						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
-						User userId = userMgr.findById(user);
-						UserVo userVo = new UserVo();
-						userVo.setCheckName(userId.getUsername());
-						userVo.setLabel(userId.getUsername());
-						userVo.setType("task");
-						userVo.setLeaf(true);
-						if(userNameVoList.size() == 0) {
-							userNameVoList.add(userVo);
-							continue;
-						}
-						for(UserVo userNameVo : userNameVoList){
-							if(!(userNameVo.getCheckName().equals(user))){
-								userNameVoList.add(userVo);
-								break;
-							}
-						}
+		Search search = new Search();
+		search.addFilterEqual("name", "当班值-值班员");
+		search.addFilterEqual("deptepment", subStationName);
+		Role role = roleMgr.searchUnique(search);
+		if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
+			for(String user : role.getSubjects()){
+				UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+				User userId = userMgr.findById(user);
+				UserVo userVo = new UserVo();
+				userVo.setCheckName(userId.getUsername());
+				userVo.setLabel(userId.getUsername());
+				userVo.setType("task");
+				userVo.setLeaf(true);
+				if(userNameVoList.size() == 0) {
+					userNameVoList.add(userVo);
+					continue;
+				}
+				for(UserVo userNameVo : userNameVoList){
+					if(!(userNameVo.getCheckName().equals(user))){
+						userNameVoList.add(userVo);
+						break;
 					}
 				}
 			}
