@@ -297,8 +297,6 @@ public class LdapUserManager implements UserManager {
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
 			attrs.put("userPassword", user.getPassword());
-		} else {
-			attrs.put("userPassword", LDAP_DEFAULT_PASSWORD);
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
