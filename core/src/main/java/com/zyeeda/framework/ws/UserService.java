@@ -13,9 +13,6 @@ import java.util.Map;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapContext;
@@ -31,7 +28,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tapestry5.ioc.internal.services.RegistryShutdownHubImpl;
 import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
@@ -125,7 +121,10 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public User update(@FormParam("") User user, @PathParam("id") String id) throws UserPersistException {
+	public User update(@FormParam("") User user,
+					   @PathParam("id") String id,
+					   @FormParam("selectedDeptFullPath") String selectedDeptFullPath)
+				throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -134,9 +133,11 @@ public class UserService extends ResourceService {
 		if (!uid.equals(user.getId())) {
 			throw new RuntimeException("不能修改账号");
 		} else {
-			user.setDeptFullPath(id);
+			user.setSelectedDeptFullPath(id);
+			String newName = "uid=" + uid + "," + selectedDeptFullPath;
+			user.setDeptFullPath(newName);
 			userMgr.update(user);
-			User u = userMgr.findById(id);
+			User u = userMgr.findById(user.getId());
 			if (u != null) {
 				logger.info("this user pwd id is {}", u.getPassword());
 				user.setPassword(u.getPassword());
@@ -145,6 +146,7 @@ public class UserService extends ResourceService {
 				logger.info("this user pwd id = {}", user.getPassword());
 				userSyncService.persist(user);
 			}
+			user = userMgr.findById(user.getId());
 			return user;
 		}
 	}
@@ -481,7 +483,6 @@ public class UserService extends ResourceService {
 	@Path("/systemUsers/{uid}/{systemName}")
 	@Produces("application/json")
 	public Map<String, Object> mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
-		logger.debug(")))))))))))))uid = {} and systemName = {}", uid, systemName);
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 		

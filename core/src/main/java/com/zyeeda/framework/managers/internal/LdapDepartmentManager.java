@@ -60,20 +60,20 @@ public class LdapDepartmentManager implements DepartmentManager {
 		Attributes attrs = unmarshal(dept);
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			if (dn.equals(dept.getParent()) || StringUtils.isBlank(dept.getParent())) {
-				ldapTemplate.modifyAttributes(dn, attrs);
-			} else {
-				String newName = StringUtils.substring(dn, 0, dn.indexOf(",")) + 
-									"," + dept.getParent();
-System.out.println("--------------" + newName);
-				if (dn.equals(newName)) {
-					ldapTemplate.modifyAttributes(dn, attrs);
-				} else {
-					ldapTemplate.rename(dn, newName);
-				}
-				dept.setId(newName);
-				updateUserDeptFullPath();
-			}
+//			if (dn.equals(dept.getParent()) || StringUtils.isBlank(dept.getParent())) {
+//				ldapTemplate.modifyAttributes(dn, attrs);
+//			} else {
+//				String newName = StringUtils.substring(dn, 0, dn.indexOf(",")) + 
+//									"," + dept.getParent();
+//				if (dn.equals(newName)) {
+//					ldapTemplate.modifyAttributes(dn, attrs);
+//				} else {
+//					ldapTemplate.rename(dn, newName);
+//				}
+//				dept.setId(newName);
+//				updateUserDeptFullPath();
+//			}
+			ldapTemplate.modifyAttributes(dn, attrs);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		}

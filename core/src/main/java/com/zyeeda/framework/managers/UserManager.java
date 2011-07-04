@@ -2,6 +2,7 @@ package com.zyeeda.framework.managers;
 
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.naming.directory.SearchControls;
 
 import com.zyeeda.framework.entities.User;
@@ -31,4 +32,6 @@ public interface UserManager {
 	public void disable(String... ids) throws UserPersistException;
 
 	public List<User> findByDepartmentId(String id, SearchControls sc) throws UserPersistException;
+	
+	public void rename(String oldName, String newName) throws UserPersistException;
 }
