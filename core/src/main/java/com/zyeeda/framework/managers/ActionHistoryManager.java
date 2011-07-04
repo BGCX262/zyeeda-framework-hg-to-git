@@ -13,7 +13,7 @@ public interface ActionHistoryManager extends GenericDAO<ActionHistory, String> 
 
 	public List<ActionHistory> findListByProcessId(Long parseLong);
 	
-	public List<ActionHistory> findListByProcessCreator(String name);
+	public List<Long> findListByProcessCreator(String name);
 	
 	
 }

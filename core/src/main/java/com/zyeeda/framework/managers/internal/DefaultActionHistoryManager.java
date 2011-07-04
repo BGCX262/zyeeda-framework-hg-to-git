@@ -1,5 +1,10 @@
 package com.zyeeda.framework.managers.internal;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.Query;
+
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.ActionHistory;
 import com.zyeeda.framework.managers.ActionHistoryManager;
@@ -37,22 +42,23 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 	}
 	
 	
-	public List<ActionHistory> findListByProcessCreator(String name){
-		Search search = new Search();
-		search.addFilterEqual("creator", name);
-		return this.search(search);
-	}
-	
-//	public List<Long> findListByProcessCreator(String name){
-//		String sql = "select distinct f_process_ins_id  FROM ZDA_SYS_ACTION_HISTORY where f_creator = ?";
-//		Query query  =  this.em().createNativeQuery(sql);
-//		query.setParameter(1, name);
-//		List<Long> longList = new ArrayList<Long>();
-//		List<Object[]> list = query.getResultList();
-//		for(int i = 0; i < list.size(); i ++) {
-//			Object[] obj = list.get(i);
-//			longList.add((Long)obj[0]);
-//		}
-//		return longList;
+//	public List<ActionHistory> findListByProcessCreator(String name){
+//		Search search = new Search();
+//		search.addFilterEqual("creator", name);
+//		return this.search(search);
 //	}
+	
+	public List<Long> findListByProcessCreator(String name){
+		String sql = "select distinct f_process_ins_id  FROM ZDA_SYS_ACTION_HISTORY where f_creator = ?";
+		Query query  =  this.em().createNativeQuery(sql);
+		query.setParameter(1, name);
+		List<Long> longList = new ArrayList<Long>();
+		List<BigDecimal> list = query.getResultList();
+		for(int i = 0; i < list.size(); i ++) {
+			BigDecimal b = (BigDecimal) list.get(i);
+			Long longId = b.longValue();
+			longList.add(longId);
+		}
+		return longList;
+	}
 }

@@ -41,46 +41,41 @@ public class MenuService extends ResourceService {
 	@GET
 	@Path("/")
 	@Produces("application/json")
-	public MenuAndPermission getMenu()throws XPathExpressionException, IOException {
+	public MenuAndPermission getMenu(@Context ServletContext ctx)throws XPathExpressionException, IOException {
 		String user = this.getSecurityService().getCurrentUser();
 		MenuManager menuMgr = new DefaultMenuManager();
 		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		List<String> rolesAuth = new ArrayList<String>();
+		//Session session = SecurityUtils.getSubject().get
 		MenuAndPermission roleWithUserVo = new MenuAndPermission();
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);	
 		Set<String> authList = roleMgr.getListAuth(roles);
-//		Session session = SecurityUtils.getSubject().getSession();
-		//List<PermissionVo> permissionVoList = new ArrayList<PermissionVo>();
+		Session session = SecurityUtils.getSubject().getSession();
 		for(String auth : authList) {
 			PermissionVo permission = permissionMgr.getPermissionByPath(auth, ROAM_PERMISSION_FILE);
 			if(permission != null) {
 				roleWithUserVo.getListPermission().add(permission);
 			}
 		}
-//		session.setAttribute("auth", authList);
+		if(session.getAttribute("auth") == null){
+			session.setAttribute("auth", authList);
+		}
+//		if(ctx.getAttribute("menuListToTree") != null) {//TODO;
+//			
+//		}
 		if(roles.size() == 1) {
 			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionList());
-			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionList());
+			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionsList());
 			roleWithUserVo.getListMenu().addAll(listMenu);
 			return roleWithUserVo;
 		}
-		for(Role role:roles) {
-			logger.debug("the value of the dept subject is = {}  ", role.getPermissions());
-			for(String permission:role.getPermissionList()){
-				if(rolesAuth.size() == 0){
-					rolesAuth.add(permission);
-					continue;
-				}
-				if(!(rolesAuth.contains(permission))){
-					rolesAuth.add(permission);
-				}
-			}
-		}
-		listMenu = menuMgr.getMenuListByPermissionAuth(rolesAuth);
+		Set<String> authMenuSet = roleMgr.getListMenuAuth(roles);
+		List<String> menuList = new ArrayList<String>();
+		menuList.addAll(authMenuSet);
+		listMenu = menuMgr.getMenuListByPermissionAuth(menuList);
 		roleWithUserVo.getListMenu().addAll(listMenu);
 		return roleWithUserVo;
 	}

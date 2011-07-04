@@ -29,11 +29,19 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 	public Set<String> getListAuth(List<Role> roles) {
 		Set<String> auths = new HashSet<String>();
 		for(Role role : roles) {
-			auths.addAll(role.getPermissionList());
+			auths.addAll(role.getRoamPermissionList());
 		}
 		return auths;
 	}
 
+	public Set<String> getListMenuAuth(List<Role> roles) {
+		Set<String> auths = new HashSet<String>();
+		for(Role role : roles) {
+			auths.addAll(role.getPermissionsList());
+		}
+		return auths;
+	}
+	
 	public  List<Role> getRoleBySubject(String subject){
 		logger.debug("the value of the dept subject is = {}  ", subject);
 		//EntityManager session = (EntityManager)this.getPersistenceService().getCurrentSession();
