@@ -63,8 +63,9 @@ public class LdapDepartmentManager implements DepartmentManager {
 			if (dn.equals(dept.getParent()) || StringUtils.isBlank(dept.getParent())) {
 				ldapTemplate.modifyAttributes(dn, attrs);
 			} else {
-				String newName = StringUtils.substring(dn, 0, dn.lastIndexOf(",")) + 
+				String newName = StringUtils.substring(dn, 0, dn.indexOf(",")) + 
 									"," + dept.getParent();
+System.out.println("--------------" + newName);
 				if (dn.equals(newName)) {
 					ldapTemplate.modifyAttributes(dn, attrs);
 				} else {
