@@ -12,7 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.managers.RoleManager;
+import com.zyeeda.framework.managers.UserManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.base.DomainEntityManager;
 import com.zyeeda.framework.persistence.PersistenceService;
 import com.zyeeda.framework.viewmodels.RoleVo;
@@ -128,13 +131,15 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		return listRoleVo;
 	}
 	
-	public List<UserVo> getUserVoByRole(Role role) {
+	public List<UserVo> getUserVoByRole(Role role) throws UserPersistException {
 		Set<String> user = role.getSubjects();
 		List<UserVo>  list = new ArrayList<UserVo>();
 		for(String userName:user) {
+			UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+			User userPojo = userMgr.findById(userName);
 			UserVo userVo = new UserVo();
-			userVo.setCheckName(userName);
-			userVo.setLabel(userName);
+			userVo.setCheckName(userPojo.getUsername());
+			userVo.setLabel(userPojo.getUsername());
 			userVo.setType("node");
 			userVo.setId(userName);
 			userVo.setKind("user");

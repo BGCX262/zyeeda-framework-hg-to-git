@@ -16,7 +16,7 @@ public interface RoleManager extends GenericDAO<Role, String> {
 		
 		public List<RoleVo> roleToVo(List<Role> listRole);
 		
-		public List<UserVo> getUserVoByRole(Role role);
+		public List<UserVo> getUserVoByRole(Role role) throws UserPersistException;
 		
 		public List<RoleVo> deptToVo(List<Role> listRole);
 		
