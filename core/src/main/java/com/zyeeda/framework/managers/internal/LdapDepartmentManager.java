@@ -65,8 +65,10 @@ public class LdapDepartmentManager implements DepartmentManager {
 			} else {
 				String newName = StringUtils.substring(dn, 0, dn.lastIndexOf(",")) + 
 									"," + dept.getParent();
+System.out.println("******************" + newName);
 				ldapTemplate.rename(dn, newName);
-				ldapTemplate.modifyAttributes(dn, attrs);
+//				ldapTemplate.modifyAttributes(dn, attrs);
+				dept.setId(newName);
 				updateUserDeptFullPath();
 			}
 		} catch (NamingException e) {
@@ -299,6 +301,8 @@ public class LdapDepartmentManager implements DepartmentManager {
 				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 		   				   new BasicAttribute("deptFullPath", 
 		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+						, mods);
 			}
 		}
 	}

@@ -101,7 +101,7 @@ public class DepartmentService extends ResourceService {
 		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
 		dept.setId(id);
 		deptMgr.update(dept);
-		return deptMgr.findById(id);
+		return deptMgr.findById(dept.getId());
 	}
 	
 	@GET
