@@ -28,22 +28,13 @@ public class OpenIdProviderAuthcFilter extends FormAuthenticationFilter {
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 		HttpServletResponse httpRes = (HttpServletResponse) response;
 		
-		Registry registry = IocUtils.getRegistry(this.getServletContext());
-		OpenIdProviderService opSvc = registry.getService(OpenIdProviderService.class);
-		
 		// 访问登录页面
 		if (this.isLoginRequest(httpReq, httpRes)) {
-			logger.debug("Sign in request detected");
+			logger.debug("Sign in request detected!");
 			// 提交数据到登录页面
 			if (this.isLoginSubmission(httpReq, httpRes)) {
 				logger.debug("Sign in submission request detected!");
-				this.executeLogin(httpReq, httpRes);
-				
-				if (this.isOpenIdRequest(httpReq)) {
-					httpRes.sendRedirect(this.getServletContext().getContextPath() + opSvc.getEndpointCompleteUrl());
-					return false;
-				}
-				return true;
+				return this.executeLogin(httpReq, httpRes);
 			}
 			
 			// 直接访问登录页面
@@ -52,7 +43,7 @@ public class OpenIdProviderAuthcFilter extends FormAuthenticationFilter {
 		}
 		
 		// 访问其它页面，转发到登录页面
-		logger.debug("Redirect to sign in page {}", this.getLoginUrl());
+		logger.debug("Redirect to sign in page {}!", this.getLoginUrl());
 		httpRes.sendRedirect(this.getLoginUrl());
 		return false;
 	}
@@ -60,16 +51,28 @@ public class OpenIdProviderAuthcFilter extends FormAuthenticationFilter {
 	@Override
 	protected boolean onLoginSuccess(AuthenticationToken token, Subject subject,
             ServletRequest request, ServletResponse response) throws Exception {
-		logger.debug("subject.isAuthenticated = {}", subject.isAuthenticated());
-		logger.debug("subject.isRemembered = {}", subject.isRemembered());
+		logger.debug("subject.isAuthenticated = {}, subject.isRemembered = {}",
+				subject.isAuthenticated(), subject.isRemembered());
+		
+		HttpServletRequest httpReq = (HttpServletRequest) request;
+		HttpServletResponse httpRes = (HttpServletResponse) response;
+		
+		Registry registry = IocUtils.getRegistry(this.getServletContext());
+		OpenIdProviderService opSvc = registry.getService(OpenIdProviderService.class);
+		
+		if (this.isOpenIdRequest(httpReq)) {
+			httpRes.sendRedirect(this.getServletContext().getContextPath() + opSvc.getEndpointCompleteUrl());
+			return false;
+		}
 		return true;
 	}
 	
 	@Override
 	protected boolean onLoginFailure(AuthenticationToken token,	AuthenticationException e, ServletRequest request,
 			ServletResponse response) {
-		logger.error(e.getMessage(), e);
-		return false;
+		logger.error("login failure", e);
+		super.onLoginFailure(token, e, request, response);
+		return true;
 	}
 	
 	@Override
