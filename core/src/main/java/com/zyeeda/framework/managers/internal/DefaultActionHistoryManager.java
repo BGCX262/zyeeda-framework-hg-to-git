@@ -1,4 +1,5 @@
 package com.zyeeda.framework.managers.internal;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,22 +42,21 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 	}
 	
 	
-	public List<ActionHistory> findListByProcessCreator(String name){
-		Search search = new Search();
-		search.addFilterEqual("creator", name);
-		return this.search(search);
-	}
+//	public List<ActionHistory> findListByProcessCreator(String name){
+//		Search search = new Search();
+//		search.addFilterEqual("creator", name);
+//		return this.search(search);
+//	}
 	
-	public List<Long> findListByProcessCreator1(String name){
+	public List<Long> findListByProcessCreator(String name){
 		String sql = "select distinct f_process_ins_id  FROM ZDA_SYS_ACTION_HISTORY where f_creator = ?";
 		Query query  =  this.em().createNativeQuery(sql);
 		query.setParameter(1, name);
 		List<Long> longList = new ArrayList<Long>();
-		List<Object[]> list = query.getResultList();
+		List<BigDecimal> list = query.getResultList();
 		for(int i = 0; i < list.size(); i ++) {
-			Object[] obj = list.get(i);
-			String processId = (String)obj[0];
-			Long longId = Long.parseLong(processId);
+			BigDecimal b = (BigDecimal) list.get(i);
+			Long longId = b.longValue();
 			longList.add(longId);
 		}
 		return longList;

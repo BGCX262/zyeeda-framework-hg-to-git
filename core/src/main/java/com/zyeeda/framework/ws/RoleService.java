@@ -45,7 +45,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 public class RoleService extends ResourceService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(RoleService.class);
-	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+	//private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
 
 	private final static String PERMISSION_FILE = "permission.xml";
 	public RoleService(@Context ServletContext ctx) {
@@ -58,8 +58,8 @@ public class RoleService extends ResourceService{
 	public List<Role> getRoleWithOutDept(){
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Search search = new Search();
-		//search.addFilterEmpty("deptepment");
-		search.addFilterNull("deptepment");
+		search.addFilterEmpty("deptepmentId");
+		search.addFilterNull("deptepmentId");
 		List<Role> list = roleMgr.search(search);
 		return list;
 	}
@@ -242,19 +242,20 @@ public class RoleService extends ResourceService{
 	public Role assignRoleAuth(@PathParam("id") String id,
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		PermissionManager permissionMgr = new DefaultPermissionManager();
+		//PermissionManager permissionMgr = new DefaultPermissionManager();
 		Role newRole = roleMgr.find(id);
-		String[] str = role.getPermissions().split(";");
-		List<String> authList = CollectionUtils.asList(str);
-		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
+		String authArray =  role.getPermissions();
+//		String[] str = role.getPermissions().split(";");
+//		List<String> authList = CollectionUtils.asList(str);
+//		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
 		String auth = newRole.getPermissions();
 		if(StringUtils.isBlank(auth)){
 			newRole.setPermissions(authArray); 
 		} else {
-			int flog = auth.indexOf("_");
+			int flog = auth.indexOf("&");
 			if(flog >= 0){
 				String menuAuth = auth.substring(flog + 1, auth.length());
-				String menuPermission = authArray + "_" + menuAuth;
+				String menuPermission = authArray + "&" + menuAuth;
 				newRole.setPermissions(menuPermission); 
 			} else {
 				newRole.setPermissions(authArray); 
@@ -270,24 +271,25 @@ public class RoleService extends ResourceService{
 	public Role assignroamRoleAuth(@PathParam("id") String id,
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		PermissionManager permissionMgr = new DefaultPermissionManager();
+		//PermissionManager permissionMgr = new DefaultPermissionManager();
 		Role newRole = roleMgr.find(id);
+		String authArray =  role.getRamoPermissions();
 		logger.debug("this ramoPermissions is : {}", role.getRamoPermissions());
-		String[] str = role.getRamoPermissions().split(";");
-		List<String> authList = CollectionUtils.asList(str);
-		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
+//		String[] str = role.getRamoPermissions().split(";");
+//		List<String> authList = CollectionUtils.asList(str);
+//		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
 		String auth = newRole.getPermissions();
 		if(StringUtils.isBlank(auth)) {
-			String menuPermission =   "_" + authArray;
+			String menuPermission =   "&" + authArray;
 			newRole.setPermissions(menuPermission);
 		} else {
-			int flog = auth.indexOf("_");
+			int flog = auth.indexOf("&");
 			if(flog >= 0){
 				String menuAuth = auth.substring(0, flog);
-				String menuPermission =  menuAuth+ "_" + authArray;
+				String menuPermission =  menuAuth+ "&" + authArray;
 				newRole.setPermissions(menuPermission); 
 			} else {
-				String  menuPermission = auth + "_" + authArray;
+				String  menuPermission = auth + "&" + authArray;
 				logger.debug("this ramoPermissions is : {}", menuPermission);
 				newRole.setPermissions(menuPermission); 
 			} 
@@ -387,11 +389,10 @@ public class RoleService extends ResourceService{
 				}
 			}
 		}
-		
 		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
-			if("当班-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+			if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
 				for(String user : role.getSubjects()){
 					UserVo userVo = new UserVo();
 					userVo.setCheckName(user);
