@@ -1,16 +1,13 @@
 package com.zyeeda.framework.managers.internal;
 
 
-import java.io.IOException;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -18,53 +15,50 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.zyeeda.framework.managers.PermissionManager;
+import com.zyeeda.framework.viewmodels.AuthVO;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 
 public class DefaultPermissionManager implements PermissionManager {
 
-	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+	//private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
 	private final static String PERMISSION_FILE = "permission.xml";
-
-	public void getAllPermssion(String authId)
+	
+	private static final Logger logger = LoggerFactory.getLogger(DefaultPermissionManager.class);
+	
+	public void getAllPermssion(AuthVO auth, String authXml, List<String> authListByRole)
 			throws XPathExpressionException, IOException {
-		//List<PermissionVo> permissions = new ArrayList<PermissionVo>();
-		Map<String, PermissionVo> permissionMap = new LinkedHashMap<String, PermissionVo>();
-		List<PermissionVo> list = new ArrayList<PermissionVo>();
-		List<PermissionVo> authList = this.findSubRoamPermissionById(authId);
-		for (PermissionVo permission : authList) {
-			//String authId = permission.getId();
-//			PermissionVo permissionVo = this.getPermissionByPath(permission
-//					.getValue(), ROAM_PERMISSION_FILE);
-			permissionMap.put(permission.getId(), permission);
-			if (authList.size() == 0) {
-				continue;
-			}
-			permission.getPermissionList().addAll(authList);
-			list.add(permission);
-			//this.getAllPermssion(authList);
+		List<AuthVO> list = new ArrayList<AuthVO>();
+		list.add(auth);
+		List<AuthVO> authList = this.findSubRoamPermissionById(auth.getId(), authXml, authListByRole);
+		logger.debug("this auth size is :", authList.size());
+		auth.getChildren().addAll(authList);
+		for (AuthVO authVo : authList) {
+			this.getAllPermssion(authVo, authXml, authListByRole);
 		}
 	}
 
-	public List<PermissionVo> getPermissionToTree(String id)
+	public List<AuthVO> getPermissionToTree(String id, String authXml, List<String> authListByRole)
 			throws XPathExpressionException, IOException {
-		List<PermissionVo> listPermission = new ArrayList<PermissionVo>();
-		listPermission = this.findSubRoamPermissionById(id);
-		for(PermissionVo permission : listPermission) {
-			this.getAllPermssion(permission.getId());
+		 List<AuthVO> listPermission = this.findSubRoamPermissionById(id, authXml, authListByRole);
+		 logger.debug("this listAuthVo size is :", listPermission.size());
+		for(AuthVO permission : listPermission) {
+			this.getAllPermssion(permission, authXml, authListByRole);
 		}
 		return listPermission;
 	}
 
-	public List<PermissionVo> findSubRoamPermissionById(String id)
+	public List<AuthVO> findSubRoamPermissionById(String id, String authXml, List<String> authListByRole)
 			throws XPathExpressionException, IOException {
 
-		List<PermissionVo> authList = new ArrayList<PermissionVo>();
+		List<AuthVO> authList = new ArrayList<AuthVO>();
 		InputStream is = null;
 		InputSource src = null;
 		XPathExpression exp = null;
@@ -73,11 +67,11 @@ public class DefaultPermissionManager implements PermissionManager {
 			XPath xpath = fac.newXPath();
 			exp = xpath.compile("//p[@id='" + id + "']");
 			is = this.getClass().getClassLoader().getResourceAsStream(
-					ROAM_PERMISSION_FILE);
+					authXml);
 			src = new InputSource(is);
 			NodeList list = (NodeList) exp
 					.evaluate(src, XPathConstants.NODESET);
-			authList = new ArrayList<PermissionVo>();
+			//authList = new ArrayList<PermissionVo>();
 			for (int i = 0; i < list.getLength(); i++) {
 				Element element = (Element) list.item(i);
 				if (element == null) {
@@ -88,17 +82,19 @@ public class DefaultPermissionManager implements PermissionManager {
 					Node e = children.item(j);
 					if (e instanceof Element) {
 						Element el = (Element) e;
-						PermissionVo permission = new PermissionVo();
-						permission.setId(el.getAttribute("id"));
-						permission.setName(el.getAttribute("name"));
-						permission.setValue(el.getAttribute("value"));
-						permission.setOrderBy(el.getAttribute("order"));
-						if (el.getAttribute("value").endsWith("*")) {
-							permission.setIsHaveIO(false);
-						} else {
-							permission.setIsHaveIO(true);
+						AuthVO authVo = new AuthVO(); 
+						String value = el.getAttribute("value");
+						authVo.setId(el.getAttribute("id"));
+						authVo.setLabel( el.getAttribute("name"));
+						authVo.setType("ltask");
+						authVo.setTag(value);
+						if(!(el.getAttribute("value").endsWith("*"))) {
+							authVo.setLeaf(true);
 						}
-						authList.add(permission);
+						if(authListByRole.contains(value)) {
+							authVo.setChecked(true);
+						}
+						authList.add(authVo);
 					}
 				}
 			}
@@ -232,7 +228,6 @@ public class DefaultPermissionManager implements PermissionManager {
 		}
 		return permission;
 	}
-
 	
 	private void getParentPermissionListAuthByPath(String auth,
 			Set<String> allAuth, String authXml) throws XPathExpressionException, IOException {
@@ -297,7 +292,6 @@ public class DefaultPermissionManager implements PermissionManager {
 		} finally {
 			is.close();
 		}
-
 		return authList;
 	}
 

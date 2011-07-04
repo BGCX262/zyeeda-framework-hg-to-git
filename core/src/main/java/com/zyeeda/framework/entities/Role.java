@@ -44,8 +44,7 @@ public class Role extends SimpleDomainEntity {
 	private String ramoPermissions;
 
 	
-	@Basic
-	@Column(name = "F_RAMO_PERMISSIONS", length=3000)
+	
 	public String getRamoPermissions() {
 		return ramoPermissions;
 	}
@@ -76,14 +75,43 @@ public class Role extends SimpleDomainEntity {
 	}
 
 	@Transient
+	public List<String> getRoamPermissionList() {
+		String permissions = this.getPermissions();
+		if(StringUtils.isNotBlank(permissions)){
+			int flog = permissions.indexOf("&");
+			if(flog >= 0) {
+				permissions = permissions.substring(flog + 1, permissions.length());
+			} 
+		}
+		String[] permissionArray = StringUtils.split(permissions,
+				PERMISSION_SEPARATOR);
+		return CollectionUtils.asList(permissionArray);
+	}
+	
+	
+	@Transient
+	public List<String> getPermissionsList() {
+		String permissions = this.getPermissions();
+		if(StringUtils.isNotBlank(permissions)){
+			int flog = permissions.indexOf("&");
+			if(flog >= 0) {
+				permissions = permissions.substring(0, flog);
+			} 
+		}
+		String[] permissionArray = StringUtils.split(permissions,
+				PERMISSION_SEPARATOR);
+		return CollectionUtils.asList(permissionArray);
+	}
+	
+	@Transient
 	public List<String> getPermissionList() {
 		String permissions = this.getPermissions();
 		if(StringUtils.isNotBlank(permissions)){
-			int flog = permissions.indexOf("_");
+			int flog = permissions.indexOf("&");
 			if(flog > 0) {
-				permissions.replace("_", ";");
+				permissions.replace("&", ";");
 			} else if(flog == 0) {
-				permissions.replace("_", "").trim();
+				permissions.replace("&", "").trim();
 			}
 		}
 		String[] permissionArray = StringUtils.split(permissions,

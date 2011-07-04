@@ -13,7 +13,7 @@ public class PermissionVo {
 	private Boolean isHaveIO;
 	private int path;
 	private String orderBy;
-	
+
 	private  List<PermissionVo> permissionList = new ArrayList<PermissionVo>();
 
 	public List<PermissionVo> getPermissionList() {
