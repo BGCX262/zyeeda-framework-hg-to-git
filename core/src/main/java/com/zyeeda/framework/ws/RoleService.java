@@ -35,6 +35,7 @@ import com.zyeeda.framework.managers.UserManager;
 import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
+import com.zyeeda.framework.managers.internal.DefaultUserManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.viewmodels.PermissionVo;
 import com.zyeeda.framework.viewmodels.RoleVo;
@@ -396,21 +397,25 @@ public class RoleService extends ResourceService{
 		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
-			if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
-				for(String user : role.getSubjects()){
-					UserVo userVo = new UserVo();
-					userVo.setCheckName(user);
-					userVo.setLabel(user);
-					userVo.setType("task");
-					userVo.setLeaf(true);
-					if(userNameVoList.size() == 0) {
-						userNameVoList.add(userVo);
-						continue;
-					}
-					for(UserVo userNameVo : userNameVoList){
-						if(!(userNameVo.getCheckName().equals(user))){
+			if(role.getName() != null && role.getDeptepment() != null) {
+				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+					for(String user : role.getSubjects()){
+						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+						User userId = userMgr.findById(user);
+						UserVo userVo = new UserVo();
+						userVo.setCheckName(userId.getUsername());
+						userVo.setLabel(userId.getUsername());
+						userVo.setType("task");
+						userVo.setLeaf(true);
+						if(userNameVoList.size() == 0) {
 							userNameVoList.add(userVo);
-							break;
+							continue;
+						}
+						for(UserVo userNameVo : userNameVoList){
+							if(!(userNameVo.getCheckName().equals(user))){
+								userNameVoList.add(userVo);
+								break;
+							}
 						}
 					}
 				}
@@ -454,24 +459,29 @@ public class RoleService extends ResourceService{
 				}
 			}
 		}
+		logger.debug("this substationName value is : ", subStationName);
 		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		for(Role role : roleList){
-			if("非当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
-				for(String user : role.getSubjects()){
-					UserVo userVo = new UserVo();
-					userVo.setCheckName(user);
-					userVo.setLabel(user);
-					userVo.setType("task");
-					userVo.setLeaf(true);
-					if(userNameVoList.size() == 0) {
-						userNameVoList.add(userVo);
-						continue;
-					}
-					for(UserVo userNameVo : userNameVoList){
-						if(!(userNameVo.getCheckName().equals(user))){
+			if(role.getName() != null && role.getDeptepment() != null) {
+				if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
+					for(String user : role.getSubjects()){
+						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+						User userId = userMgr.findById(user);
+						UserVo userVo = new UserVo();
+						userVo.setCheckName(userId.getUsername());
+						userVo.setLabel(userId.getUsername());
+						userVo.setType("task");
+						userVo.setLeaf(true);
+						if(userNameVoList.size() == 0) {
 							userNameVoList.add(userVo);
-							break;
+							continue;
+						}
+						for(UserVo userNameVo : userNameVoList){
+							if(!(userNameVo.getCheckName().equals(user))){
+								userNameVoList.add(userVo);
+								break;
+							}
 						}
 					}
 				}
@@ -483,7 +493,7 @@ public class RoleService extends ResourceService{
 	@GET
 	@Path("/depts/{id}")
 	@Produces("application/json")
-	public List<UserVo> getUserVo(@PathParam("id") String id) {
+	public List<UserVo> getUserVo(@PathParam("id") String id) throws UserPersistException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role role = roleMgr.find(id);
 		List<UserVo> listUserVo = roleMgr.getUserVoByRole(role);
