@@ -5,7 +5,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -13,10 +12,7 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-import javax.naming.ldap.LdapContext;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.zyeeda.framework.entities.User;
@@ -28,8 +24,6 @@ import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
-
-	private static final String LDAP_DEFAULT_PASSWORD = "123456";
 
 	private LdapService ldapSvc;
 
