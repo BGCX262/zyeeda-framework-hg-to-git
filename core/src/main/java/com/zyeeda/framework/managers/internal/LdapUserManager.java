@@ -65,6 +65,8 @@ public class LdapUserManager implements UserManager {
 			String dn = user.getSelectedDeptFullPath();
 			Attributes attrs = LdapUserManager.unmarshal(user);
 			ctx = this.ldapSvc.getLdapContext();
+System.out.println("****************" + dn);
+System.out.println("****************" + user.getDeptFullPath());
 			if (!dn.equals(user.getDeptFullPath())) {
 				ctx.rename(dn, user.getDeptFullPath());
 				dn = user.getDeptFullPath();
@@ -447,7 +449,7 @@ public class LdapUserManager implements UserManager {
 		LdapContext ctx = this.ldapSvc.getLdapContext();
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=*)",
+		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(objectclass=employee)",
 				sc);
 		ModificationItem[] mods = new ModificationItem[2];
 		SearchResult rs = null;
