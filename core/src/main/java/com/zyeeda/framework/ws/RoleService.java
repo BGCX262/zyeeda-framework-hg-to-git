@@ -391,24 +391,25 @@ public class RoleService extends ResourceService{
 		search.addFilterEqual("deptepment", subStationName);
 		List<Role> roleList = roleMgr.search(search);
 		for(Role role : roleList){
-			if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
-				for(String user : role.getSubjects()){
-					
-					UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
-					User userId = userMgr.findById(user);
-					UserVo userVo = new UserVo();
-					userVo.setCheckName(userId.getUsername());
-					userVo.setLabel(userId.getUsername());
-					userVo.setType("task");
-					userVo.setLeaf(true);
-					if(userNameVoList.size() == 0) {
-						userNameVoList.add(userVo);
-						continue;
-					}
-					for(UserVo userNameVo : userNameVoList){
-						if(!(userNameVo.getCheckName().equals(user))){
+			if(role.getName() != null && role.getDeptepment() != null) {
+				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+					for(String user : role.getSubjects()){
+						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+						User userId = userMgr.findById(user);
+						UserVo userVo = new UserVo();
+						userVo.setCheckName(userId.getUsername());
+						userVo.setLabel(userId.getUsername());
+						userVo.setType("task");
+						userVo.setLeaf(true);
+						if(userNameVoList.size() == 0) {
 							userNameVoList.add(userVo);
-							break;
+							continue;
+						}
+						for(UserVo userNameVo : userNameVoList){
+							if(!(userNameVo.getCheckName().equals(user))){
+								userNameVoList.add(userVo);
+								break;
+							}
 						}
 					}
 				}
@@ -457,27 +458,29 @@ public class RoleService extends ResourceService{
 		search.addFilterEqual("deptepment", subStationName);
 		List<Role> roleList = roleMgr.search(search);
 		for(Role role : roleList){
-		if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
-			for(String user : role.getSubjects()){
-				UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
-				User userId = userMgr.findById(user);
-				UserVo userVo = new UserVo();
-				userVo.setCheckName(userId.getUsername());
-				userVo.setLabel(userId.getUsername());
-				userVo.setType("task");
-				userVo.setLeaf(true);
-				if(userNameVoList.size() == 0) {
-					userNameVoList.add(userVo);
-					continue;
-				}
-				for(UserVo userNameVo : userNameVoList){
-					if(!(userNameVo.getCheckName().equals(user))){
-						userNameVoList.add(userVo);
-						break;
+			if(role.getName() != null && role.getDeptepment() != null) {
+				if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
+					for(String user : role.getSubjects()){
+						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+						User userId = userMgr.findById(user);
+						UserVo userVo = new UserVo();
+						userVo.setCheckName(userId.getUsername());
+						userVo.setLabel(userId.getUsername());
+						userVo.setType("task");
+						userVo.setLeaf(true);
+						if(userNameVoList.size() == 0) {
+							userNameVoList.add(userVo);
+							continue;
+						}
+						for(UserVo userNameVo : userNameVoList){
+							if(!(userNameVo.getCheckName().equals(user))){
+								userNameVoList.add(userVo);
+								break;
+							}
+						}
 					}
 				}
 			}
-		}
 		}
 		return userNameVoList;
 	}
