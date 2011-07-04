@@ -322,7 +322,7 @@ public class UserService extends ResourceService {
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 		userVo.setId(user.getId());
-		userVo.setType("task");
+		userVo.setType("io");
 		userVo.setLabel(user.getUsername());
 		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
