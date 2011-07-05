@@ -1,6 +1,7 @@
 package com.zyeeda.framework.ws;
 import java.io.IOException;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,7 +22,6 @@ import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -392,7 +392,7 @@ public class RoleService extends ResourceService{
 		List<Role> roleList = roleMgr.search(search);
 		for(Role role : roleList){
 			if(role.getName() != null && role.getDeptepment() != null && subStationName != null) {
-				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+				if(role.getName().equals("当班值-值长") && role.getDeptepment().equals(subStationName)){
 					for(String user : role.getSubjects()){
 						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
 						User userId = userMgr.findById(user);
