@@ -212,17 +212,17 @@ public class UserService extends ResourceService {
 		return UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(deptId));
 	}
 	
-	@GET
-	@Path("/syn_all_user")
-	@Produces("application/json")
-	public List<User> getAllUser() {
-		LdapService ldapSvc = this.getLdapService();
-		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<User> users = null;
-		
-		return null;
-	}
-	
+//	@GET
+//	@Path("/syn_all_user")
+//	@Produces("application/json")
+//	public List<User> getAllUser() {
+//		LdapService ldapSvc = this.getLdapService();
+//		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+//		List<User> users = null;
+//		
+//		return null;
+//	}
+//	
 	
 	@PUT
 	@Path("/{id}/update_password")

@@ -65,8 +65,6 @@ public class LdapUserManager implements UserManager {
 			String dn = user.getSelectedDeptFullPath();
 			Attributes attrs = LdapUserManager.unmarshal(user);
 			ctx = this.ldapSvc.getLdapContext();
-System.out.println("****************" + dn);
-System.out.println("****************" + user.getDeptFullPath());
 			if (!dn.equals(user.getDeptFullPath())) {
 				ctx.rename(dn, user.getDeptFullPath());
 				dn = user.getDeptFullPath();
