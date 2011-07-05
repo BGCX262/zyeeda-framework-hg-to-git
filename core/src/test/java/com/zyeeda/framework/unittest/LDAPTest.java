@@ -33,7 +33,7 @@ public class LDAPTest {
 		String root = "dc=ehv,dc=csg,dc=cn";
 		Hashtable<String, String> env = new Hashtable<String, String>();
 		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, "ldap://192.168.1.123:389/" + root);
+		env.put(Context.PROVIDER_URL, "ldap://192.168.1.14:389/" + root);
 		env.put(Context.SECURITY_AUTHENTICATION, "simple");
 		env.put(Context.SECURITY_PRINCIPAL, "cn=admin");
 		env.put(Context.SECURITY_CREDENTIALS, "admin");
@@ -183,14 +183,14 @@ public class LDAPTest {
 				deptName += StringUtils.substring(spilt[i -1], spilt[i -1].indexOf("=") + 1, spilt[i -1].length()) + "/";
 			}
 			deptName = deptName.substring(0, deptName.lastIndexOf("/"));
-		    System.out.println(rs.getAttributes().get("uid"));
-			System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
+System.out.println(rs.getAttributes().get("uid"));
+System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
 			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
 				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-	   				   new BasicAttribute("deptName", " "));
+	   				   new BasicAttribute("status", "true"));
 				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-		   				   new BasicAttribute("deptFullPath", 
-		   			" "));
+		   				   new BasicAttribute("postStatus", 
+		   			"true"));
 //				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 //		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
 				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
