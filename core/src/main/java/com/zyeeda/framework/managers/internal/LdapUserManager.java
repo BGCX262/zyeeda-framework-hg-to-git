@@ -425,5 +425,38 @@ public class LdapUserManager implements UserManager {
 		return new LdapTemplate(ctx);
 	}
 	*/
+
+	@Override
+	public String findStationDivisionByCreator(String creator) throws UserPersistException {
+		UserManager userManager = new LdapUserManager(this.ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userManager.findByName(creator, sc);
+		String subStation = null;
+		List<String> siteDeptList = new ArrayList<String>();
+		siteDeptList.add("广州站");
+		siteDeptList.add("宝安站");
+		siteDeptList.add("福山站");
+		siteDeptList.add("肇庆站");
+		siteDeptList.add("花都站");
+		siteDeptList.add("隧东站");
+		if (userList != null && userList.size() > 0) {
+			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
+				String fullPath = userList.get(0).getDeptFullPath();
+				String[] spilt = StringUtils.split(fullPath, ",");
+				for (int i = 0; i < spilt.length; i++) {
+					if (spilt[i].indexOf("=") != -1) {
+						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
+								.indexOf("=") + 1, spilt[i].length());
+						if (siteDeptList.contains(spilt[i])) {
+							subStation = spilt[i];
+							return subStation;
+							//setDefect.setStationDivision(subStation);
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 	
 }
