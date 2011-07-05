@@ -97,8 +97,4 @@ public class DefaultUserManager extends DomainEntityManager<User, String>
 		return null;
 	}
 
-	@Override
-	public void rename(String oldName, String newName)
-			throws UserPersistException {
-	}
 }

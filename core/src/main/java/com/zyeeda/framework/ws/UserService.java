@@ -47,6 +47,7 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.LdapTemplate;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.DepartmentManager;
@@ -73,6 +74,19 @@ public class UserService extends ResourceService {
 	
 	private static String createUserDn(String parent, String id) {
 		return "uid=" + id + "," + parent;
+	}
+	
+	public String getChNameById(String id) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userMgr.findByName(id, sc);
+		if (userList != null && userList.size() > 0) {
+			return userList.get(0).getUsername();
+		} else {
+			return "";
+		}
 	}
 	
 	@POST
@@ -158,8 +172,10 @@ public class UserService extends ResourceService {
 	public User findById(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		
-		return userMgr.findById(id);
+		User user = userMgr.findById(id);
+		user.setDepartmentName(LdapTemplate.spiltNameInNamespace(id));
+		user.setDeptFullPath(id);
+		return user;
 	}
 	
 	@GET
@@ -211,18 +227,6 @@ public class UserService extends ResourceService {
 		//TODO
 		return UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(deptId));
 	}
-	
-//	@GET
-//	@Path("/syn_all_user")
-//	@Produces("application/json")
-//	public List<User> getAllUser() {
-//		LdapService ldapSvc = this.getLdapService();
-//		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-//		List<User> users = null;
-//		
-//		return null;
-//	}
-//	
 	
 	@PUT
 	@Path("/{id}/update_password")
@@ -381,18 +385,6 @@ public class UserService extends ResourceService {
 		}
 		return userVoList;
 	}
-	
-//	@POST
-//	@Path("/{id}")
-//	@Produces("application/json")
-//	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
-//		if(objAccount == null){
-//			throw new RuntimeException("用户名或密码不能为空");
-//		}else{
-//			objAccount.setUserFullPath(fullPath);
-//		}
-//		return objAccount;
-//	}	
 	
 	/**
 	 * 配置系统信息
