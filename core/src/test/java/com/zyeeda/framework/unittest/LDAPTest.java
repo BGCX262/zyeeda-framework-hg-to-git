@@ -168,14 +168,15 @@ public class LDAPTest {
 		LdapContext ctx = getLdapContext();
 		SearchControls sc = new SearchControls();
 		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
-		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=*)",
+		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(objectclass=employee)",
 				sc);
-		ModificationItem[] mods = new ModificationItem[3];
+		ModificationItem[] mods = new ModificationItem[2];
 		SearchResult rs = null;
 		while (results.hasMore()) {
 			String deptName = "";
 			rs = results.next();
 			String nameInNamespace = rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "");
+			System.out.println(nameInNamespace);
 			nameInNamespace = nameInNamespace.substring(nameInNamespace.indexOf(",") + 1, nameInNamespace.length());
 			String[] spilt = StringUtils.split(nameInNamespace, ",");
 			for (int i = spilt.length ; i > 0; i --) {
@@ -190,8 +191,8 @@ public class LDAPTest {
 				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 		   				   new BasicAttribute("deptFullPath", 
 		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
-				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
+//				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+//		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
 				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
 																	, mods);
 			}

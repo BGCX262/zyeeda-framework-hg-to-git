@@ -415,7 +415,7 @@ System.out.println("****************" + user.getDeptFullPath());
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "(|(uid=*" + condition + "*)(cn=*" + condition + "*))";
 			if ("*".equals(condition)) {
-				filter = "(|(uid=*)(cn=*))";
+				filter = "(objectclass=employee)";
 			}
 			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
 																	filter,
