@@ -1,5 +1,6 @@
 package com.zyeeda.framework.ws;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +12,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.managers.PermissionManager;
@@ -25,7 +29,7 @@ import com.zyeeda.framework.ws.base.ResourceService;
 public class AuthService extends ResourceService {
 
 	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
-
+	private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 	private final static String PERMISSION_FILE = "permission.xml";
 	public AuthService(@Context ServletContext ctx) {
 		super(ctx);
@@ -37,10 +41,10 @@ public class AuthService extends ResourceService {
 	public List<AuthVO> getPermissionById(@PathParam("id") String id,
 			@PathParam("role_id") String roleId)
 			throws XPathExpressionException, IOException {
-		RoleManager roleMgr = new DefaultRoleManager(this
-				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
 		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, PERMISSION_FILE);
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
 		Role role = roleMgr.find(roleId);
 		List<AuthVO> authVO = getAuthList(list, roleId, role
 				.getPermissionList());
@@ -92,8 +96,7 @@ public class AuthService extends ResourceService {
 		PermissionManager permissionMgr = new DefaultPermissionManager();
 		List<PermissionVo> list = permissionMgr.findSubPermissionById(id, ROAM_PERMISSION_FILE);
 		Role role = roleMgr.find(roleId);
-		List<AuthVO> authVO = getRaomAuthList(list, roleId, role
-				.getPermissionList());
+		List<AuthVO> authVO = getRaomAuthList(list, roleId, role.getRoamPermissionList());
 		return authVO;
 	}
 	
@@ -132,26 +135,42 @@ public class AuthService extends ResourceService {
 		return authList;
 	}
 	
+	@GET
+	@Path("/{id}/get_auth_to_tree/{roleId}")
+	@Produces("application/json")
+	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id, @PathParam("roleId") String roleId)
+			throws XPathExpressionException, IOException {
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
+		List<String> authList = new ArrayList<String>();
+		Role role = roleMgr.find(roleId);
+		if(role != null) {
+			authList = role.getRoamPermissionList();
+			logger.debug("this RoamPermissionList auth value is :", authList.size());
+		}
+		List<AuthVO> list = permissionMgr.getPermissionToTree(id, ROAM_PERMISSION_FILE, authList);
+		return list;
+	}
 	
 	
-	
-//	
-//	@GET
-//	@Path("/{id}/{role_id}")
-//	@Produces("application/json")
-//	public List<AuthVO> getRoamPermissionById(@PathParam("id") String id,
-//			@PathParam("role_id") String roleId)
-//			throws XPathExpressionException, IOException {
-//		RoleManager roleMgr = new DefaultRoleManager(this
-//				.getPersistenceService());
-//		PermissionManager permissionMgr = new DefaultPermissionManager();
-//		List<PermissionVo> list = permissionMgr.findSubPermissionById(id);
-//		Role role = roleMgr.find(roleId);
-//		List<AuthVO> authVO = getAuthList(list, roleId, role
-//				.getPermissionList());
-//		return authVO;
-//	}
-	
+	@GET
+	@Path("/{id}/get_permission_tree/{roleId}")
+	@Produces("application/json")
+	public List<AuthVO> getPermissionsById(@PathParam("id") String id, @PathParam("roleId") String roleId)
+			throws XPathExpressionException, IOException {
+		PermissionManager permissionMgr = new DefaultPermissionManager();
+		RoleManager roleMgr = new DefaultRoleManager(this
+				.getPersistenceService());
+		List<String> authList = new ArrayList<String>();
+		Role role = roleMgr.find(roleId);
+		if(role != null) {
+			 authList = role.getPermissionsList();
+			 logger.debug("this permission auth value is :", authList.size());
+		}
+		List<AuthVO> list = permissionMgr.getPermissionToTree(id, PERMISSION_FILE, authList);
+		return list;
+	}
 	
 
 }

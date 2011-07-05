@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -112,5 +113,6 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 
 		return out;
 	}
+
 	
 }
