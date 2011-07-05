@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 @Entity(name = "ZDA_SYS_USER")
 public class User/* extends SimpleDomainEntity*/ implements Serializable {
@@ -29,6 +30,7 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 	private String departmentName;
 	private String deptFullPath;
 	private String departmentNo;
+	private String selectedDeptFullPath;
 
 	@Id @Column(name = "F_ID")
 	public String getId() {
@@ -171,7 +173,18 @@ public class User/* extends SimpleDomainEntity*/ implements Serializable {
 	public String getDepartmentNo() {
 		return this.departmentNo;
 	}
+	
 	public void setDepartmentNo(String departmentNo) {
 		this.departmentNo = departmentNo;
 	}
+
+	@Transient
+	public String getSelectedDeptFullPath() {
+		return selectedDeptFullPath;
+	}
+
+	public void setSelectedDeptFullPath(String selectedDeptFullPath) {
+		this.selectedDeptFullPath = selectedDeptFullPath;
+	}
+	
  }

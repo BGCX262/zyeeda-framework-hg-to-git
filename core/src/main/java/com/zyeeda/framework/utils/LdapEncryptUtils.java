@@ -7,7 +7,6 @@ import java.security.NoSuchAlgorithmException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.digest.DigestUtils;
 
-@Deprecated
 public class LdapEncryptUtils {
 	
 	public static String md5Encode(String standardMd5) throws UnsupportedEncodingException {
@@ -21,7 +20,6 @@ public class LdapEncryptUtils {
 		return new String(base64.encode(ba), "UTF-8").trim();
 	}
 	
-	@SuppressWarnings("restriction")
 	public static boolean verifySHA(String ldapPw, String inputPw)
 			throws NoSuchAlgorithmException {
 
@@ -67,6 +65,6 @@ public class LdapEncryptUtils {
 	public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 		//e10adc3949ba59abbe56e057f20f883e
 		System.out.println(DigestUtils.md5Hex("admin"));
-		System.out.println(verifySHA("{SSHA}6GjgruydvdSc7zNuTKvSSzQgKFDEg/SuE4MqIg==", DigestUtils.md5Hex("111111")));
+		System.out.println(verifySHA("{SSHA}RphV6QRjgL1WMfCQOkpzwhHrXSUbpfAKnshKjA==", DigestUtils.md5Hex("111111")));
 	}
 }

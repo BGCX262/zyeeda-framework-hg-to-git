@@ -4,10 +4,16 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -54,6 +60,19 @@ public class LdapDepartmentManager implements DepartmentManager {
 		Attributes attrs = unmarshal(dept);
 		try {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
+//			if (dn.equals(dept.getParent()) || StringUtils.isBlank(dept.getParent())) {
+//				ldapTemplate.modifyAttributes(dn, attrs);
+//			} else {
+//				String newName = StringUtils.substring(dn, 0, dn.indexOf(",")) + 
+//									"," + dept.getParent();
+//				if (dn.equals(newName)) {
+//					ldapTemplate.modifyAttributes(dn, attrs);
+//				} else {
+//					ldapTemplate.rename(dn, newName);
+//				}
+//				dept.setId(newName);
+//				updateUserDeptFullPath();
+//			}
 			ldapTemplate.modifyAttributes(dn, attrs);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
@@ -176,10 +195,6 @@ public class LdapDepartmentManager implements DepartmentManager {
 		return dept;
 	}
 	
-	private LdapTemplate getLdapTemplate() throws NamingException {
-		return new LdapTemplate(this.ldapSvc.getLdapContext());
-	}
-
 	@Override
 	public List<Department> getRootAndSecondLevelDepartment()
 												throws UserPersistException {
@@ -261,8 +276,39 @@ public class LdapDepartmentManager implements DepartmentManager {
 		}
 	}
 	
+	private LdapTemplate getLdapTemplate() throws NamingException {
+		return new LdapTemplate(this.ldapSvc.getLdapContext());
+	}
 	
-	
+	public void updateUserDeptFullPath() throws NamingException {
+		LdapContext ctx = this.ldapSvc.getLdapContext();
+		SearchControls sc = new SearchControls();
+		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(uid=*)",
+				sc);
+		ModificationItem[] mods = new ModificationItem[2];
+		SearchResult rs = null;
+		while (results.hasMore()) {
+			String deptName = "";
+			rs = results.next();
+			String nameInNamespace = rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "");
+			nameInNamespace = nameInNamespace.substring(nameInNamespace.indexOf(",") + 1, nameInNamespace.length());
+			String[] spilt = StringUtils.split(nameInNamespace, ",");
+			for (int i = spilt.length ; i > 0; i --) {
+				deptName += StringUtils.substring(spilt[i -1], spilt[i -1].indexOf("=") + 1, spilt[i -1].length()) + "/";
+			}
+			deptName = deptName.substring(0, deptName.lastIndexOf("/"));
+			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
+				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+	   				   new BasicAttribute("deptName", deptName));
+				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("deptFullPath", 
+		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+						, mods);
+			}
+		}
+	}
 	
 	/*
 	private LdapTemplate getLdapTemplate(LinkedHashMap<String, Boolean> orderBy)

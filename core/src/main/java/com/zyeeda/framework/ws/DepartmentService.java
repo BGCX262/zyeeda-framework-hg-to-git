@@ -279,7 +279,6 @@ public class DepartmentService extends ResourceService {
 		return deptVoList;
 	}
 	
-	
 	public static DepartmentVo fillPropertiesToVoAndRole(Department dept) {
 		DepartmentVo deptVo = new DepartmentVo();
 		deptVo.setType("io");
@@ -293,7 +292,6 @@ public class DepartmentService extends ResourceService {
 		deptVo.setKind("dept");
 		return deptVo;
 	}
-
 	
 	public static List<DepartmentVo> fillPropertiesToVo(List<Department> deptList) {
 		List<DepartmentVo> deptVoList = new ArrayList<DepartmentVo>(deptList.size());
@@ -304,7 +302,6 @@ public class DepartmentService extends ResourceService {
 		}
 		return deptVoList;
 	}
-	
 	
 	@GET
 	@Path("root_and_second_level_dept")
@@ -470,7 +467,6 @@ public class DepartmentService extends ResourceService {
 			return deptList;
 	}
 	
-	
 	@GET
 	@Path("/{id}/children/{roleId}")
 	@Produces("application/json")
@@ -623,8 +619,6 @@ public class DepartmentService extends ResourceService {
 		return orgList;
 	}
 	
-	
-	
 	@GET
 	@Path("/{id}/children/for_user_combobox_dept_not_combobox")
 	@Produces("application/json")
@@ -659,6 +653,26 @@ public class DepartmentService extends ResourceService {
 		deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id), "task");
 		userVoList = UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(id));
 		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList, userVoList);
+		
+		return orgList;
+	}
+	
+	@GET
+	@Path("/dept_tree/{id}")
+	@Produces("application/json")
+	public List<OrganizationNodeVo> getDeptTree(@PathParam("id") String id)
+												throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		
+		LdapDepartmentManager deptMgr = new LdapDepartmentManager(ldapSvc);
+		List<DepartmentVo> deptVoList = null;
+		deptVoList = DepartmentService.fillPropertiesToVo(deptMgr.getChildrenById(id));
+		for (DepartmentVo deptVo : deptVoList) {
+			deptVo.setIo("/rest/depts/dept_tree/" + deptVo.getDeptFullPath());
+			deptVo.setType("check");
+		}
+		List<OrganizationNodeVo> orgList = this.mergeDepartmentVoAndUserVo(deptVoList,
+				                                                           new ArrayList<UserVo>());
 		
 		return orgList;
 	}

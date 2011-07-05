@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -12,8 +13,11 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.shiro.realm.ldap.LdapUtils;
 
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
@@ -24,8 +28,6 @@ import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
-
-	private static final String LDAP_DEFAULT_PASSWORD = "123456";
 
 	private LdapService ldapSvc;
 
@@ -58,15 +60,24 @@ public class LdapUserManager implements UserManager {
 
 	@Override
 	public void update(User user) throws UserPersistException {
+		LdapContext ctx = null;
 		try {
-			String dn = user.getDeptFullPath();
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String dn = user.getSelectedDeptFullPath();
 			Attributes attrs = LdapUserManager.unmarshal(user);
-			ldapTemplate.modifyAttributes(dn, attrs);
+			ctx = this.ldapSvc.getLdapContext();
+			if (!dn.equals(user.getDeptFullPath())) {
+				ctx.rename(dn, user.getDeptFullPath());
+				dn = user.getDeptFullPath();
+			}
+			ctx.modifyAttributes(dn, DirContext.REPLACE_ATTRIBUTE, attrs);
+			this.updateUserDeptFullPath();
+			user.setId(dn);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		} catch (UnsupportedEncodingException e) {
 			throw new UserPersistException(e);
+		} finally {
+			LdapUtils.closeContext(ctx);
 		}
 	}
 
@@ -293,8 +304,6 @@ public class LdapUserManager implements UserManager {
 
 		if (StringUtils.isNotBlank(user.getPassword())) {
 			attrs.put("userPassword", user.getPassword());
-		} else {
-			attrs.put("userPassword", LDAP_DEFAULT_PASSWORD);
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -404,7 +413,7 @@ public class LdapUserManager implements UserManager {
 			LdapTemplate ldapTemplate = this.getLdapTemplate();
 			String filter = "(|(uid=*" + condition + "*)(cn=*" + condition + "*))";
 			if ("*".equals(condition)) {
-				filter = "(|(uid=*)(cn=*))";
+				filter = "(objectclass=employee)";
 			}
 			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
 																	filter,
@@ -420,6 +429,47 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
+		}
+	}
+
+	@Override
+	public void rename(String oldName, String newName) throws UserPersistException {
+		LdapTemplate ldapTemplate;
+		try {
+			ldapTemplate = this.getLdapTemplate();
+			ldapTemplate.rename(oldName, newName);
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		}
+	}
+	
+	public void updateUserDeptFullPath() throws NamingException {
+		LdapContext ctx = this.ldapSvc.getLdapContext();
+		SearchControls sc = new SearchControls();
+		sc.setSearchScope(SearchControls.SUBTREE_SCOPE);
+		NamingEnumeration<SearchResult> results = ctx.search("o=广州局", "(objectclass=employee)",
+				sc);
+		ModificationItem[] mods = new ModificationItem[2];
+		SearchResult rs = null;
+		while (results.hasMore()) {
+			String deptName = "";
+			rs = results.next();
+			String nameInNamespace = rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "");
+			nameInNamespace = nameInNamespace.substring(nameInNamespace.indexOf(",") + 1, nameInNamespace.length());
+			String[] spilt = StringUtils.split(nameInNamespace, ",");
+			for (int i = spilt.length ; i > 0; i --) {
+				deptName += StringUtils.substring(spilt[i -1], spilt[i -1].indexOf("=") + 1, spilt[i -1].length()) + "/";
+			}
+			deptName = deptName.substring(0, deptName.lastIndexOf("/"));
+			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
+				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+	   				   new BasicAttribute("deptName", deptName));
+				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
+		   				   new BasicAttribute("deptFullPath", 
+		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
+						, mods);
+			}
 		}
 	}
 
