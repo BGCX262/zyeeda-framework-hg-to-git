@@ -34,5 +34,4 @@ public interface UserManager {
 	
 	public String findStationDivisionByCreator(String creator) throws UserPersistException;
 
-	
 }
