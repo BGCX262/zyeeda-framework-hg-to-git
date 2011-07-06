@@ -1,12 +1,9 @@
 package com.zyeeda.framework.ws;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.naming.directory.SearchControls;
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -21,14 +18,12 @@ import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.entities.User;
-import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.PermissionManager;
 import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.UserManager;
@@ -359,32 +354,7 @@ public class RoleService extends ResourceService{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String creator = this.getSecurityService().getCurrentUser();
 		UserManager userManager = new LdapUserManager(this.getLdapService());
-		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
-		List<User> userList = userManager.findByName(creator, sc);
-		List<String> siteDeptList = new ArrayList<String>();
-		siteDeptList.add("广州站");
-		siteDeptList.add("宝安站");
-		siteDeptList.add("福山站");
-		siteDeptList.add("肇庆站");
-		siteDeptList.add("花都站");
-		siteDeptList.add("隧东站");
-		String subStationName = null;
-		if (userList != null && userList.size() > 0) {
-			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
-				String fullPath = userList.get(0).getDeptFullPath();
-				String[] spilt = StringUtils.split(fullPath, ",");
-				for (int i = 0; i < spilt.length; i++) {
-					if (spilt[i].indexOf("=") != -1) {
-						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
-								.indexOf("=") + 1, spilt[i].length());
-						if (siteDeptList.contains(spilt[i])) {
-							subStationName = spilt[i];
-							break;
-						}
-					}
-				}
-			}
-		}
+		String subStationName = userManager.findStationDivisionByCreator(creator);
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		Search search = new Search();
 		search.addFilterEqual("name", "当班值-值长");
@@ -392,7 +362,7 @@ public class RoleService extends ResourceService{
 		List<Role> roleList = roleMgr.search(search);
 		for(Role role : roleList){
 			if(role.getName() != null && role.getDeptepment() != null && subStationName != null) {
-				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+				if(role.getName().equals("当班值-值长") && role.getDeptepment().equals(subStationName)){
 					for(String user : role.getSubjects()){
 						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
 						User userId = userMgr.findById(user);
@@ -425,32 +395,7 @@ public class RoleService extends ResourceService{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		String creator = this.getSecurityService().getCurrentUser();
 		UserManager userManager = new LdapUserManager(this.getLdapService());
-		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
-		List<User> userList = userManager.findByName(creator, sc);
-		List<String> siteDeptList = new ArrayList<String>();
-		siteDeptList.add("广州站");
-		siteDeptList.add("宝安站");
-		siteDeptList.add("福山站");
-		siteDeptList.add("肇庆站");
-		siteDeptList.add("花都站");
-		siteDeptList.add("隧东站");
-		String subStationName = null;
-		if (userList != null && userList.size() > 0) {
-			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
-				String fullPath = userList.get(0).getDeptFullPath();
-				String[] spilt = StringUtils.split(fullPath, ",");
-				for (int i = 0; i < spilt.length; i++) {
-					if (spilt[i].indexOf("=") != -1) {
-						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
-								.indexOf("=") + 1, spilt[i].length());
-						if (siteDeptList.contains(spilt[i])) {
-							subStationName = spilt[i];
-							break;
-						}
-					}
-				}
-			}
-		}
+		String subStationName = userManager.findStationDivisionByCreator(creator);
 		logger.debug("this substationName value is : ", subStationName);
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
 		Search search = new Search();

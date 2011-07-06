@@ -20,7 +20,6 @@ public class DefaultMenuManager implements MenuManager {
 	private final static String PERMISSION_FILE = "permission.xml";
 
 
-	@SuppressWarnings("unchecked")
 	public List<MenuVo> getMenuListByPermissionAuth(List<String> authList)
 			throws XPathExpressionException, IOException {
 		

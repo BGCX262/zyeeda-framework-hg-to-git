@@ -4,7 +4,9 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
@@ -12,9 +14,9 @@ import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.commons.lang.StringUtils;
-
 import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.ldap.LdapService;
 import com.zyeeda.framework.ldap.LdapTemplate;
@@ -25,8 +27,6 @@ import com.zyeeda.framework.utils.DatetimeUtils;
 
 public class LdapUserManager implements UserManager {
 
-	private static final String LDAP_DEFAULT_PASSWORD = "123456";
-
 	private LdapService ldapSvc;
 
 	public LdapUserManager(LdapService ldapSvc) {
@@ -35,45 +35,66 @@ public class LdapUserManager implements UserManager {
 
 	@Override
 	public void persist(User user) throws UserPersistException {
+		LdapTemplate ldapTemplate = null;
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate = this.getLdapTemplate();
 			Attributes attrs = LdapUserManager.unmarshal(user);
 			ldapTemplate.bind(user.getDeptFullPath(), attrs);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		} catch (UnsupportedEncodingException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 
 	@Override
 	public void remove(String id) throws UserPersistException {
+		LdapTemplate ldapTemplate = null;
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate = this.getLdapTemplate();
 			ldapTemplate.unbind(id, true);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 
 	@Override
 	public void update(User user) throws UserPersistException {
+		LdapTemplate ldapTemplate = null;
 		try {
-			String dn = user.getDeptFullPath();
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			String dn = user.getSelectedDeptFullPath();
 			Attributes attrs = LdapUserManager.unmarshal(user);
+			ldapTemplate = this.getLdapTemplate();
+			if (!dn.equals(user.getDeptFullPath())) {
+				ldapTemplate.rename(dn, user.getDeptFullPath());
+				dn = user.getDeptFullPath();
+			}
 			ldapTemplate.modifyAttributes(dn, attrs);
+			user.setId(dn);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
 		} catch (UnsupportedEncodingException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 
 	@Override
 	public User findById(String id) throws UserPersistException {
+		LdapTemplate ldapTemplate = null;
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate = this.getLdapTemplate();
 			Attributes attrs = ldapTemplate.findByDn(id);
 			User user = LdapUserManager.marshal(attrs);
 			return user;
@@ -81,14 +102,19 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 	
 	public Integer getChildrenCountById(String id,
 									    String filter)
 								   throws UserPersistException {
+		LdapTemplate ldapTemplate = null;
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate = this.getLdapTemplate();
 			SearchControls sc = SearchControlsFactory.getSearchControls(
 											SearchControls.ONELEVEL_SCOPE);
 			List<Attributes> attrsList = ldapTemplate.getResultList(id,
@@ -98,6 +124,10 @@ public class LdapUserManager implements UserManager {
 			return attrsList.size();
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 
@@ -114,22 +144,21 @@ public class LdapUserManager implements UserManager {
 										 SearchControls sc)
 									throws UserPersistException {
 		List<User> userList = null;
+		LdapTemplate ldapTemplate = null;
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate = this.getLdapTemplate();
 			if ("root".equals(id)) {
 				id = "";
 			}
-			List<Attributes> attrsList = ldapTemplate.getResultList(id,
-															 		"(uid=*)",
-															 		sc);
-			userList = new ArrayList<User>(attrsList.size());
-			for (Attributes attrs : attrsList) {
-				User user = LdapUserManager.marshal(attrs);
-				if (StringUtils.isNotBlank(id)) {
-					user.setDeptFullPath("uid=" + user.getId() + "," + id);
-				} else {
-					user.setDeptFullPath("uid=" + user.getId());
-				}
+			NamingEnumeration<SearchResult> ne = ldapTemplate.getSearchResult(id,
+															 				  "(objectclass=employee)",
+															 		          sc);
+			Map<String, Attributes> map = ldapTemplate.searchResultToMap(ne);
+			userList = new ArrayList<User>(map.keySet().size());
+			for (String key : map.keySet()) {
+				User user = LdapUserManager.marshal(map.get(key));
+				user.setDeptFullPath(key);
+				user.setDepartmentName(LdapTemplate.spiltNameInNamespace(key));
 				userList.add(user);
 			}
 			return userList;
@@ -137,6 +166,10 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 
@@ -153,16 +186,19 @@ public class LdapUserManager implements UserManager {
 							     SearchControls sc) 
 							 throws UserPersistException {
 		List<User> userList = null;
+		LdapTemplate ldapTemplate = null;
 
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			List<Attributes> attrsList = ldapTemplate.getResultList("",
-																    "(uid=" + name + ")",
-																    sc);
-			userList = new ArrayList<User>();
-			
-			for (Attributes attrs : attrsList) {
-				User user = LdapUserManager.marshal(attrs);
+			ldapTemplate = this.getLdapTemplate();
+			NamingEnumeration<SearchResult> ne = ldapTemplate.getSearchResult("",
+																			  "(uid=" + name + ")",
+															 		          sc);
+			Map<String, Attributes> map = ldapTemplate.searchResultToMap(ne);
+			userList = new ArrayList<User>(map.keySet().size());
+			for (String key : map.keySet()) {
+				User user = LdapUserManager.marshal(map.get(key));
+				user.setDeptFullPath(key);
+				user.setDepartmentName(LdapTemplate.spiltNameInNamespace(key));
 				userList.add(user);
 			}
 			return userList;
@@ -170,12 +206,17 @@ public class LdapUserManager implements UserManager {
 			throw new UserPersistException(e);
 		} catch (ParseException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 	
 	public void updatePassword(String id, String password) throws UserPersistException {
+		LdapTemplate ldapTemplate = null;
 		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
+			ldapTemplate = this.getLdapTemplate();
 			ModificationItem[] mods = new ModificationItem[1];
 			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 					      				   new BasicAttribute("userPassword", password));
@@ -183,6 +224,10 @@ public class LdapUserManager implements UserManager {
 			ldapTemplate.modifyAttributes(id, mods);
 		} catch (NamingException e) {
 			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
 		}
 	}
 	
@@ -208,76 +253,6 @@ public class LdapUserManager implements UserManager {
 		}
 	}
 	
-	private void setVisible(Boolean visible, String... ids)
-									   throws NamingException,
-									          ParseException {
-		ModificationItem[] mods = new ModificationItem[1];
-		LdapTemplate ldapTemplate = this.getLdapTemplate();
-		for (String dn : ids) {
-			mods = new ModificationItem[1];
-			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-										   new BasicAttribute("status", visible.toString()));
-			ldapTemplate.modifyAttributes(dn, mods);
-		}
-	}
-	
-//	@Override
-//	public List<User> getUserListByDepartmentId(String id, String type)
-//			throws NamingException {
-//		LdapContext ctx = null;
-//		NamingEnumeration<SearchResult> ne = null;
-//		List<User> userList = null;
-//		logger.debug("the value of the id is = {}  ", id);
-//
-//		try {
-//			ctx = this.ldapSvc.getLdapContext();
-//			ne = ctx.search(id, "(uid=*)", this.getOneLevelScopeSearchControls());
-//
-//			SearchResult entry = null;
-//			userList = new ArrayList<User>();
-//			for (; ne.hasMore();) {
-//				entry = ne.next();
-//				User user = new User();
-//				Attributes attr = entry.getAttributes();
-//
-//				user.setUsername((String) attr.get("cn").get());
-//				user.setId((String) attr.get("uid").get());
-//				user.setPassword(new String((byte[]) attr.get("userPassword").get()));
-//				user.setDeptFullPath(id);
-//
-////				UserVo userVo = this.fillUserPropertiesToVo(user);
-////				userVo.setType(type);
-//				userList.add(user);
-//			}
-//			return userList;
-//		} finally {
-//			LdapUtils.closeEnumeration(ne);
-//			LdapUtils.closeContext(ctx);
-//		}
-//	}
-	
-	//add for upload photo
-//	private static byte[] getBytesFromFile(File file) throws IOException {
-//		InputStream is = new FileInputStream(file);
-//        long length = file.length();
-//        if (length > Integer.MAX_VALUE) {
-//        	throw new IOException("File is to large "+file.getName());
-//        }
-//        byte[] bytes = new byte[(int)length];
-//        int offset = 0;
-//        int numRead = 0;
-//
-//        while (offset < bytes.length
-//        		&& (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
-//            offset += numRead;
-//        }
-//        if (offset < bytes.length) {
-//            throw new IOException("Could not completely read file "+file.getName());
-//        }
-//        is.close();
-//        return bytes;
-//	}
-	
 	public static Attributes unmarshal(User user) throws UnsupportedEncodingException {
 		Attributes attrs = new BasicAttributes();
 
@@ -287,14 +262,15 @@ public class LdapUserManager implements UserManager {
 		attrs.put("objectClass", "inetOrgPerson");
 		attrs.put("objectClass", "employee");
 
-		attrs.put("cn", user.getUsername());
-		attrs.put("sn", user.getUsername());
-		attrs.put("uid", user.getId());
-
+		if (StringUtils.isNotBlank(user.getUsername())) {
+			attrs.put("cn", user.getUsername());
+			attrs.put("sn", user.getUsername());
+		}
+		if (StringUtils.isNotBlank(user.getId())) {
+			attrs.put("uid", user.getId());
+		}
 		if (StringUtils.isNotBlank(user.getPassword())) {
 			attrs.put("userPassword", user.getPassword());
-		} else {
-			attrs.put("userPassword", LDAP_DEFAULT_PASSWORD);
 		}
 		if (StringUtils.isNotBlank(user.getGender())) {
 			attrs.put("gender", user.getGender());
@@ -336,8 +312,12 @@ public class LdapUserManager implements UserManager {
 	public static User marshal(Attributes attrs) throws NamingException,
 														 ParseException {
 		User user = new User();
-		user.setUsername((String) attrs.get("sn").get());
-		user.setId((String) attrs.get("uid").get());
+		if (attrs.get("sn") != null) {
+			user.setUsername((String) attrs.get("sn").get());
+		}
+		if (attrs.get("uid") != null) {
+			user.setId((String) attrs.get("uid").get());
+		}
 		if (attrs.get("userPassword") != null) {
 			user.setPassword(new String((byte[]) attrs.get("userPassword").get()));
 		}
@@ -369,13 +349,67 @@ public class LdapUserManager implements UserManager {
 			user.setPostStatus(new Boolean(attrs.get("postStatus").get().toString()));
 		}
 		if (attrs.get("deptName") != null) {
-			user.setDepartmentName(attrs.get("deptName").get().toString());
+			user.setDepartmentName(LdapTemplate.spiltNameInNamespace(attrs.get("deptName").get().toString()));
 		}
 		if (attrs.get("deptFullPath") != null) {
 			user.setDeptFullPath(attrs.get("deptFullPath").get().toString());
 		}
 		
 		return user;
+	}
+	
+	private LdapTemplate getLdapTemplate() throws NamingException {
+		return new LdapTemplate(this.ldapSvc.getLdapContext());
+	}
+
+	@Override
+	public List<User> search(String condition) throws UserPersistException {
+		List<User> userList = null;
+		LdapTemplate ldapTemplate = null;
+		try {
+			ldapTemplate = this.getLdapTemplate();
+			String filter = "(|(uid=*" + condition + "*)(cn=*" + condition + "*))";
+			if ("*".equals(condition)) {
+				filter = "(objectclass=employee)";
+			}
+			SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
+			NamingEnumeration<SearchResult> ne = ldapTemplate.getSearchResult("",
+																			  filter,
+															 		          sc);
+			Map<String, Attributes> map = ldapTemplate.searchResultToMap(ne);
+			userList = new ArrayList<User>(map.keySet().size());
+			for (String key : map.keySet()) {
+				User user = LdapUserManager.marshal(map.get(key));
+				user.setDeptFullPath(key);
+				user.setDepartmentName(LdapTemplate.spiltNameInNamespace(key));
+				userList.add(user);
+			}
+			return userList;
+		} catch (NamingException e) {
+			throw new UserPersistException(e);
+		} catch (ParseException e) {
+			throw new UserPersistException(e);
+		} finally {
+			if (ldapTemplate != null) {
+				ldapTemplate.closeLdapContext();
+			}
+		}
+	}
+	
+	private void setVisible(Boolean visible, String... ids)
+									throws NamingException, 
+									       ParseException {
+		ModificationItem[] mods = new ModificationItem[1];
+		LdapTemplate ldapTemplate = this.getLdapTemplate();
+		for (String dn : ids) {
+			mods = new ModificationItem[1];
+			mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE,
+					  new BasicAttribute("status", visible.toString()));
+			ldapTemplate.modifyAttributes(dn, mods);
+		}
+		if (ldapTemplate != null) {
+			ldapTemplate.closeLdapContext();
+		}
 	}
 	
 	/*
@@ -391,36 +425,38 @@ public class LdapUserManager implements UserManager {
 		return new LdapTemplate(ctx);
 	}
 	*/
-	
-	private LdapTemplate getLdapTemplate() throws NamingException {
-		return new LdapTemplate(this.ldapSvc.getLdapContext());
-	}
 
 	@Override
-	public List<User> search(String condition) throws UserPersistException {
-		List<User> userList = null;
-
-		try {
-			LdapTemplate ldapTemplate = this.getLdapTemplate();
-			String filter = "(|(uid=*" + condition + "*)(cn=*" + condition + "*))";
-			if ("*".equals(condition)) {
-				filter = "(|(uid=*)(cn=*))";
+	public String findStationDivisionByCreator(String creator) throws UserPersistException {
+		UserManager userManager = new LdapUserManager(this.ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userManager.findByName(creator, sc);
+		String subStation = null;
+		List<String> siteDeptList = new ArrayList<String>();
+		siteDeptList.add("广州站");
+		siteDeptList.add("宝安站");
+		siteDeptList.add("福山站");
+		siteDeptList.add("肇庆站");
+		siteDeptList.add("花都站");
+		siteDeptList.add("隧东站");
+		if (userList != null && userList.size() > 0) {
+			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
+				String fullPath = userList.get(0).getDeptFullPath();
+				String[] spilt = StringUtils.split(fullPath, ",");
+				for (int i = 0; i < spilt.length; i++) {
+					if (spilt[i].indexOf("=") != -1) {
+						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
+								.indexOf("=") + 1, spilt[i].length());
+						if (siteDeptList.contains(spilt[i])) {
+							subStation = spilt[i];
+							return subStation;
+							//setDefect.setStationDivision(subStation);
+						}
+					}
+				}
 			}
-			List<Attributes> attrsList = ldapTemplate.getResultList("o=广州局",
-																	filter,
-																    SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE));
-			userList = new ArrayList<User>();
-			
-			for (Attributes attrs : attrsList) {
-				User user = LdapUserManager.marshal(attrs); 
-				userList.add(user);
-			}
-			return userList;
-		} catch (NamingException e) {
-			throw new UserPersistException(e);
-		} catch (ParseException e) {
-			throw new UserPersistException(e);
 		}
+		return null;
 	}
 	
 }

@@ -31,4 +31,7 @@ public interface UserManager {
 	public void disable(String... ids) throws UserPersistException;
 
 	public List<User> findByDepartmentId(String id, SearchControls sc) throws UserPersistException;
+	
+	public String findStationDivisionByCreator(String creator) throws UserPersistException;
+
 }

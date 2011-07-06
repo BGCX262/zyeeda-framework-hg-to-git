@@ -48,12 +48,13 @@ public class DefaultActionHistoryManager extends DomainEntityManager<ActionHisto
 //		return this.search(search);
 //	}
 	
+	@SuppressWarnings("unchecked")
 	public List<Long> findListByProcessCreator(String name){
 		String sql = "select distinct f_process_ins_id  FROM ZDA_SYS_ACTION_HISTORY where f_creator = ?";
 		Query query  =  this.em().createNativeQuery(sql);
 		query.setParameter(1, name);
 		List<Long> longList = new ArrayList<Long>();
-		List<BigDecimal> list = query.getResultList();
+		List<BigDecimal> list = (List<BigDecimal>)query.getResultList();
 		for(int i = 0; i < list.size(); i ++) {
 			BigDecimal b = (BigDecimal) list.get(i);
 			Long longId = b.longValue();
