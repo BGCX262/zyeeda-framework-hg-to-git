@@ -96,4 +96,11 @@ public class DefaultUserManager extends DomainEntityManager<User, String>
 			throws UserPersistException {
 		return null;
 	}
+
+	@Override
+	public String findStationDivisionByCreator(String creator)
+			throws UserPersistException {
+		return null;
+	}
+
 }

@@ -3,7 +3,6 @@ package com.zyeeda.framework.ws;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +46,7 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.LdapTemplate;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.DepartmentManager;
@@ -57,7 +57,6 @@ import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
-import com.zyeeda.framework.utils.LdapEncryptUtils;
 import com.zyeeda.framework.viewmodels.AccountVo;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
@@ -73,6 +72,19 @@ public class UserService extends ResourceService {
 	
 	private static String createUserDn(String parent, String id) {
 		return "uid=" + id + "," + parent;
+	}
+	
+	public String getChNameById(String id) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userMgr.findByName(id, sc);
+		if (userList != null && userList.size() > 0) {
+			return userList.get(0).getUsername();
+		} else {
+			return "";
+		}
 	}
 	
 	@POST
@@ -122,7 +134,10 @@ public class UserService extends ResourceService {
 	@PUT
 	@Path("/{id}")
 	@Produces("application/json")
-	public User update(@FormParam("") User user, @PathParam("id") String id) throws UserPersistException {
+	public User update(@FormParam("") User user,
+					   @PathParam("id") String id,
+					   @FormParam("selectedDeptFullPath") String selectedDeptFullPath)
+				throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		UserSyncService userSyncService = this.getUserSynchService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
@@ -131,9 +146,11 @@ public class UserService extends ResourceService {
 		if (!uid.equals(user.getId())) {
 			throw new RuntimeException("不能修改账号");
 		} else {
-			user.setDeptFullPath(id);
+			user.setSelectedDeptFullPath(id);
+			String newName = "uid=" + uid + "," + selectedDeptFullPath;
+			user.setDeptFullPath(newName);
 			userMgr.update(user);
-			User u = userMgr.findById(id);
+			User u = userMgr.findById(user.getId());
 			if (u != null) {
 				logger.info("this user pwd id is {}", u.getPassword());
 				user.setPassword(u.getPassword());
@@ -142,6 +159,7 @@ public class UserService extends ResourceService {
 				logger.info("this user pwd id = {}", user.getPassword());
 				userSyncService.persist(user);
 			}
+			user = userMgr.findById(user.getId());
 			return user;
 		}
 	}
@@ -152,8 +170,10 @@ public class UserService extends ResourceService {
 	public User findById(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		
-		return userMgr.findById(id);
+		User user = userMgr.findById(id);
+		user.setDepartmentName(LdapTemplate.spiltNameInNamespace(id));
+		user.setDeptFullPath(id);
+		return user;
 	}
 	
 	@GET
@@ -206,18 +226,6 @@ public class UserService extends ResourceService {
 		return UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(deptId));
 	}
 	
-	@GET
-	@Path("/syn_all_user")
-	@Produces("application/json")
-	public List<User> getAllUser() {
-		LdapService ldapSvc = this.getLdapService();
-		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		List<User> users = null;
-		
-		return null;
-	}
-	
-	
 	@PUT
 	@Path("/{id}/update_password")
 	@Produces("application/json")
@@ -225,19 +233,16 @@ public class UserService extends ResourceService {
 							   @FormParam("oldPassword") String oldPassword,
 							   @FormParam("newPassword") String newPassword)
 						  throws UserPersistException,
-						  		 UnsupportedEncodingException,
-						  		 NoSuchAlgorithmException {
+						  		 NoSuchAlgorithmException, NamingException, IOException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		String ldapPw = u.getPassword();
 		String inputPw = oldPassword;
-		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
-			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
-				userMgr.updatePassword(id, newPassword);
-			}
-		} else {
+		try {
+			ldapSvc.getLdapContext(u.getId(), inputPw);
+			userMgr.updatePassword(id, newPassword);
+		} catch (Exception e) {
 			throw new RuntimeException("旧密码输入错误");
 		}
 		return userMgr.findById(id);
@@ -331,7 +336,7 @@ public class UserService extends ResourceService {
 	public static UserVo fillUserPropertiesToVo(User user) {
 		UserVo userVo = new UserVo();
 		userVo.setId(user.getId());
-		userVo.setType("task");
+		userVo.setType("io");
 		userVo.setLabel(user.getUsername());
 		userVo.setCheckName(user.getUsername());
 		userVo.setLeaf(true);
@@ -375,18 +380,6 @@ public class UserService extends ResourceService {
 		}
 		return userVoList;
 	}
-	
-//	@POST
-//	@Path("/{id}")
-//	@Produces("application/json")
-//	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
-//		if(objAccount == null){
-//			throw new RuntimeException("用户名或密码不能为空");
-//		}else{
-//			objAccount.setUserFullPath(fullPath);
-//		}
-//		return objAccount;
-//	}	
 	
 	/**
 	 * 配置系统信息
@@ -498,7 +491,6 @@ public class UserService extends ResourceService {
 	@Path("/systemUsers/{uid}/{systemName}")
 	@Produces("application/json")
 	public Map<String, Object> mockSignIn(@PathParam("uid") String uid,@PathParam("systemName") String systemName) throws UserPersistException{
-		logger.debug(")))))))))))))uid = {} and systemName = {}", uid, systemName);
 		LdapService ldapSvc = this.getLdapService();
 		AccountManager objAccountManager = new SystemAccountManager(ldapSvc);
 		
@@ -597,4 +589,5 @@ public class UserService extends ResourceService {
 		userVo.setKind("user");
 		return userVo;
 	}
+	
 }

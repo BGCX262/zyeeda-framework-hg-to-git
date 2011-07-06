@@ -1,12 +1,9 @@
 package com.zyeeda.framework.ws;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.naming.directory.SearchControls;
 import javax.servlet.ServletContext;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -21,14 +18,12 @@ import javax.ws.rs.core.Context;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Role;
 import com.zyeeda.framework.entities.User;
-import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.PermissionManager;
 import com.zyeeda.framework.managers.RoleManager;
 import com.zyeeda.framework.managers.UserManager;
@@ -78,7 +73,7 @@ public class RoleService extends ResourceService{
 	}
 	
 	@GET
-	@Path("/getAllRoles")
+	@Path("/getAllRoles")//TODO;
 	@Produces("application/json")
 	public List<Role> getRoles() {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
@@ -189,7 +184,7 @@ public class RoleService extends ResourceService{
 		String name = role.getName();
 		Search search = new Search();
 		search.addFilterEqual("name", name);
-		
+		search.addFilterEqual("deptepment", role.getDeptepment());
 		List<Role> list = roleMgr.search(search);
 		if (list.size() > 0) {
 			return null;
@@ -249,9 +244,6 @@ public class RoleService extends ResourceService{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
 		Role newRole = roleMgr.find(id);
 		String authArray =  role.getPermissions();
-//		String[] str = role.getPermissions().split(";");
-//		List<String> authList = CollectionUtils.asList(str);
-//		String authArray = permissionMgr.getParentPermissionListAuthByList(authList, PERMISSION_FILE);
 		String auth = newRole.getPermissions();
 		if(StringUtils.isBlank(auth)){
 			newRole.setPermissions(authArray); 
@@ -275,13 +267,9 @@ public class RoleService extends ResourceService{
 	public Role assignroamRoleAuth(@PathParam("id") String id,
 			@FormParam("") Role role) throws XPathExpressionException, IOException {
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		//PermissionManager permissionMgr = new DefaultPermissionManager();
 		Role newRole = roleMgr.find(id);
 		String authArray =  role.getRamoPermissions();
 		logger.debug("this ramoPermissions is : {}", role.getRamoPermissions());
-//		String[] str = role.getRamoPermissions().split(";");
-//		List<String> authList = CollectionUtils.asList(str);
-//		String authArray = permissionMgr.getParentPermissionListAuthByList(authList,ROAM_PERMISSION_FILE);
 		String auth = newRole.getPermissions();
 		if(StringUtils.isBlank(auth)) {
 			String menuPermission =   "&" + authArray;
@@ -364,41 +352,17 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public Set<UserVo>  getAllSubUser() throws UserPersistException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String userName = this.getSecurityService().getCurrentUser();
-		List<Role> roleList = roleMgr.getRoleBySubject(userName);
 		String creator = this.getSecurityService().getCurrentUser();
 		UserManager userManager = new LdapUserManager(this.getLdapService());
-		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
-		List<User> userList = userManager.findByName(creator, sc);
-		List<String> siteDeptList = new ArrayList<String>();
-		siteDeptList.add("广州站");
-		siteDeptList.add("宝安站");
-		siteDeptList.add("福山站");
-		siteDeptList.add("肇庆站");
-		siteDeptList.add("花都站");
-		siteDeptList.add("隧东站");
-		String subStationName = null;
-		if (userList != null && userList.size() > 0) {
-			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
-				String fullPath = userList.get(0).getDeptFullPath();
-				String[] spilt = StringUtils.split(fullPath, ",");
-				for (int i = 0; i < spilt.length; i++) {
-					if (spilt[i].indexOf("=") != -1) {
-						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
-								.indexOf("=") + 1, spilt[i].length());
-						if (siteDeptList.contains(spilt[i])) {
-							subStationName = spilt[i];
-							break;
-						}
-					}
-				}
-			}
-		}
-		//List<String> subjectList = new ArrayList<String>();
+		String subStationName = userManager.findStationDivisionByCreator(creator);
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
+		Search search = new Search();
+		search.addFilterEqual("name", "当班值-值长");
+		search.addFilterEqual("deptepment", subStationName);
+		List<Role> roleList = roleMgr.search(search);
 		for(Role role : roleList){
-			if(role.getName() != null && role.getDeptepment() != null) {
-				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
+			if(role.getName() != null && role.getDeptepment() != null && subStationName != null) {
+				if(role.getName().equals("当班值-值长") && role.getDeptepment().equals(subStationName)){
 					for(String user : role.getSubjects()){
 						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
 						User userId = userMgr.findById(user);
@@ -429,41 +393,17 @@ public class RoleService extends ResourceService{
 	@Produces("application/json")
 	public Set<UserVo>  getAllNotSubUser() throws UserPersistException{
 		RoleManager roleMgr = new DefaultRoleManager(this.getPersistenceService());
-		String userName = this.getSecurityService().getCurrentUser();
-		List<Role> roleList = roleMgr.getRoleBySubject(userName);
 		String creator = this.getSecurityService().getCurrentUser();
 		UserManager userManager = new LdapUserManager(this.getLdapService());
-		SearchControls sc = SearchControlsFactory.getSearchControls(SearchControls.SUBTREE_SCOPE);
-		List<User> userList = userManager.findByName(creator, sc);
-		List<String> siteDeptList = new ArrayList<String>();
-		siteDeptList.add("广州站");
-		siteDeptList.add("宝安站");
-		siteDeptList.add("福山站");
-		siteDeptList.add("肇庆站");
-		siteDeptList.add("花都站");
-		siteDeptList.add("隧东站");
-		String subStationName = null;
-		if (userList != null && userList.size() > 0) {
-			if (StringUtils.isNotBlank(userList.get(0).getDeptFullPath())) {
-				String fullPath = userList.get(0).getDeptFullPath();
-				String[] spilt = StringUtils.split(fullPath, ",");
-				for (int i = 0; i < spilt.length; i++) {
-					if (spilt[i].indexOf("=") != -1) {
-						spilt[i] = StringUtils.substring(spilt[i], spilt[i]
-								.indexOf("=") + 1, spilt[i].length());
-						if (siteDeptList.contains(spilt[i])) {
-							subStationName = spilt[i];
-							break;
-						}
-					}
-				}
-			}
-		}
+		String subStationName = userManager.findStationDivisionByCreator(creator);
 		logger.debug("this substationName value is : ", subStationName);
-		//List<String> subjectList = new ArrayList<String>();
 		Set<UserVo> userNameVoList = new HashSet<UserVo>();
+		Search search = new Search();
+		search.addFilterEqual("name", "当班值-值班员");
+		search.addFilterEqual("deptepment", subStationName);
+		List<Role> roleList = roleMgr.search(search);
 		for(Role role : roleList){
-			if(role.getName() != null && role.getDeptepment() != null) {
+			if(role.getName() != null && role.getDeptepment() != null && subStationName != null) {
 				if("当班值-值班员".equals(role.getName()) && subStationName.equals(role.getDeptepment())){
 					for(String user : role.getSubjects()){
 						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
