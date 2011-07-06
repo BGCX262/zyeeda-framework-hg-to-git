@@ -1,8 +1,6 @@
 package com.zyeeda.framework.ws;
 
-import java.util.Collections;
 import java.util.List;
-
 
 import javax.servlet.ServletContext;
 import javax.ws.rs.FormParam;
@@ -14,12 +12,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
-import com.googlecode.genericdao.search.Filter;
 import com.googlecode.genericdao.search.Search;
 import com.zyeeda.framework.entities.Dictionary;
 import com.zyeeda.framework.managers.DictionaryManager;
 import com.zyeeda.framework.managers.internal.DefaultDictionaryManager;
-import com.zyeeda.framework.utils.MenuListComparator;
 import com.zyeeda.framework.ws.base.ResourceService;
 
 @Path("/dicts")
