@@ -5,8 +5,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "document")
 public class DocumentVo {
 
-	private static final long serialVersionUID = 6753120023803767202L;
-	
 	private String id;
 	private String fileName;
 	private long fileSize;
