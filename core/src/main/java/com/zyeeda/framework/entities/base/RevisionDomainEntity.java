@@ -15,7 +15,7 @@ public class RevisionDomainEntity extends SimpleDomainEntity {
     private Date lastModifiedTime;
     
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "F_CREATOR", length = 20)
+    @javax.persistence.Column(name = "F_CREATOR", length = 50)
     public String getCreator() {
         return this.creator;
     }
@@ -33,7 +33,7 @@ public class RevisionDomainEntity extends SimpleDomainEntity {
     }
     
     @javax.persistence.Basic
-    @javax.persistence.Column(name = "F_LAST_MODIFIER", length = 20)
+    @javax.persistence.Column(name = "F_LAST_MODIFIER", length = 50)
     public String getLastModifier() {
         return this.lastModifier;
     }
