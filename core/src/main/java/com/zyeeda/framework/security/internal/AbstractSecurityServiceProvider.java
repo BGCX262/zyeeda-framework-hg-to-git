@@ -21,12 +21,12 @@ public abstract class AbstractSecurityServiceProvider extends AbstractService im
 
 	@Override
 	public String getCurrentUser() {
-//		Subject current = SecurityUtils.getSubject();
-//		Object principal = current.getPrincipal();
-//		if (principal == null) {
-//			throw new AuthenticationException("Subject not signed in.");
-//		}
-		return  "admin";//principal.toString();
+		Subject current = SecurityUtils.getSubject();
+		Object principal = current.getPrincipal();
+		if (principal == null) {
+			throw new AuthenticationException("Subject not signed in.");
+		}
+		return  principal.toString();
 	}
 
 }

@@ -53,7 +53,6 @@ public class MenuService extends ResourceService {
 		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
-		//Session session = SecurityUtils.getSubject().get
 		MenuAndPermission roleWithUserVo = new MenuAndPermission();
 		roleWithUserVo.setUserName(userName.getUsername());
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
