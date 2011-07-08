@@ -18,11 +18,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.zyeeda.framework.entities.Role;
+import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.managers.MenuManager;
 import com.zyeeda.framework.managers.PermissionManager;
+import com.zyeeda.framework.managers.UserManager;
+import com.zyeeda.framework.managers.UserPersistException;
 import com.zyeeda.framework.managers.internal.DefaultMenuManager;
 import com.zyeeda.framework.managers.internal.DefaultPermissionManager;
 import com.zyeeda.framework.managers.internal.DefaultRoleManager;
+import com.zyeeda.framework.managers.internal.DefaultUserManager;
 import com.zyeeda.framework.viewmodels.MenuAndPermission;
 import com.zyeeda.framework.viewmodels.MenuVo;
 import com.zyeeda.framework.viewmodels.PermissionVo;
@@ -41,14 +45,17 @@ public class MenuService extends ResourceService {
 	@GET
 	@Path("/")
 	@Produces("application/json")
-	public MenuAndPermission getMenu(@Context ServletContext ctx)throws XPathExpressionException, IOException {
+	public MenuAndPermission getMenu(@Context ServletContext ctx)throws XPathExpressionException, IOException, UserPersistException {
 		String user = this.getSecurityService().getCurrentUser();
+		UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
+		User userName = userMgr.findById(user);
 		MenuManager menuMgr = new DefaultMenuManager();
 		DefaultRoleManager roleMgr = new DefaultRoleManager(this
 				.getPersistenceService());
 		PermissionManager permissionMgr = new DefaultPermissionManager();
 		//Session session = SecurityUtils.getSubject().get
 		MenuAndPermission roleWithUserVo = new MenuAndPermission();
+		roleWithUserVo.setUserName(userName.getUsername());
 		List<MenuVo> listMenu = new ArrayList<MenuVo>();
 		List<Role> roles = new ArrayList<Role>();
 		roles = roleMgr.getRoleBySubject(user);	

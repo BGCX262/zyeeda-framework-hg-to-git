@@ -361,9 +361,7 @@ public class RoleService extends ResourceService{
 		search.addFilterEqual("name", "当班值-值长");
 		search.addFilterEqual("deptepment", subStationName);
 		List<Role> roleList = roleMgr.search(search);
-		System.out.println("this role size is :" + roleList.size());
 		for(Role role : roleList){
-			System.out.println("this role name and depet is :" + role.getDeptepment() + role.getName());
 			if(role.getName() != null && role.getDeptepment() != null && subStationName != null) {
 				if("当班值-值长".equals(role.getName()) && role.getDeptepment().equals(subStationName)){
 					for(String user : role.getSubjects()){
@@ -404,14 +402,11 @@ public class RoleService extends ResourceService{
 		Search search = new Search();
 		search.addFilterOr(Filter.and(Filter.equal("name", "当班值-值班员"), Filter.equal("deptepment", subStationName)), Filter.and(Filter.equal("deptepment", subStationName), Filter.equal("name", "当班值-值长")));
 		List<Role> roleList = roleMgr.search(search);
-		System.out.println("this role size is :" + roleList.size());
 		
 		for(Role role : roleList){
-			System.out.println("this role name and depet is :" + role.getDeptepment() + "*******" + role.getName());
 			if(role.getName() != null && role.getDeptepment() != null && subStationName != null) {
 				if(("当班值-值班员".equals(role.getName()) || "当班值-值长".equals(role.getName())) && subStationName.equals(role.getDeptepment())){
 					for(String user : role.getSubjects()) {
-						System.out.println("**************1111**********" + user);
 						UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
 						User userId = userMgr.findById(user);
 						UserVo userVo = new UserVo();

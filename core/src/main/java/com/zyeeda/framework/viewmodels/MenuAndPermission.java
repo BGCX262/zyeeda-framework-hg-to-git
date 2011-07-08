@@ -11,6 +11,16 @@ public class MenuAndPermission {
 	private List<MenuVo> listMenu = new ArrayList<MenuVo>();
 	
 	private List<PermissionVo> listPermission = new ArrayList<PermissionVo>();
+	
+	private String userName;
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	public List<MenuVo> getListMenu() {
 		return listMenu;
