@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,14 +138,16 @@ public class DefaultRoleManager extends DomainEntityManager<Role, String>
 		for(String userName:user) {
 			UserManager userMgr = new DefaultUserManager(this.getPersistenceService());
 			User userPojo = userMgr.findById(userName);
-			UserVo userVo = new UserVo();
-			userVo.setCheckName(userPojo.getUsername());
-			userVo.setLabel(userPojo.getUsername());
-			userVo.setType("node");
-			userVo.setId(userName);
-			userVo.setKind("user");
-			userVo.setLeaf(true);
-			list.add(userVo);
+			if(userPojo != null) {
+				UserVo userVo = new UserVo();
+				userVo.setCheckName(userPojo.getUsername());
+				userVo.setLabel(userPojo.getUsername());
+				userVo.setType("node");
+				userVo.setId(userName);
+				userVo.setKind("user");
+				userVo.setLeaf(true);
+				list.add(userVo);
+			}
 		}
 		return list;
 	}

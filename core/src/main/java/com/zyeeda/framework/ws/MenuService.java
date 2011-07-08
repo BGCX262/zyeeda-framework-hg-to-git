@@ -54,20 +54,24 @@ public class MenuService extends ResourceService {
 		roles = roleMgr.getRoleBySubject(user);	
 		Set<String> authList = roleMgr.getListAuth(roles);
 		Session session = SecurityUtils.getSubject().getSession();
+		//Long begin = System.currentTimeMillis();
 		for(String auth : authList) {
 			PermissionVo permission = permissionMgr.getPermissionByPath(auth, ROAM_PERMISSION_FILE);
 			if(permission != null) {
 				roleWithUserVo.getListPermission().add(permission);
 			}
 		}
+	//	Long end = System.currentTimeMillis();
+//		System.out.println("************roam**************" + (end - begin));
 		if(session.getAttribute("auth") == null){
 			session.setAttribute("auth", authList);
 		}
 //		if(ctx.getAttribute("menuListToTree") != null) {//TODO;
-//			
+//			ctx.setAttribute("menuListToTree", listMenu);
 //		}
+	    Long begin1 = System.currentTimeMillis();
 		if(roles.size() == 1) {
-			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionList());
+			logger.debug("the value of the dept subject is = {}  ", roles.get(0).getPermissionsList());
 			listMenu = menuMgr.getMenuListByPermissionAuth(roles.get(0).getPermissionsList());
 			roleWithUserVo.getListMenu().addAll(listMenu);
 			return roleWithUserVo;
@@ -77,6 +81,8 @@ public class MenuService extends ResourceService {
 		menuList.addAll(authMenuSet);
 		listMenu = menuMgr.getMenuListByPermissionAuth(menuList);
 		roleWithUserVo.getListMenu().addAll(listMenu);
+		Long end1 = System.currentTimeMillis();
+		System.out.println("************permission**************" + (end1 - begin1));
 		return roleWithUserVo;
 	}
 }

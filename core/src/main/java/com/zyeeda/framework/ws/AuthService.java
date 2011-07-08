@@ -29,8 +29,11 @@ import com.zyeeda.framework.ws.base.ResourceService;
 public class AuthService extends ResourceService {
 
 	private final static String ROAM_PERMISSION_FILE = "roamPermission.xml";
+	
 	private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+	
 	private final static String PERMISSION_FILE = "permission.xml";
+	
 	public AuthService(@Context ServletContext ctx) {
 		super(ctx);
 	}
