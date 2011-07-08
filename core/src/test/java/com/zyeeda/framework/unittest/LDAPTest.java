@@ -62,7 +62,7 @@ public class LDAPTest {
 			// Display an entry
 			SearchResult entry = (SearchResult) results.next();
 			Attributes attributes = entry.getAttributes();
-			System.out.println(new String((byte[])attributes.get("userpassword").get()));
+//			System.out.println(new String((byte[])attributes.get("userpassword").get()));
 //			System.out.println(attributes.get("userpassword").get());
 //			System.out.println(attributes);
 			// Handle the entry's response controls (if any)
@@ -183,14 +183,14 @@ public class LDAPTest {
 				deptName += StringUtils.substring(spilt[i -1], spilt[i -1].indexOf("=") + 1, spilt[i -1].length()) + "/";
 			}
 			deptName = deptName.substring(0, deptName.lastIndexOf("/"));
-		    System.out.println(rs.getAttributes().get("uid"));
-			System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
+System.out.println(rs.getAttributes().get("uid"));
+System.out.println(new String((byte[]) rs.getAttributes().get("userpassword").get()));
 			if (!rs.getNameInNamespace().startsWith("uid=admin")) {
 				mods[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-	   				   new BasicAttribute("deptName", deptName));
+	   				   new BasicAttribute("status", "true"));
 				mods[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
-		   				   new BasicAttribute("deptFullPath", 
-		   			rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")));
+		   				   new BasicAttribute("postStatus", 
+		   			"true"));
 //				mods[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, 
 //		   				   new BasicAttribute("userPassword", DigestUtils.md5Hex("111111")));
 				ctx.modifyAttributes(rs.getNameInNamespace().replaceAll(",dc=ehv,dc=csg,dc=cn", "")
@@ -200,12 +200,12 @@ public class LDAPTest {
 	}
 	
 	public static void main(String[] args) throws NamingException, IOException {
-//		System.exit(0);
-//		saveUserRefObject();
+////		System.exit(0);
+////		saveUserRefObject();
 //		ldapPageView();
-//		getAllUser();
+////		getAllUser();
 		updateUserDeptFullPath();
-//		ldapPageView();
+////		ldapPageView();
 //		save();
 	}
 

@@ -18,6 +18,7 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.Control;
 import javax.naming.ldap.LdapContext;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.realm.ldap.LdapUtils;
 
 /**
@@ -55,10 +56,9 @@ public class LdapTemplate{
 			this.ctx.bind(dn, null, attrs);
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
-		} finally {
+		}/* finally {
 			LdapUtils.closeContext(this.ctx);
-		}
-		
+		}*/
 	}
 	
 	/**
@@ -72,9 +72,9 @@ public class LdapTemplate{
 			this.ctx.rebind(dn, null, attrs);
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
-		} finally {
+		}/* finally {
 			LdapUtils.closeContext(this.ctx);
-		}
+		}*/
 	}
 	
 	public void rename(String oldName, String newName) throws NamingException {
@@ -82,9 +82,9 @@ public class LdapTemplate{
 			this.ctx.rename(oldName, newName);
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
-		} finally {
+		}/* finally {
 			LdapUtils.closeContext(this.ctx);
-		}
+		}*/
 	}
 	
 	public void modifyAttributes(String dn, Attributes attrs) throws NamingException {
@@ -132,9 +132,46 @@ public class LdapTemplate{
 			return this.ctx.getAttributes(dn);
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
-		} finally {
+		}/* finally {
 			LdapUtils.closeContext(this.ctx);
-		}
+		}*/
+	}
+	
+	public NamingEnumeration<SearchResult> getSearchResult(String name,
+	   		  											   Attributes matchingAttributes)
+	   		  										 throws NamingException {
+		NamingEnumeration<SearchResult> ne = this.ctx.search(name, matchingAttributes);
+		return ne;
+	}
+	
+	public NamingEnumeration<SearchResult> getSearchResult(String name,
+														   String filter,
+														   SearchControls cons)
+												     throws NamingException {
+		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
+		return ne;
+	}
+	
+	public NamingEnumeration<SearchResult> getSearchResult(String name,
+												           Attributes matchingAttributes,
+												           String[] attributesToReturn) 
+												     throws NamingException {
+		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
+												 			 matchingAttributes,
+												             attributesToReturn);
+		return ne;
+	}
+	
+	public NamingEnumeration<SearchResult> getSearchResult(String name,
+														   String filterExpr,
+														   Object[] filterArgs,
+														   SearchControls cons)
+												     throws NamingException {
+		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
+															 filterExpr,
+															 filterArgs,
+															 cons);
+		return ne;
 	}
 	
 	/**
@@ -146,7 +183,7 @@ public class LdapTemplate{
 	public List<Attributes> getResultList(String name,
 			      				   		  Attributes matchingAttributes)
 			      		    throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name, matchingAttributes);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name, matchingAttributes);
 		return this.searchResultToList(ne);
 	}
 	
@@ -162,7 +199,7 @@ public class LdapTemplate{
 			      					      String filter,
 			                              SearchControls cons)
 			                throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name, filter, cons);
 		return this.searchResultToList(ne);
 	}
 	
@@ -177,9 +214,9 @@ public class LdapTemplate{
 							              Attributes matchingAttributes,
 							              String[] attributesToReturn)
 							throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
-												 			 matchingAttributes,
-												             attributesToReturn);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name, 
+																  matchingAttributes,
+																  attributesToReturn);
 		return this.searchResultToList(ne);
 	}
 	
@@ -196,10 +233,10 @@ public class LdapTemplate{
 										  Object[] filterArgs,
 										  SearchControls cons)
 						    throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
-															 filterExpr,
-															 filterArgs,
-															 cons);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name,
+																  filterExpr,
+																  filterArgs, 
+																  cons);
 		return this.searchResultToList(ne);
 	}
 	
@@ -214,9 +251,9 @@ public class LdapTemplate{
             							  Attributes matchingAttributes,
             							  String[] attributesToReturn)
 								   throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
-															 matchingAttributes,
-															 attributesToReturn);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name,
+																  matchingAttributes,
+																  attributesToReturn);
 		return this.searchResultToQueryResult(ne);
 	}
 	
@@ -229,7 +266,8 @@ public class LdapTemplate{
 	public QueryResult<Attributes> search(String name,
             						      Attributes matchingAttributes)
      						       throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name, matchingAttributes);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name,
+																  matchingAttributes);
 		return this.searchResultToQueryResult(ne);
 	}
 	
@@ -244,7 +282,9 @@ public class LdapTemplate{
             						      String filter,
             						      SearchControls cons)
      						       throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name, filter, cons);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name, 
+																  filter, 
+																  cons);
 		return this.searchResultToQueryResult(ne);
 	}
 	
@@ -261,10 +301,10 @@ public class LdapTemplate{
 										  Object[] filterArgs,
 										  SearchControls cons)
 								   throws NamingException {
-		NamingEnumeration<SearchResult> ne = this.ctx.search(name,
-															 filterExpr,
-															 filterArgs,
-															 cons);
+		NamingEnumeration<SearchResult> ne = this.getSearchResult(name,
+																  filterExpr,
+																  filterArgs,
+																  cons);
 		return this.searchResultToQueryResult(ne);
 	}
 	
@@ -329,4 +369,28 @@ public class LdapTemplate{
 		}
 		entry.unbind("");
 	}
+	
+	public void closeLdapContext() {
+		LdapUtils.closeContext(this.ctx);
+	}
+	
+	public static String spiltNameInNamespace(String nameInNamespace) {
+		String deptName = "";
+		if (nameInNamespace.startsWith("uid")) {
+			nameInNamespace = nameInNamespace.substring(nameInNamespace.indexOf(",") + 1,
+                    nameInNamespace.length());
+		}
+		String[] spilt = StringUtils.split(nameInNamespace, ",");
+		for (int i = spilt.length ; i > 0; i --) {
+			deptName += StringUtils.substring(spilt[i -1],
+											  spilt[i -1].indexOf("=") + 1,
+											  spilt[i -1].length()) + "/";
+		}
+		if (deptName.lastIndexOf("/") != -1) {
+			deptName = deptName.substring(0, deptName.lastIndexOf("/"));
+		}
+		
+		return deptName;
+	}
+	
 }

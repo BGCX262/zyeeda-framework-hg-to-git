@@ -6,7 +6,6 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -24,6 +23,8 @@ import com.zyeeda.framework.persistence.PersistenceService;
 public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOImpl<T, ID> {
 
 	private PersistenceService persistenceSvc;
+	protected Class<T> entityClass = (Class<T>) ((ParameterizedType) this
+			.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 	
 	public DomainEntityManager(PersistenceService persistenceSvc) {
 		this.persistenceSvc = persistenceSvc;
@@ -40,10 +41,8 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 	protected PersistenceService getPersistenceService() {
 		return this.persistenceSvc;
 	}
-	
-	protected Class<T> entityClass = (Class<T>) ((ParameterizedType) this
-			.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
+	@Deprecated
 	protected static void setQueryParams(Query query, Object[] queryParams) {
 		if (queryParams != null && queryParams.length > 0) {
 			for (int i = 0; i < queryParams.length; i++) {
@@ -58,6 +57,7 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 	 * @param clazz 实体类
 	 * @return
 	 */
+	@Deprecated
 	protected static <E> String getEntityName(Class<E> clazz){
 		String entityname = clazz.getSimpleName();
 		Entity entity = clazz.getAnnotation(Entity.class);
@@ -73,6 +73,7 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 	 * @param orderby
 	 * @return
 	 */
+	@Deprecated
 	protected static String buildOrderBy(LinkedHashMap<String, Object> orderby) {
 		StringBuffer orderbyql = new StringBuffer("");
 		if (orderby != null && orderby.size() > 0) {
@@ -87,6 +88,7 @@ public class DomainEntityManager<T, ID extends Serializable> extends GenericDAOI
 		return orderbyql.toString();
 	}
 
+	@Deprecated
 	protected static <E> String getCountField(Class<E> clazz) {
 		String out = "o";
 		try {

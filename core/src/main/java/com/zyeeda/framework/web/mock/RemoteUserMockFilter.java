@@ -36,8 +36,6 @@ import com.zyeeda.framework.jpassport.JPassportHttpServletRequest;
  */
 public class RemoteUserMockFilter implements Filter {
 
-	private static final long serialVersionUID = -4188351109178565968L;
-	
 	@Override
 	public void destroy() {
 	}

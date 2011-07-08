@@ -228,10 +228,10 @@ public class DepartmentService extends ResourceService {
 		deptVo.setLabel(dept.getName());
 		deptVo.setCheckName(dept.getId());
 		deptVo.setLeaf(false);
-		if (StringUtils.isBlank(dept.getParent())) {
+		if (StringUtils.isBlank(dept.getDeptFullPath())) {
 			deptVo.setDeptFullPath("o=" + dept.getId());
 		} else {
-			deptVo.setDeptFullPath("ou=" + dept.getId() + "," + dept.getParent());
+			deptVo.setDeptFullPath(dept.getDeptFullPath());
 		}
 		if (StringUtils.isBlank(deptVo.getDeptFullPath())) {
 			deptVo.setIo("/rest/depts/root/children");

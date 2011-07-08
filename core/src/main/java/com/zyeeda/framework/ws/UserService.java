@@ -3,7 +3,6 @@ package com.zyeeda.framework.ws;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,6 +46,7 @@ import com.zyeeda.framework.entities.User;
 import com.zyeeda.framework.entities.Department;
 import com.zyeeda.framework.helpers.AccountHelper;
 import com.zyeeda.framework.ldap.LdapService;
+import com.zyeeda.framework.ldap.LdapTemplate;
 import com.zyeeda.framework.ldap.SearchControlsFactory;
 import com.zyeeda.framework.managers.AccountManager;
 import com.zyeeda.framework.managers.DepartmentManager;
@@ -57,7 +57,6 @@ import com.zyeeda.framework.managers.internal.LdapDepartmentManager;
 import com.zyeeda.framework.managers.internal.LdapUserManager;
 import com.zyeeda.framework.managers.internal.SystemAccountManager;
 import com.zyeeda.framework.sync.UserSyncService;
-import com.zyeeda.framework.utils.LdapEncryptUtils;
 import com.zyeeda.framework.viewmodels.AccountVo;
 import com.zyeeda.framework.viewmodels.UserVo;
 import com.zyeeda.framework.ws.base.ResourceService;
@@ -73,6 +72,19 @@ public class UserService extends ResourceService {
 	
 	private static String createUserDn(String parent, String id) {
 		return "uid=" + id + "," + parent;
+	}
+	
+	public String getChNameById(String id) throws UserPersistException {
+		LdapService ldapSvc = this.getLdapService();
+		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
+		SearchControls sc = SearchControlsFactory.getSearchControls(
+										SearchControls.SUBTREE_SCOPE);
+		List<User> userList = userMgr.findByName(id, sc);
+		if (userList != null && userList.size() > 0) {
+			return userList.get(0).getUsername();
+		} else {
+			return "";
+		}
 	}
 	
 	@POST
@@ -158,8 +170,10 @@ public class UserService extends ResourceService {
 	public User findById(@PathParam("id") String id) throws UserPersistException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-		
-		return userMgr.findById(id);
+		User user = userMgr.findById(id);
+		user.setDepartmentName(LdapTemplate.spiltNameInNamespace(id));
+		user.setDeptFullPath(id);
+		return user;
 	}
 	
 	@GET
@@ -212,18 +226,6 @@ public class UserService extends ResourceService {
 		return UserService.fillUserListPropertiesToVo(userMgr.findByDepartmentId(deptId));
 	}
 	
-//	@GET
-//	@Path("/syn_all_user")
-//	@Produces("application/json")
-//	public List<User> getAllUser() {
-//		LdapService ldapSvc = this.getLdapService();
-//		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
-//		List<User> users = null;
-//		
-//		return null;
-//	}
-//	
-	
 	@PUT
 	@Path("/{id}/update_password")
 	@Produces("application/json")
@@ -231,19 +233,16 @@ public class UserService extends ResourceService {
 							   @FormParam("oldPassword") String oldPassword,
 							   @FormParam("newPassword") String newPassword)
 						  throws UserPersistException,
-						  		 UnsupportedEncodingException,
-						  		 NoSuchAlgorithmException {
+						  		 NoSuchAlgorithmException, NamingException, IOException {
 		LdapService ldapSvc = this.getLdapService();
 		LdapUserManager userMgr = new LdapUserManager(ldapSvc);
 		
 		User u = userMgr.findById(id);
-		String ldapPw = u.getPassword();
 		String inputPw = oldPassword;
-		if (LdapEncryptUtils.verifySHA(ldapPw, inputPw)) {
-			if (!LdapEncryptUtils.verifySHA(ldapPw, newPassword)) {
-				userMgr.updatePassword(id, newPassword);
-			}
-		} else {
+		try {
+			ldapSvc.getLdapContext(u.getId(), inputPw);
+			userMgr.updatePassword(id, newPassword);
+		} catch (Exception e) {
 			throw new RuntimeException("旧密码输入错误");
 		}
 		return userMgr.findById(id);
@@ -381,18 +380,6 @@ public class UserService extends ResourceService {
 		}
 		return userVoList;
 	}
-	
-//	@POST
-//	@Path("/{id}")
-//	@Produces("application/json")
-//	public Account updateAccount(@FormParam("") Account objAccount, @PathParam("id") String fullPath){
-//		if(objAccount == null){
-//			throw new RuntimeException("用户名或密码不能为空");
-//		}else{
-//			objAccount.setUserFullPath(fullPath);
-//		}
-//		return objAccount;
-//	}	
 	
 	/**
 	 * 配置系统信息
