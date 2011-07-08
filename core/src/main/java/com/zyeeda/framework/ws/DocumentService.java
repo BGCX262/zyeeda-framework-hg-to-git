@@ -57,7 +57,7 @@ public class DocumentService extends ResourceService {
 	@Path("/")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@Produces("text/json")
-	public DocumentVo upload(MultipartBody body, @QueryParam("foreignId") String foreignId, @Context UriInfo ui) throws DocumentException {
+	public DocumentVo upload(MultipartBody body, @QueryParam("foreignId") String foreignId) throws DocumentException {
 		
 		logger.debug("foreign id = {}", foreignId);
 
