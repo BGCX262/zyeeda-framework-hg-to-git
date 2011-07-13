@@ -5,9 +5,8 @@ import java.util.Hashtable;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.transaction.TransactionSynchronizationRegistry;
-import javax.transaction.UserTransaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.annotations.Marker;
 import org.apache.tapestry5.ioc.annotations.Primary;
@@ -56,6 +55,7 @@ public class DefaultTransactionServiceProvider extends AbstractService implement
 		}
 	}
 
+	/*
 	@SuppressWarnings("rawtypes")
 	@Override
 	public TransactionSynchronizationRegistry getTransactionSynchronizationRegistry()
@@ -71,5 +71,6 @@ public class DefaultTransactionServiceProvider extends AbstractService implement
 			throw new TransactionServiceException(e);
 		}
 	}
+	*/
 
 }

@@ -7,7 +7,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
-import javax.transaction.TransactionSynchronizationRegistry;
 import javax.transaction.UserTransaction;
 
 import org.apache.tapestry5.ioc.annotations.Marker;
@@ -16,13 +15,13 @@ import org.apache.tapestry5.ioc.services.RegistryShutdownHub;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import bitronix.tm.Configuration;
+import bitronix.tm.TransactionManagerServices;
+
 import com.zyeeda.framework.service.AbstractService;
 import com.zyeeda.framework.transaction.TransactionService;
 import com.zyeeda.framework.transaction.TransactionServiceException;
 import com.zyeeda.framework.transaction.annotations.BTM;
-
-import bitronix.tm.Configuration;
-import bitronix.tm.TransactionManagerServices;
 
 @Marker(BTM.class)
 @ServiceId("bitronix-transaction-service")
@@ -74,10 +73,12 @@ public class BitronixTransactionServiceProvider extends AbstractService implemen
 		return TransactionManagerServices.getTransactionManager();
 	}
 
+	/*
 	@Override
 	public TransactionSynchronizationRegistry getTransactionSynchronizationRegistry()
 			throws TransactionServiceException {
 		return TransactionManagerServices.getTransactionSynchronizationRegistry();
 	}
+	*/
 	
 }

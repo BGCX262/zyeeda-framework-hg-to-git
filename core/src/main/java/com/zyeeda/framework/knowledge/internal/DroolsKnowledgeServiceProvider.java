@@ -171,7 +171,7 @@ public class DroolsKnowledgeServiceProvider extends AbstractService implements K
 			env.set(EnvironmentName.APP_SCOPED_ENTITY_MANAGER, this.defaultPersistenceSvc.getCurrentSession());
 			env.set(EnvironmentName.TRANSACTION_MANAGER, this.txSvc.getTransactionManager());
 			env.set(EnvironmentName.TRANSACTION, this.txSvc.getTransaction());
-			env.set(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, this.txSvc.getTransactionSynchronizationRegistry());
+			//env.set(EnvironmentName.TRANSACTION_SYNCHRONIZATION_REGISTRY, this.txSvc.getTransactionSynchronizationRegistry());
 			
 			if (command.getSessionId() > 0) {
 				ksession = JPAKnowledgeService.loadStatefulKnowledgeSession(
