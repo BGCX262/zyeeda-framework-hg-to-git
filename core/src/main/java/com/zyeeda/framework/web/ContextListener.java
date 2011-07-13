@@ -73,8 +73,10 @@ public class ContextListener implements ServletContextListener {
     	try {
 	    	ServletContext context = event.getServletContext();
 	    	Registry registry = (Registry) context.getAttribute(FrameworkConstants.SERVICE_REGISTRY);
-	    	registry.shutdown();
-	    	context.removeAttribute(FrameworkConstants.SERVICE_REGISTRY);
+	    	if (registry != null) {
+		    	registry.shutdown();
+		    	context.removeAttribute(FrameworkConstants.SERVICE_REGISTRY);
+	    	}
     	} catch (Throwable t) {
     		logger.error("destroy context failed.", t);
     		System.exit(1);
