@@ -545,27 +545,6 @@
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>org.datanucleus</groupId>
-                <artifactId>maven-datanucleus-plugin</artifactId>
-                <version>3.0.0-m1</version>
-                <configuration>
-                    <fork>false</fork>
-                    <verbose>true</verbose>
-                    <api>JDO</api>
-                    <metadataIncludes>com/zyeeda/framework/entities/**/*.class</metadataIncludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>enhance</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 </project>
